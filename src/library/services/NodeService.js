@@ -273,6 +273,10 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
   // TODO: add sets
 
+  NodeObj.prototype.getCollectionPaths = function (name) {
+    return this.databaseConnection.client.getNode( this.id ).getCollectionPaths( name );
+  };
+
   NodeObj.prototype.getBaseNode = function () {
     // TODO: add proper error handling
     return self.loadNode( this.context, this.getBaseId() );
