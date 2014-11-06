@@ -150,6 +150,21 @@ module.exports = function ( $q, dataStoreService, branchService ) {
   };
 
   /**
+   * Updates the attribute of the given node
+   * @param {object} context - Where to create the node.
+   * @param {string} context.db - Database where the node will be created.
+   * @param {string} id - Path to node to update.
+   * @param {string} name - Name of Attribute.
+   * @param {string} value - New value for Attribute.
+   * @param {string} [msg] - optional commit message.
+   * @returns {string} - id (path) of new node.
+   */
+  this.setAttributes = function ( context, id, name, value, msg ) {
+    var dbConn = dataStoreService.getDatabaseConnection( context.db );
+    return dbConn.client.setAttributes (id, name, value, msg);
+  };
+
+  /**
    * Removes the node from the data-base connection.
    * @param {object} context - From where to delete the node.
    * @param {string} context.db - Database from where the node will be deleted.
