@@ -282,8 +282,14 @@ module.exports = function ( $q, dataStoreService, branchService ) {
       .getPointer( name );
   };
 
-  NodeObj.prototype.setPointer = function ( /*name, nodeOrId, msg*/) {
-
+  /**
+   * Sets pointer named pointer from this node to given node.
+   * @param {string} name - name of pointer, e.g. 'src', 'dst'.
+   * @param {string} toId - id of node to point to
+   * @param {string} [msg] - optional commit message.
+   */
+  NodeObj.prototype.makePointer = function (name, toId, msg ) {
+      this.databaseConnection.client.makePointer( this.id, name, toId, msg );
   };
 
   // TODO: add sets
