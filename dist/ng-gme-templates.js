@@ -1,0 +1,1 @@
+angular.module("gme.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/ng-gme/templates/projectBrowser.html","");}]);
