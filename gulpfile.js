@@ -34,14 +34,14 @@ sourcePaths = {
 
   libraryModuleScript: './src/library/ng-gme.js',
   libraryScripts: [
-
-    'src/library/services/*.js'
+    'src/library/**/*.js'
   ],
   libraryTemplates: [
     'src/**/templates/**/*.html'
   ],
   libraryStyles: [
-    'src/library/*/styles/*.scss'
+    'src/library/*/styles/*.scss',
+    'src/library/*/*/styles/*.scss'
   ],
   libraryImages: [
     'src/**/*.png',
@@ -304,7 +304,7 @@ gulp.task( 'refresh-server', function () {
 } );
 
 
-gulp.task( 'register-watchers', function ( cb ) {
+gulp.task( 'register-watchers', [ 'compile-all' ], function ( cb ) {
   gulp.watch( sourcePaths.index, [ 'compile-index', 'refresh-server' ] );
 
   gulp.watch( sourcePaths.docsSourceIndex, [ 'compile-docs', 'refresh-server' ] );

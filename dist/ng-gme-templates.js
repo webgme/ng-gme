@@ -1,1 +1,1 @@
-angular.module("gme.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/ng-gme/templates/projectBrowser.html","");}]);
+angular.module("gme.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/ng-gme/templates/projectBrowser.html","<div class=\"project-browser\">\n    Project browser comes here\n    <item-list list-data=\"{}\" config=\"{}\" class=\"col-md-12\"></item-list>\n</div>");}]);

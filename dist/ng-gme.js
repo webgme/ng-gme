@@ -2,7 +2,38 @@
 'use strict';
 
 require( './services/gmeServices.js' );
-},{"./services/gmeServices.js":6}],2:[function(require,module,exports){
+require( './directives/gmeDirectives.js' );
+},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":8}],2:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+require('./projectBrowser/projectBrowser.js');
+
+angular.module('gme.directives',
+[
+  'gme.templates',
+  'gme.directives.projectBrowser'
+]);
+},{"./projectBrowser/projectBrowser.js":3}],3:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+angular.module('gme.directives.projectBrowser', [
+  'gme.templates'
+])
+.run(function(){
+
+})
+.directive('projectBrowser', function(){
+
+  return {
+    scope: false,
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/ng-gme/templates/projectBrowser.html'
+  };
+});
+},{}],4:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -155,7 +186,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     // TODO: register for branch change event OR BranchService onInitialize
   };
 };
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
@@ -214,7 +245,7 @@ module.exports = function ( $q ) {
 
   // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
@@ -736,7 +767,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     }
   };
 };
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
@@ -886,7 +917,7 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
@@ -901,4 +932,4 @@ angular.module( 'gme.services', [] )
   .service( 'projectService', ProjectServiceClass )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
-},{"./BranchService.js":2,"./DataStoreService.js":3,"./NodeService.js":4,"./ProjectService.js":5}]},{},[1]);
+},{"./BranchService.js":4,"./DataStoreService.js":5,"./NodeService.js":6,"./ProjectService.js":7}]},{},[1]);

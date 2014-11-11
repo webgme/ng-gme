@@ -6,9 +6,7 @@
     "url": "https://github.com/webgme/ng-gme"
   },
   "license": "MIT",
-  "dependencies": {
-    
-  },
+  "dependencies": {},
   "devDependencies": {
     "angular-markdown-directive": "^0.3.0",
     "angular-sanitize": "0.0.1",
@@ -17,6 +15,7 @@
     "browserify-shim": "^3.7.0",
     "chai": ">=1.9.0",
     "code-mirror": "~3.22.0",
+    "codemirror": "^4.7.0",
     "connect-livereload": "^0.4.0",
     "cssify": "~0.6.0",
     "express": "^4.8.6",
@@ -46,9 +45,10 @@
   },
   "browser": {
     "showdown": "./vendor/showdown_for_browserify.js",
-    "codemirrorCSS": "./bower_components/codemirror/lib/codemirror.css",
+    "codemirror-css": "./bower_components/codemirror/lib/codemirror.css",
     "angular-ui-codemirror": "./bower_components/angular-ui-codemirror/ui-codemirror.js",
-    "chance": "./bower_components/chance/chance.js"
+    "chance": "./bower_components/chance/chance.js",
+    "ui-utils": "./bower_components/angular-ui-utils/ui-utils.js"
   },
   "browserify-shim": {
     "showdown": "Showdown"
@@ -57,6 +57,5 @@
     "node": ">=0.10.0"
   },
   "config": {},
-  "scripts": {
-  }
+  "scripts": {}
 }
