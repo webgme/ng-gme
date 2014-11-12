@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="gme.demoApp">
+<html>
 <head>
     <title>ISIS UI Components Documentation</title>
 
@@ -53,6 +53,9 @@
 </div>
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+
+<script src="../../node_modules/webgme/dist/webgme.classes.build.js"></script>
+
 <script src="../../bower_components/angular/angular.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script>
@@ -65,6 +68,48 @@
 
 <script src="ng-gme-docs.js"></script>
 <script src="ng-gme-doc-templates.js"></script>
+
+<script type="text/javascript">
+    var clientLoaded,
+            timeout = 5000, // 10 seconds
+            waitCounter = 0,
+            i,
+            success,
+            usedClasses = ['Client'],
+            interval = 200, // 100 milliseconds interval
+            waitForLoadId = setInterval(function () {
+                if (window.WebGMEGlobal &&
+                    window.WebGMEGlobal.classes) {
+                    // TODO: check for all classes that we use
+                    clearInterval(waitForLoadId);
+                    success = true;
+                    for (i = 0; i < usedClasses.length; i += 1) {
+                        if (window.WebGMEGlobal.classes.hasOwnProperty(usedClasses[i])) {
+                            console.log('WebGME ' + usedClasses[i] + ' is available.');
+                        } else {
+                            console.error('WebGME ' + usedClasses[i] + ' was not found.');
+                            success = false;
+                        }
+                    }
+                    if (success) {
+                        console.log('WebGME client library is ready to use.');
+                        clientLoaded();
+                    }
+                } else {
+                    console.log('Waiting for WebGME client library to load.');
+                    waitCounter += 1;
+                    if (waitCounter >= timeout / interval) {
+                        clearInterval(waitForLoadId);
+                        console.error('WebGME client library was not loaded within a reasonable time. (' + (timeout / 1000) + ' s)');
+                    }
+                }
+            }, interval);
+    clientLoaded = function () {
+        // main entry point of the app.js
+        // once the webgme Client is loaded and ready we can use it.
+        angular.bootstrap(document, ['gme.demoApp']);
+    };
+</script>
 
 </body>
 </html>
