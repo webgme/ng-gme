@@ -771,7 +771,28 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
-  this.getProjects = function ( databaseId ) {
+
+  this.getProjects = function( databaseId ) {
+
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+      deferred = new $q.defer();
+
+    dbConn.projectService = dbConn.projectService || {};
+
+    dbConn.client.getFullProjectsInfoAsync( function ( err, projects ) {
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      }
+
+      deferred.resolve( projects );
+    } );
+
+    return deferred.promise;
+
+  };
+
+  this.getProjectsIds = function ( databaseId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
       deferred = new $q.defer();
 
@@ -795,7 +816,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     dbConn.projectService = dbConn.projectService || {};
 
-    this.getProjects( databaseId )
+    this.getProjectsIds( databaseId )
       .then( function ( projectIds ) {
         if ( projectIds.indexOf( projectId ) > -1 ) {
           dbConn.client.selectProjectAsync( projectId, function ( err ) {
