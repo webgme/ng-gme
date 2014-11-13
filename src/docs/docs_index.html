@@ -26,14 +26,16 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6 show-grid" ng-include="component.template">
+            <div class="col-md-12 show-grid" ng-include="component.template">
 
-            </div>
-            <div btf-markdown class="col-md-6" ng-include="component.docs">
             </div>
         </div>
             <div class="row">
                 <tabset class="col-md-12" ng-if="component.sources">
+                    <tab heading="Documentation">
+                        <div class="docs-container" btf-markdown ng-include="component.docs">
+                        </div>
+                    </tab>
                     <tab ng-repeat="sourceFile in component.sources"
                          heading="{{sourceFile.fileName}}"
                          select="selectedSourceFile=sourceFile">
