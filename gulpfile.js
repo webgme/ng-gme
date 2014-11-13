@@ -14,6 +14,19 @@ libraryTemplatesModule = 'gme.templates',
 
 docTemplatesModule = 'gme.docs.templates',
 
+docLibs = [
+  'bower_components/isis-ui-components/dist/isis-ui-components.css',
+  'bower_components/isis-ui-components/dist/isis-ui-components.js',
+  'bower_components/isis-ui-components/dist/isis-ui-components-templates.js',
+  'bower_components/angular/angular.min.js',
+  'bower_components/angular/angular.min.js.map',
+  'dist/ng-gme.css',
+  'dist/ng-gme.js',
+  'dist/ng-gme-templates.js',
+  'node_modules/webgme/dist/webgme.classes.build.js',
+  'node_modules/angular-sanitize/angular-sanitize.min.js'
+],
+
 sourcePaths = {
 
   docsSourceIndex: 'src/docs/docs_index.html',
@@ -155,9 +168,13 @@ function () {
   console.log( 'Compiling docs...' );
 
   gulp.src( sourcePaths.docsSourceIndex )
-  .pipe( rename( libraryName + '-docs.html' ) )
+  .pipe( rename( 'index.html' ) )
   .pipe( gulp.dest( buildPaths.docsRoot ) );
-
+  gulp.src(docLibs)
+  .pipe( rename( function ( path ) {
+    path.dirname = 'libs';
+  } ) )
+  .pipe( gulp.dest( buildPaths.docsRoot ) );
 } );
 
 
@@ -245,7 +262,7 @@ function () {
 
 gulp.task( 'compile-all', function ( cb ) {
   runSequence( 'clean-build', [
-    'compile-docs', 'compile-library'
+    'compile-library','compile-docs',
   ], cb );
 } );
 
