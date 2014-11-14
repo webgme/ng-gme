@@ -53,6 +53,7 @@ sourcePaths = {
     'src/**/templates/**/*.html'
   ],
   libraryStyles: [
+    'src/library/styles/*.scss',
     'src/library/*/styles/*.scss',
     'src/library/*/*/styles/*.scss'
   ],
@@ -170,6 +171,7 @@ function () {
   gulp.src( sourcePaths.docsSourceIndex )
   .pipe( rename( 'index.html' ) )
   .pipe( gulp.dest( buildPaths.docsRoot ) );
+
   gulp.src(docLibs)
   .pipe( rename( function ( path ) {
     path.dirname = 'libs';
@@ -331,9 +333,9 @@ gulp.task( 'register-watchers', [ 'compile-all' ], function ( cb ) {
   gulp.watch( sourcePaths.docsStyles, [ 'compile-docs-styles', 'refresh-server' ] );
 
   gulp.watch( sourcePaths.libraryModuleScript, [ 'compile-library', 'refresh-server' ] );
-  gulp.watch( sourcePaths.libraryScripts, [ 'compile-library', 'refresh-server' ] );
-  gulp.watch( sourcePaths.libraryTemplates, [ 'compile-library-templates', 'refresh-server' ] );
-  gulp.watch( sourcePaths.libraryStyles, [ 'compile-library-styles', 'refresh-server' ] );
+  gulp.watch( sourcePaths.libraryScripts, [ 'compile-library', 'compile-docs', 'refresh-server' ] );
+  gulp.watch( sourcePaths.libraryTemplates, [ 'compile-library-templates', 'compile-docs', 'refresh-server' ] );
+  gulp.watch( sourcePaths.libraryStyles, [ 'compile-library-styles', 'compile-docs', 'refresh-server' ] );
   gulp.watch( sourcePaths.libraryImages, [ 'compile-library-images', 'refresh-server' ] );
 
   return cb;
