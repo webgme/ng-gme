@@ -12301,8 +12301,6 @@ angular.module( 'gme.directives.projectService', [
                     }
                     console.log($scope.projects);
                   });
-
-
                 return null;
             });
 })
