@@ -11,7 +11,8 @@ angular.module(
     'isis.ui.itemList.newItem',
     'isis.ui.itemList.filter',
     'isis.ui.itemList.itemGroup',
-    'isis.ui.contextmenu'
+    'isis.ui.contextmenu',
+    'isis.ui.taxonomyTerms'
   ]
 )
   .controller(
@@ -47,7 +48,7 @@ angular.module(
 
       $scope.itemMenuConfig = {
         triggerEvent: 'click',
-        position: 'right bottom'
+        position: 'left bottom'
       };
 
       $scope.config = $scope.config || {};

@@ -1,6 +1,8 @@
 This is a collection of Angular ui-components originally developed for WebGME.
 
-## Intsall
+## [Preview and Documentation](http://vu-isis.github.io/isis-ui-components/dist/docs/isis-ui-components-docs.html)
+
+## Install
 
 ```
 bower install isis-ui-components
@@ -26,6 +28,8 @@ Include library CSS:
 - Angular (1.3.2)
 - jQuery UI (1.11.1)
 - Angular-ui-bootstrap (0.10.0)
+- Angular-ui-utils
+- Ng-grid
 
 
 ## Development
@@ -39,6 +43,3 @@ Key gulp tasks:
 By default gulp runs in debug mode and generates source maps.
 
 Use gulp with the `--production` flag to not to run in debug mode.
-
-## [Preview and Documentation](http://vu-isis.github.io/isis-ui-components/dist/docs/isis-ui-components-docs.html)
-
