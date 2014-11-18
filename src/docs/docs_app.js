@@ -5,11 +5,17 @@ var components = [
   {
     name: 'projectBrowser',
     sources: [ 'demo.html', 'demo.js']
+  },
+  {
+    name: 'projectService',
+    sources: [ 'demo.html', 'demo.js' ]
   }
 ];
 
 require( '../library/ng-gme.js' );
 require( '../library/directives/projectBrowser/docs/demo.js' );
+require( '../library/directives/projectService/docs/demo.js' );
+
 
 require( 'angular-sanitize' );
 window.Showdown = require( 'showdown' );
@@ -33,7 +39,7 @@ var demoApp = angular.module(
   'gme.docs.templates',
   'btford.markdown',
   'ui.codemirror',
-  'ui.bootstrap'
+  'ui.bootstrap',
 ].concat( components.map( function ( e ) {
   return 'gme.' + e.name + '.demo';
 } ) )
@@ -41,6 +47,7 @@ var demoApp = angular.module(
 
 demoApp.run( function () {
   console.log( 'DemoApp run...' );
+
 } );
 
 demoApp.controller(
@@ -91,3 +98,6 @@ function ( $scope, $templateCache ) {
   } );
 
 } );
+
+
+demoApp.controller('');

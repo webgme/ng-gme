@@ -1,0 +1,10 @@
+<div>
+  <ul>
+    <li ng-repeat='project in projects'><b>Project Name (and Id):</b> {{ project.visibleName }} ({{ project.visibleName }})
+      <ul>
+        <li>Description: {{ project.description }}</li>
+        <li>Tags: <span ng-repeat='tag in project.tags'>{{ tag }}; </span></li>
+      </ul>
+    </li>
+  </ul>
+</div>
