@@ -1,9 +1,14 @@
 /*globals angular*/
 'use strict';
 
+require( '../tagFilter/tagFilter.js' );
+require( '../../filters/taxonomyFilter.js' );
+
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
-  'isis.ui.itemList'
+  'isis.ui.itemList',
+  'gme.directives.tagFilter',
+  'gme.filters.taxonomyFilter'
 ] )
 .run( function () {
 
@@ -14,6 +19,39 @@ angular.module( 'gme.directives.projectBrowser', [
   projectList,
   dummyProjectGenerator,
   i;
+
+  $scope.availableTerms = [
+    {
+      id: 'tag1',
+      name: 'Tag A',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag2',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag3',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    }
+
+  ];
+
+  $scope.selectedTerms = [
+    {
+      id: 'tag1',
+      name: 'Tag A',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag3',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    }
+
+  ];
 
   $scope.projectList = projectList = {
     items: []
@@ -32,6 +70,18 @@ angular.module( 'gme.directives.projectBrowser', [
         user: 'N/A'
 
       },
+      taxonomyTerms: [
+        {
+          id: 'tag1',
+          name: 'Tag A',
+          url: 'http://vanderbilt.edu'
+        },
+        {
+          id: 'tag2',
+          name: 'Tag B',
+          url: 'http://vanderbilt.edu'
+        }
+      ],
       stats: [
         {
           value: id,
@@ -54,7 +104,7 @@ angular.module( 'gme.directives.projectBrowser', [
     $scope.projectList.items.push( dummyProjectGenerator( i ) );
   }
 
-  $log.debug($scope.projectList.items);
+  $log.debug( $scope.projectList.items );
 
   $scope.config = config = {
 

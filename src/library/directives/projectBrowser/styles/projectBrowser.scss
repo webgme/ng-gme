@@ -1,5 +1,10 @@
 .project-browser {
 
+  .list-group-wrapper {
+    max-height: 580px;
+    overflow: auto;
+  }
+
   .create-new-item {
 
   .panel-group > .panel {

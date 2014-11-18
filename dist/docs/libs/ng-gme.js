@@ -3,7 +3,7 @@
 
 require( './services/gmeServices.js' );
 require( './directives/gmeDirectives.js' );
-},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":9}],2:[function(require,module,exports){
+},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":11}],2:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -21,9 +21,14 @@ angular.module('gme.directives',
 /*globals angular*/
 'use strict';
 
+require( '../tagFilter/tagFilter.js' );
+require( '../../filters/taxonomyFilter.js' );
+
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
-  'isis.ui.itemList'
+  'isis.ui.itemList',
+  'gme.directives.tagFilter',
+  'gme.filters.taxonomyFilter'
 ] )
 .run( function () {
 
@@ -34,6 +39,39 @@ angular.module( 'gme.directives.projectBrowser', [
   projectList,
   dummyProjectGenerator,
   i;
+
+  $scope.availableTerms = [
+    {
+      id: 'tag1',
+      name: 'Tag A',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag2',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag3',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    }
+
+  ];
+
+  $scope.selectedTerms = [
+    {
+      id: 'tag1',
+      name: 'Tag A',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag3',
+      name: 'Tag B',
+      url: 'http://vanderbilt.edu'
+    }
+
+  ];
 
   $scope.projectList = projectList = {
     items: []
@@ -52,6 +90,18 @@ angular.module( 'gme.directives.projectBrowser', [
         user: 'N/A'
 
       },
+      taxonomyTerms: [
+        {
+          id: 'tag1',
+          name: 'Tag A',
+          url: 'http://vanderbilt.edu'
+        },
+        {
+          id: 'tag2',
+          name: 'Tag B',
+          url: 'http://vanderbilt.edu'
+        }
+      ],
       stats: [
         {
           value: id,
@@ -74,7 +124,7 @@ angular.module( 'gme.directives.projectBrowser', [
     $scope.projectList.items.push( dummyProjectGenerator( i ) );
   }
 
-  $log.debug($scope.projectList.items);
+  $log.debug( $scope.projectList.items );
 
   $scope.config = config = {
 
@@ -150,7 +200,7 @@ angular.module( 'gme.directives.projectBrowser', [
     templateUrl: '/ng-gme/templates/projectBrowser.html'
   };
 } );
-},{}],4:[function(require,module,exports){
+},{"../../filters/taxonomyFilter.js":6,"../tagFilter/tagFilter.js":5}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -164,22 +214,22 @@ angular.module( 'gme.directives.projectService', [
 } )
 .controller( 'ProjectServiceController', function ( $scope, $log, dataStoreService, projectService ) {
   $scope.projects = [];
-  dataStoreService.connectToDatabase('multi', {host: window.location.basename})
-            .then(function () {
-                //console.log('Connected ...');
-                //return projectService.selectProject('my-db-connection-id', 'ADMEditor');
-                projectService.getProjects('multi')
-                  .then(function(result){
-                    $scope.projects = Object.keys(result);
-                    for (var i = $scope.projects.length-1; i >= 0; i--) {
-                      result[$scope.projects[i]].info.id=$scope.projects[i];
-                      $scope.projects[i] = result[$scope.projects[i]].info;
-                    }
-                    console.log($scope.projects);
-                  });
-                return null;
-            });
-})
+  dataStoreService.connectToDatabase( 'multi', {host: window.location.basename} )
+  .then( function () {
+    //console.log('Connected ...');
+    //return projectService.selectProject('my-db-connection-id', 'ADMEditor');
+    projectService.getProjects( 'multi' )
+    .then( function ( result ) {
+      $scope.projects = Object.keys( result );
+      for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
+        result[$scope.projects[i]].info.id = $scope.projects[i];
+        $scope.projects[i] = result[$scope.projects[i]].info;
+      }
+      console.log( $scope.projects );
+    } );
+    return null;
+  } );
+} )
 .directive( 'projectService', function () {
   return {
     scope: false,
@@ -191,6 +241,75 @@ angular.module( 'gme.directives.projectService', [
 } );
 
 },{}],5:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+angular.module(
+'gme.directives.tagFilter', [
+  'isis.ui.taxonomyTerm'
+]
+
+)
+.controller( 'TagFilterController', function ( $scope ) {
+
+  $scope.tagClick = function(tag) {
+
+  };
+
+} )
+.directive(
+'tagFilter',
+function () {
+
+  return {
+    scope: {
+      availableTags: '=',
+      selectedTags: '='
+    },
+    controller: 'TagFilterController',
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/ng-gme/templates/tagFilter.html'
+  };
+} );
+
+
+},{}],6:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+angular.module(
+'gme.filters.taxonomyFilter', []
+)
+.filter('taxonomyFilter', function() {
+  return function(input, selectedTerms){
+
+    var output = [];
+
+    if (angular.isArray(selectedTerms)) {
+
+      angular.forEach(input, function(elem) {
+
+        angular.forEach(elem.taxonomyTerms, function(aTerm) {
+
+          if (selectedTerms.indexOf(aTerm) > -1) {
+            output.push(elem);
+            return;
+          }
+
+        });
+
+      });
+
+    }
+
+    return output;
+
+  };
+});
+
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -343,7 +462,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     // TODO: register for branch change event OR BranchService onInitialize
   };
 };
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
@@ -402,7 +521,7 @@ module.exports = function ( $q ) {
 
   // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
@@ -924,7 +1043,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     }
   };
 };
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
@@ -1095,7 +1214,7 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
@@ -1110,4 +1229,4 @@ angular.module( 'gme.services', [] )
   .service( 'projectService', ProjectServiceClass )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
-},{"./BranchService.js":5,"./DataStoreService.js":6,"./NodeService.js":7,"./ProjectService.js":8}]},{},[1]);
+},{"./BranchService.js":7,"./DataStoreService.js":8,"./NodeService.js":9,"./ProjectService.js":10}]},{},[1]);
