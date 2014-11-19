@@ -23,6 +23,7 @@ docLibs = [
   'bower_components/ng-grid/ng-grid.min.css',
   'bower_components/angular/angular.min.js',
   'bower_components/angular/angular.min.js.map',
+  'bower_components/chance/chance.js',
   'dist/ng-gme.css',
   'dist/ng-gme.js',
   'dist/ng-gme-templates.js',
@@ -94,12 +95,21 @@ server = express(),
 livereload = require( 'connect-livereload' ),
 refresh = require( 'gulp-livereload' ),
 lrserver = require( 'tiny-lr' )(),
-prettify = require( 'gulp-js-prettify' );
+prettify = require( 'gulp-js-prettify' ),
+gutil = require( 'gutil' );
 
 // Utility tasks
 
 require( 'process' );
 require( 'path' );
+
+function swallowError( error ) {
+
+  //If you want details of the error in the console
+  console.log( error.toString() );
+
+  this.emit( 'end' );
+}
 
 gulp.task( 'clean-build', function () {
   return gulp.src( buildPaths.root ).pipe( clean() );
@@ -130,7 +140,7 @@ gulp.task( 'browserify-docs', function () {
     entries: [ sourcePaths.docsApp ]
   } )
   .bundle()
-  .pipe( source( libraryName + '-docs.js' ) )
+  .on('error', swallowError)  .pipe( source( libraryName + '-docs.js' ) )
   .pipe( gulp.dest( buildPaths.docsRoot ) );
 
 } );
@@ -175,7 +185,7 @@ function () {
   .pipe( rename( 'index.html' ) )
   .pipe( gulp.dest( buildPaths.docsRoot ) );
 
-  gulp.src(docLibs)
+  gulp.src( docLibs )
   .pipe( rename( function ( path ) {
     path.dirname = 'libs';
   } ) )
@@ -207,7 +217,7 @@ gulp.task( 'browserify-library', function () {
     entries: [sourcePaths.libraryModuleScript]
   } )
   .bundle()
-  .pipe( source( libraryName + '.js' ) )
+  .on('error', swallowError)  .pipe( source( libraryName + '.js' ) )
   .pipe( gulp.dest( buildPaths.scripts ) );
 
 } );
@@ -267,7 +277,7 @@ function () {
 
 gulp.task( 'compile-all', function ( cb ) {
   runSequence( 'clean-build', [
-    'compile-library','compile-docs',
+    'compile-library', 'compile-docs',
   ], cb );
 } );
 

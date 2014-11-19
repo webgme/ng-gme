@@ -1,14 +1,12 @@
-/*globals angular*/
+/*globals angular, chance*/
 'use strict';
 
-require( '../tagFilter/tagFilter.js' );
-require( '../../filters/taxonomyFilter.js' );
+require( '../termFilter/termFilter.js' );
 
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
-  'gme.directives.tagFilter',
-  'gme.filters.taxonomyFilter'
+  'gme.directives.termFilter'
 ] )
 .run( function () {
 
@@ -16,7 +14,6 @@ angular.module( 'gme.directives.projectBrowser', [
 .controller( 'ProjectBrowserController', function ( $scope, $log ) {
 
   var config,
-  projectList,
   dummyProjectGenerator,
   i;
 
@@ -33,55 +30,50 @@ angular.module( 'gme.directives.projectBrowser', [
     },
     {
       id: 'tag3',
-      name: 'Tag B',
-      url: 'http://vanderbilt.edu'
-    }
-
-  ];
-
-  $scope.selectedTerms = [
-    {
-      id: 'tag1',
-      name: 'Tag A',
+      name: 'Tag C',
       url: 'http://vanderbilt.edu'
     },
     {
-      id: 'tag3',
-      name: 'Tag B',
+      id: 'tag4',
+      name: 'Tag D',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag5',
+      name: 'Tag E',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag6',
+      name: 'Tag F',
       url: 'http://vanderbilt.edu'
     }
-
   ];
 
-  $scope.projectList = projectList = {
+  $scope.selectedTermIds = [
+    'tag1', 'tag3', 'tag4', 'tag5'
+  ];
+
+  $scope.projectList = {
     items: []
   };
 
   dummyProjectGenerator = function ( id ) {
-    return {
+
+    var projectDescriptor, i, randomTerm;
+
+    projectDescriptor = {
       id: id,
-      title: 'The world as I modeled ' + id,
+      title: chance.paragraph({sentences: 1}),
       cssClass: 'project-item',
       toolTip: 'Open project',
-      description: 'We believe in domain-specific modeling and not coding just generating stuff. ' +
-      'Just like this line was generated here with good care.',
+      description: chance.paragraph({sentences: 2}),
       lastUpdated: {
         time: Date.now(),
         user: 'N/A'
 
       },
-      taxonomyTerms: [
-        {
-          id: 'tag1',
-          name: 'Tag A',
-          url: 'http://vanderbilt.edu'
-        },
-        {
-          id: 'tag2',
-          name: 'Tag B',
-          url: 'http://vanderbilt.edu'
-        }
-      ],
+      taxonomyTerms: [],
       stats: [
         {
           value: id,
@@ -94,9 +86,19 @@ angular.module( 'gme.directives.projectBrowser', [
           iconClass: 'fa fa-users'
         }
       ],
-      details: 'Some detailed text. Lorem ipsum ama fea rin the poc ketofmyja cket.',
+      details: chance.paragraph({sentences: 3}),
       detailsTemplateUrl: '/ng-gme/templates/projectDetails.html'
     };
+
+    for(i=0; i<$scope.availableTerms.length-1; i++) {
+
+      if (Math.random() > 0.5) {
+        projectDescriptor.taxonomyTerms.push($scope.availableTerms[i]);
+      }
+    }
+
+    return projectDescriptor;
+
   };
 
 
@@ -104,7 +106,7 @@ angular.module( 'gme.directives.projectBrowser', [
     $scope.projectList.items.push( dummyProjectGenerator( i ) );
   }
 
-  $log.debug( $scope.projectList.items );
+  //$log.debug( $scope.projectList.items );
 
   $scope.config = config = {
 

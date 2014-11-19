@@ -1,4 +1,4 @@
-/*globals angular, require*/
+/*globals angular, require, Chance*/
 'use strict';
 
 var components = [
@@ -11,6 +11,8 @@ var components = [
     sources: [ 'demo.html', 'demo.js' ]
   }
 ];
+
+window.chance = new Chance();
 
 require( '../library/ng-gme.js' );
 require( '../library/directives/projectBrowser/docs/demo.js' );

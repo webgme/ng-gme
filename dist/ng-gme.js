@@ -3,7 +3,7 @@
 
 require( './services/gmeServices.js' );
 require( './directives/gmeDirectives.js' );
-},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":11}],2:[function(require,module,exports){
+},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":10}],2:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -18,17 +18,15 @@ angular.module('gme.directives',
 ]);
 
 },{"./projectBrowser/projectBrowser.js":3,"./projectService/projectService.js":4}],3:[function(require,module,exports){
-/*globals angular*/
+/*globals angular, chance*/
 'use strict';
 
-require( '../tagFilter/tagFilter.js' );
-require( '../../filters/taxonomyFilter.js' );
+require( '../termFilter/termFilter.js' );
 
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
-  'gme.directives.tagFilter',
-  'gme.filters.taxonomyFilter'
+  'gme.directives.termFilter'
 ] )
 .run( function () {
 
@@ -36,7 +34,6 @@ angular.module( 'gme.directives.projectBrowser', [
 .controller( 'ProjectBrowserController', function ( $scope, $log ) {
 
   var config,
-  projectList,
   dummyProjectGenerator,
   i;
 
@@ -53,55 +50,50 @@ angular.module( 'gme.directives.projectBrowser', [
     },
     {
       id: 'tag3',
-      name: 'Tag B',
-      url: 'http://vanderbilt.edu'
-    }
-
-  ];
-
-  $scope.selectedTerms = [
-    {
-      id: 'tag1',
-      name: 'Tag A',
+      name: 'Tag C',
       url: 'http://vanderbilt.edu'
     },
     {
-      id: 'tag3',
-      name: 'Tag B',
+      id: 'tag4',
+      name: 'Tag D',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag5',
+      name: 'Tag E',
+      url: 'http://vanderbilt.edu'
+    },
+    {
+      id: 'tag6',
+      name: 'Tag F',
       url: 'http://vanderbilt.edu'
     }
-
   ];
 
-  $scope.projectList = projectList = {
+  $scope.selectedTermIds = [
+    'tag1', 'tag3', 'tag4', 'tag5'
+  ];
+
+  $scope.projectList = {
     items: []
   };
 
   dummyProjectGenerator = function ( id ) {
-    return {
+
+    var projectDescriptor, i, randomTerm;
+
+    projectDescriptor = {
       id: id,
-      title: 'The world as I modeled ' + id,
+      title: chance.paragraph({sentences: 1}),
       cssClass: 'project-item',
       toolTip: 'Open project',
-      description: 'We believe in domain-specific modeling and not coding just generating stuff. ' +
-      'Just like this line was generated here with good care.',
+      description: chance.paragraph({sentences: 2}),
       lastUpdated: {
         time: Date.now(),
         user: 'N/A'
 
       },
-      taxonomyTerms: [
-        {
-          id: 'tag1',
-          name: 'Tag A',
-          url: 'http://vanderbilt.edu'
-        },
-        {
-          id: 'tag2',
-          name: 'Tag B',
-          url: 'http://vanderbilt.edu'
-        }
-      ],
+      taxonomyTerms: [],
       stats: [
         {
           value: id,
@@ -114,9 +106,19 @@ angular.module( 'gme.directives.projectBrowser', [
           iconClass: 'fa fa-users'
         }
       ],
-      details: 'Some detailed text. Lorem ipsum ama fea rin the poc ketofmyja cket.',
+      details: chance.paragraph({sentences: 3}),
       detailsTemplateUrl: '/ng-gme/templates/projectDetails.html'
     };
+
+    for(i=0; i<$scope.availableTerms.length-1; i++) {
+
+      if (Math.random() > 0.5) {
+        projectDescriptor.taxonomyTerms.push($scope.availableTerms[i]);
+      }
+    }
+
+    return projectDescriptor;
+
   };
 
 
@@ -124,7 +126,7 @@ angular.module( 'gme.directives.projectBrowser', [
     $scope.projectList.items.push( dummyProjectGenerator( i ) );
   }
 
-  $log.debug( $scope.projectList.items );
+  //$log.debug( $scope.projectList.items );
 
   $scope.config = config = {
 
@@ -200,7 +202,7 @@ angular.module( 'gme.directives.projectBrowser', [
     templateUrl: '/ng-gme/templates/projectBrowser.html'
   };
 } );
-},{"../../filters/taxonomyFilter.js":6,"../tagFilter/tagFilter.js":5}],4:[function(require,module,exports){
+},{"../termFilter/termFilter.js":5}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -245,54 +247,52 @@ angular.module( 'gme.directives.projectService', [
 'use strict';
 
 angular.module(
-'gme.directives.tagFilter', [
+'gme.directives.termFilter', [
   'isis.ui.taxonomyTerm'
 ]
 
 )
-.controller( 'TagFilterController', function ( $scope ) {
+.filter('isSelected', [ function(){
+  return function(input, selectedTermIds, direction) {
+    var output = [];
 
-  $scope.tagClick = function(tag) {
+    angular.forEach(input, function(term) {
+
+      if (direction === -1) {
+
+        if (selectedTermIds.indexOf(term.id) === -1) {
+          output.push(term);
+        }
+
+      } else {
+
+        if (selectedTermIds.indexOf(term.id) > -1) {
+          output.push(term);
+        }
+
+      }
+    });
+
+    return output;
 
   };
-
-} )
-.directive(
-'tagFilter',
-function () {
-
-  return {
-    scope: {
-      availableTags: '=',
-      selectedTags: '='
-    },
-    controller: 'TagFilterController',
-    restrict: 'E',
-    replace: true,
-    templateUrl: '/ng-gme/templates/tagFilter.html'
-  };
-} );
-
-
-},{}],6:[function(require,module,exports){
-/*globals angular*/
-'use strict';
-
-angular.module(
-'gme.filters.taxonomyFilter', []
-)
-.filter('taxonomyFilter', function() {
-  return function(input, selectedTerms){
+}])
+.filter('termFilter', function() {
+  return function(input, selectedTermIds){
 
     var output = [];
 
-    if (angular.isArray(selectedTerms)) {
+    console.log(input);
+
+    if (angular.isArray(selectedTermIds)) {
 
       angular.forEach(input, function(elem) {
 
+        console.log(elem);
+
         angular.forEach(elem.taxonomyTerms, function(aTerm) {
 
-          if (selectedTerms.indexOf(aTerm) > -1) {
+          if (selectedTermIds.indexOf(aTerm.id) > -1) {
             output.push(elem);
             return;
           }
@@ -303,13 +303,46 @@ angular.module(
 
     }
 
-    return output;
+    console.log(output);
+
+    return input;
 
   };
-});
+})
+.controller( 'TermFilterController', function ( $scope ) {
+
+  $scope.toggle = function(term) {
+
+    var index;
+
+    index = $scope.selectedTermIds.indexOf(term.id);
+
+    if (index === -1) {
+      $scope.selectedTermIds.push(term.id);
+    } else {
+      $scope.selectedTermIds.splice(index, 1);
+    }
+  };
+
+} )
+.directive(
+'termFilter',
+function () {
+
+  return {
+    scope: {
+      availableTerms: '=',
+      selectedTermIds: '='
+    },
+    controller: 'TermFilterController',
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/ng-gme/templates/termFilter.html'
+  };
+} );
 
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -462,7 +495,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     // TODO: register for branch change event OR BranchService onInitialize
   };
 };
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
@@ -521,7 +554,7 @@ module.exports = function ( $q ) {
 
   // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
@@ -1043,7 +1076,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     }
   };
 };
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
@@ -1214,7 +1247,7 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
@@ -1229,4 +1262,4 @@ angular.module( 'gme.services', [] )
   .service( 'projectService', ProjectServiceClass )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
-},{"./BranchService.js":7,"./DataStoreService.js":8,"./NodeService.js":9,"./ProjectService.js":10}]},{},[1]);
+},{"./BranchService.js":6,"./DataStoreService.js":7,"./NodeService.js":8,"./ProjectService.js":9}]},{},[1]);
