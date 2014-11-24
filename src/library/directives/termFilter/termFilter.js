@@ -37,13 +37,9 @@ angular.module(
 
     var output = [];
 
-    console.log(input);
-
     if (angular.isArray(selectedTermIds)) {
 
       angular.forEach(input, function(elem) {
-
-        console.log(elem);
 
         angular.forEach(elem.taxonomyTerms, function(aTerm) {
 
@@ -58,9 +54,7 @@ angular.module(
 
     }
 
-    console.log(output);
-
-    return input;
+    return output;
 
   };
 })

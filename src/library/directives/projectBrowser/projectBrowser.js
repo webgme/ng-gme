@@ -11,10 +11,11 @@ angular.module( 'gme.directives.projectBrowser', [
 .run( function () {
 
 } )
-.controller( 'ProjectBrowserController', function ( $scope, $log ) {
+.controller( 'ProjectBrowserController', function ( $scope, $log, $filter ) {
 
   var config,
   dummyProjectGenerator,
+  filterItems,
   i;
 
   $scope.availableTerms = [
@@ -50,24 +51,52 @@ angular.module( 'gme.directives.projectBrowser', [
     }
   ];
 
-  $scope.selectedTermIds = [
-    'tag1', 'tag3', 'tag4', 'tag5'
-  ];
+  $scope.filtering = {
+    selectedTermIds: [
+      'tag1', 'tag3', 'tag4', 'tag5'
+    ]
+  };
 
   $scope.projectList = {
     items: []
   };
 
+  $scope.filteredProjectList = {
+    items: []
+  };
+
+
+  filterItems = function () {
+    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items, $scope.filtering.selectedTermIds );
+  };
+
+  $scope.$watch( function () {
+
+    return $scope.filtering.selectedTermIds;
+  }, function () {
+    filterItems();
+  },
+  true );
+
+
+  $scope.$watch( 'filtering.selectedTermIds', function () {
+    filterItems();
+  } );
+
+  $scope.$watch( 'projectList.items', function () {
+    filterItems();
+  } );
+
   dummyProjectGenerator = function ( id ) {
 
-    var projectDescriptor, i, randomTerm;
+    var projectDescriptor, i;
 
     projectDescriptor = {
       id: id,
-      title: chance.paragraph({sentences: 1}),
+      title: chance.paragraph( {sentences: 1} ),
       cssClass: 'project-item',
       toolTip: 'Open project',
-      description: chance.paragraph({sentences: 2}),
+      description: chance.paragraph( {sentences: 2} ),
       lastUpdated: {
         time: Date.now(),
         user: 'N/A'
@@ -86,14 +115,14 @@ angular.module( 'gme.directives.projectBrowser', [
           iconClass: 'fa fa-users'
         }
       ],
-      details: chance.paragraph({sentences: 3}),
+      details: chance.paragraph( {sentences: 3} ),
       detailsTemplateUrl: '/ng-gme/templates/projectDetails.html'
     };
 
-    for(i=0; i<$scope.availableTerms.length-1; i++) {
+    for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-      if (Math.random() > 0.5) {
-        projectDescriptor.taxonomyTerms.push($scope.availableTerms[i]);
+      if ( Math.random() > 0.5 ) {
+        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[i] );
       }
     }
 
@@ -105,8 +134,6 @@ angular.module( 'gme.directives.projectBrowser', [
   for ( i = 0; i < 20; i++ ) {
     $scope.projectList.items.push( dummyProjectGenerator( i ) );
   }
-
-  //$log.debug( $scope.projectList.items );
 
   $scope.config = config = {
 
@@ -170,6 +197,7 @@ angular.module( 'gme.directives.projectBrowser', [
     }
 
   };
+
 
 } )
 .directive( 'projectBrowser', function () {
