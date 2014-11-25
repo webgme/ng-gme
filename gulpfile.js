@@ -24,6 +24,8 @@ docLibs = [
   'bower_components/angular/angular.min.js',
   'bower_components/angular/angular.min.js.map',
   'bower_components/chance/chance.js',
+  'bower_components/ng-tags-input/ng-tags-input.min.js',
+  'bower_components/ng-tags-input/ng-tags-input.bootstrap.min.css',
   'dist/ng-gme.css',
   'dist/ng-gme.js',
   'dist/ng-gme-templates.js',

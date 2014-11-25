@@ -1,1 +1,1 @@
-Description of this directive.
+Depends on `ng-tags-input`.

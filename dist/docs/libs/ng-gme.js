@@ -26,7 +26,8 @@ require( '../termFilter/termFilter.js' );
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
-  'gme.directives.termFilter'
+  'gme.directives.termFilter',
+  'ngTagsInput'
 ] )
 .run( function () {
 
@@ -36,9 +37,11 @@ angular.module( 'gme.directives.projectBrowser', [
   var config,
   dummyProjectGenerator,
   filterItems,
-  i, projectList;
+  projectList,
+  availableTerms,
+  i;
 
-  $scope.availableTerms = [
+  availableTerms = $scope.availableTerms = [
     {
       id: 'tag1',
       name: 'Tag A',
@@ -73,7 +76,7 @@ angular.module( 'gme.directives.projectBrowser', [
 
   $scope.filtering = {
     selectedTermIds: [
-    
+
     ]
   };
 
@@ -203,6 +206,8 @@ angular.module( 'gme.directives.projectBrowser', [
       controller: function ( $scope ) {
 
         $scope.newItem = {};
+
+        $scope.tags = availableTerms;
 
         $scope.createItem = function ( newItem ) {
 
