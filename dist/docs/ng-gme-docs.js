@@ -12152,7 +12152,7 @@ angular.module( 'gme.directives.projectBrowser', [
   var config,
   dummyProjectGenerator,
   filterItems,
-  i;
+  i, projectList;
 
   $scope.availableTerms = [
     {
@@ -12189,11 +12189,11 @@ angular.module( 'gme.directives.projectBrowser', [
 
   $scope.filtering = {
     selectedTermIds: [
-      'tag1', 'tag3', 'tag4', 'tag5'
+    
     ]
   };
 
-  $scope.projectList = {
+  projectList = $scope.projectList = {
     items: []
   };
 
@@ -12203,7 +12203,8 @@ angular.module( 'gme.directives.projectBrowser', [
 
 
   filterItems = function () {
-    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items, $scope.filtering.selectedTermIds );
+    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+    $scope.filtering.selectedTermIds );
   };
 
   $scope.$watch( function () {
@@ -12251,8 +12252,7 @@ angular.module( 'gme.directives.projectBrowser', [
           iconClass: 'fa fa-users'
         }
       ],
-      details: chance.paragraph( {sentences: 3} ),
-      detailsTemplateUrl: '/ng-gme/templates/projectDetails.html'
+      details: chance.paragraph( {sentences: 3} )
     };
 
     for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
@@ -12317,18 +12317,21 @@ angular.module( 'gme.directives.projectBrowser', [
       itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
       expanded: false,
       controller: function ( $scope ) {
+
+        $scope.newItem = {};
+
         $scope.createItem = function ( newItem ) {
 
-          newItem.url = 'something';
-          newItem.toolTip = newItem.title;
-
-          $scope.projectList.items.push( newItem );
+          newItem.id = newItem.title;
+          projectList.items.push( newItem );
+          console.log(projectList.items);
 
           $scope.newItem = {};
 
           config.newItemForm.expanded = false; // this is how you close the form itself
 
         };
+
       }
     }
 
@@ -12436,7 +12439,7 @@ angular.module(
 
     var output = [];
 
-    if (angular.isArray(selectedTermIds)) {
+    if (angular.isArray(selectedTermIds) && selectedTermIds.length) {
 
       angular.forEach(input, function(elem) {
 
@@ -12451,6 +12454,8 @@ angular.module(
 
       });
 
+    } else {
+      output = input;
     }
 
     return output;

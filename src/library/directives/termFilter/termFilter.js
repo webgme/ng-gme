@@ -37,7 +37,7 @@ angular.module(
 
     var output = [];
 
-    if (angular.isArray(selectedTermIds)) {
+    if (angular.isArray(selectedTermIds) && selectedTermIds.length) {
 
       angular.forEach(input, function(elem) {
 
@@ -52,6 +52,8 @@ angular.module(
 
       });
 
+    } else {
+      output = input;
     }
 
     return output;
