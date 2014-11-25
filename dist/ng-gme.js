@@ -250,21 +250,80 @@ angular.module( 'gme.directives.projectService', [
 .run( function () {
 
 } )
-.controller( 'ProjectServiceController', function ( $scope, $log, dataStoreService, projectService ) {
+.controller( 'ProjectServiceController', function ( $scope, $log, $q, dataStoreService, projectService ) {
+  var testProjects = [
+    {
+      projectName:'ProjectServiceTest1',
+      projectInfo: {
+        visibleName: 'ProjectServiceTest1',
+        description: 'project in webGME',
+        tags:{
+          tag1:'Master'
+        }
+      }
+    },
+    {
+      projectName:'ProjectServiceTest2',
+      projectInfo: {
+        visibleName: 'ProjectServiceTest2',
+        description: 'project in webGME',
+        tags:{
+          tag1:'Master'
+        }
+      }
+    }],
+    index = 0;
+
   $scope.projects = [];
   dataStoreService.connectToDatabase( 'multi', {host: window.location.basename} )
   .then( function () {
-    //console.log('Connected ...');
-    //return projectService.selectProject('my-db-connection-id', 'ADMEditor');
-    projectService.getProjects( 'multi' )
-    .then( function ( result ) {
-      $scope.projects = Object.keys( result );
-      for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
-        result[$scope.projects[i]].info.id = $scope.projects[i];
-        $scope.projects[i] = result[$scope.projects[i]].info;
+    var getProjects = function() {
+          projectService.getProjects( 'multi' )
+            .then( function ( result ) {
+              $scope.projects = Object.keys( result );
+              for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
+                result[$scope.projects[i]].info.id = $scope.projects[i];
+                $scope.projects[i] = result[$scope.projects[i]].info;
+              }
+          });
+        };
+
+    projectService.getAvailableProjects( 'multi').then( function (names) {
+      if (names) {
+        var createProjectPromises = [];
+
+        for(index = 0; index<testProjects.length; index++){
+          // If testProject doesn't exist
+          if (names.indexOf(testProjects[index].projectName)===-1){
+            createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo ));
+          }
+        }
+
+        if (createProjectPromises.length>0){
+          $q.all(createProjectPromises).then(getProjects);
+        }
+        else{
+          getProjects();
+        }
       }
-      console.log( $scope.projects );
-    } );
+    });
+
+    // Create initial test projects
+    /*var testProject1Prom = ,
+        testProject2Prom = projectService.createProject('multi', 'ProjectServiceTest2'),
+        getProjects = function() {
+        projectService.getProjects( 'multi' )
+          .then( function ( result ) {
+            $scope.projects = Object.keys( result );
+            for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
+              result[$scope.projects[i]].info.id = $scope.projects[i];
+              $scope.projects[i] = result[$scope.projects[i]].info;
+            }
+          });
+    };
+
+    $q.all([testProject1Prom, testProject2Prom]).then(getProjects,getProjects);
+*/
     return null;
   } );
 } )
@@ -1113,6 +1172,22 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
 module.exports = function ( $q, dataStoreService ) {
 
+  this.getAvailableProjects = function ( databaseId ) {
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+        deferred = $q.defer();
+    dbConn.projectService = dbConn.projectService || {};
+    dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      }
+
+      deferred.resolve( projects );
+    } );
+
+    return deferred.promise;
+  };
+
   this.getProjects = function( databaseId ) {
 
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -1147,6 +1222,23 @@ module.exports = function ( $q, dataStoreService ) {
 
       deferred.resolve( projectIds );
     } );
+
+    return deferred.promise;
+  };
+
+  this.createProject = function ( databaseId, projectname, projectInfo ) {
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+        deferred = new $q.defer();
+
+        dbConn.client.createProjectAsync(projectname, projectInfo, function(err){
+          if ( err ) {
+              deferred.reject( err );
+              return;
+            }
+            else{
+              deferred.resolve();
+            }
+          });
 
     return deferred.promise;
   };
@@ -1279,6 +1371,7 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
+
 },{}],10:[function(require,module,exports){
 /*globals angular, require*/
 

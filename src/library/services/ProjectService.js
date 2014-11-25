@@ -2,6 +2,22 @@
 
 module.exports = function ( $q, dataStoreService ) {
 
+  this.getAvailableProjects = function ( databaseId ) {
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+        deferred = $q.defer();
+    dbConn.projectService = dbConn.projectService || {};
+    dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      }
+
+      deferred.resolve( projects );
+    } );
+
+    return deferred.promise;
+  };
+
   this.getProjects = function( databaseId ) {
 
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -36,6 +52,23 @@ module.exports = function ( $q, dataStoreService ) {
 
       deferred.resolve( projectIds );
     } );
+
+    return deferred.promise;
+  };
+
+  this.createProject = function ( databaseId, projectname, projectInfo ) {
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+        deferred = new $q.defer();
+
+        dbConn.client.createProjectAsync(projectname, projectInfo, function(err){
+          if ( err ) {
+              deferred.reject( err );
+              return;
+            }
+            else{
+              deferred.resolve();
+            }
+          });
 
     return deferred.promise;
   };
