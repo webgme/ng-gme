@@ -7,16 +7,14 @@ require( './directives/gmeDirectives.js' );
 /*globals angular*/
 'use strict';
 
-require('./projectBrowser/projectBrowser.js');
-require('./projectService/projectService.js');
+require( './projectBrowser/projectBrowser.js' );
+require( './projectService/projectService.js' );
 
-angular.module('gme.directives',
-[
+angular.module( 'gme.directives', [
   'gme.templates',
   'gme.directives.projectBrowser',
   'gme.directives.projectService'
-]);
-
+] );
 },{"./projectBrowser/projectBrowser.js":3,"./projectService/projectService.js":4}],3:[function(require,module,exports){
 /*globals angular, chance*/
 'use strict';
@@ -29,159 +27,154 @@ angular.module( 'gme.directives.projectBrowser', [
   'gme.directives.termFilter',
   'ngTagsInput'
 ] )
-.run( function () {
+  .run( function () {
 
-} )
-.controller( 'ProjectBrowserController', function ( $scope, $log, $filter ) {
+  } )
+  .controller( 'ProjectBrowserController', function ( $scope, $log, $filter ) {
 
-  var config,
-  dummyProjectGenerator,
-  filterItems,
-  projectList,
-  availableTerms,
-  i;
+    var config,
+      dummyProjectGenerator,
+      filterItems,
+      projectList,
+      availableTerms,
+      i;
 
-  availableTerms = $scope.availableTerms = [
-    {
+    availableTerms = $scope.availableTerms = [ {
       id: 'tag1',
       name: 'Tag A',
       url: 'http://vanderbilt.edu'
-    },
-    {
+    }, {
       id: 'tag2',
       name: 'Tag B',
       url: 'http://vanderbilt.edu'
-    },
-    {
+    }, {
       id: 'tag3',
       name: 'Tag C',
       url: 'http://vanderbilt.edu'
-    },
-    {
+    }, {
       id: 'tag4',
       name: 'Tag D',
       url: 'http://vanderbilt.edu'
-    },
-    {
+    }, {
       id: 'tag5',
       name: 'Tag E',
       url: 'http://vanderbilt.edu'
-    },
-    {
+    }, {
       id: 'tag6',
       name: 'Tag F',
       url: 'http://vanderbilt.edu'
-    }
-  ];
+    } ];
 
-  $scope.filtering = {
-    selectedTermIds: [
+    $scope.filtering = {
+      selectedTermIds: [
 
-    ]
-  };
+      ]
+    };
 
-  projectList = $scope.projectList = {
-    items: []
-  };
+    projectList = $scope.projectList = {
+      items: []
+    };
 
-  $scope.filteredProjectList = {
-    items: []
-  };
-
-
-  filterItems = function () {
-    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
-    $scope.filtering.selectedTermIds );
-  };
-
-  $scope.$watch( function () {
-
-    return $scope.filtering.selectedTermIds;
-  }, function () {
-    filterItems();
-  },
-  true );
+    $scope.filteredProjectList = {
+      items: []
+    };
 
 
-  $scope.$watch( 'filtering.selectedTermIds', function () {
-    filterItems();
-  } );
+    filterItems = function () {
+      $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+        $scope.filtering.selectedTermIds );
+    };
 
-  $scope.$watch( 'projectList.items', function () {
-    filterItems();
-  } );
+    $scope.$watch( function () {
 
-  dummyProjectGenerator = function ( id ) {
-
-    var projectDescriptor, i;
-
-    projectDescriptor = {
-      id: id,
-      title: chance.paragraph( {sentences: 1} ),
-      cssClass: 'project-item',
-      toolTip: 'Open project',
-      description: chance.paragraph( {sentences: 2} ),
-      lastUpdated: {
-        time: Date.now(),
-        user: 'N/A'
-
+        return $scope.filtering.selectedTermIds;
+      }, function () {
+        filterItems();
       },
-      taxonomyTerms: [],
-      stats: [
-        {
+      true );
+
+
+    $scope.$watch( 'filtering.selectedTermIds', function () {
+      filterItems();
+    } );
+
+    $scope.$watch( 'projectList.items', function () {
+      filterItems();
+    } );
+
+    dummyProjectGenerator = function ( id ) {
+
+      var projectDescriptor, i;
+
+      projectDescriptor = {
+        id: id,
+        title: chance.paragraph( {
+          sentences: 1
+        } ),
+        cssClass: 'project-item',
+        toolTip: 'Open project',
+        description: chance.paragraph( {
+          sentences: 2
+        } ),
+        lastUpdated: {
+          time: Date.now(),
+          user: 'N/A'
+
+        },
+        taxonomyTerms: [],
+        stats: [ {
           value: id,
           toolTip: 'Commits',
           iconClass: 'fa fa-cloud-upload'
-        },
-        {
+        }, {
           value: id,
           toolTip: 'Users',
           iconClass: 'fa fa-users'
+        } ],
+        details: chance.paragraph( {
+          sentences: 3
+        } )
+      };
+
+      for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
+
+        if ( Math.random() > 0.5 ) {
+          projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
         }
-      ],
-      details: chance.paragraph( {sentences: 3} )
+      }
+
+      return projectDescriptor;
+
     };
 
-    for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-      if ( Math.random() > 0.5 ) {
-        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[i] );
-      }
+    for ( i = 0; i < 20; i++ ) {
+      $scope.projectList.items.push( dummyProjectGenerator( i ) );
     }
 
-    return projectDescriptor;
+    $scope.config = config = {
 
-  };
+      sortable: true,
+      secondaryItemMenu: true,
+      detailsCollapsible: true,
+      showDetailsLabel: 'Show details',
+      hideDetailsLabel: 'Hide details',
+      filter: {},
 
+      // Event handlers
 
-  for ( i = 0; i < 20; i++ ) {
-    $scope.projectList.items.push( dummyProjectGenerator( i ) );
-  }
+      itemSort: function ( jQEvent, ui ) {
+        console.log( 'Sort happened', jQEvent, ui );
+      },
 
-  $scope.config = config = {
+      itemClick: function ( event, item ) {
+        console.log( 'Clicked: ' + item );
+      },
 
-    sortable: true,
-    secondaryItemMenu: true,
-    detailsCollapsible: true,
-    showDetailsLabel: 'Show details',
-    hideDetailsLabel: 'Hide details',
-    filter: {},
+      itemContextmenuRenderer: function ( e, item ) {
+        console.log( 'Contextmenu was triggered for node:', item );
 
-    // Event handlers
-
-    itemSort: function ( jQEvent, ui ) {
-      console.log( 'Sort happened', jQEvent, ui );
-    },
-
-    itemClick: function ( event, item ) {
-      console.log( 'Clicked: ' + item );
-    },
-
-    itemContextmenuRenderer: function ( e, item ) {
-      console.log( 'Contextmenu was triggered for node:', item );
-
-      return [
-        {
+        return [ {
           items: [
 
             {
@@ -191,53 +184,52 @@ angular.module( 'gme.directives.projectBrowser', [
               iconClass: 'fa fa-plus'
             }
           ]
-        }
-      ];
-    },
+        } ];
+      },
 
-    detailsRenderer: function ( item ) {
-      item.details = 'My details are here now!';
-    },
+      detailsRenderer: function ( item ) {
+        item.details = 'My details are here now!';
+      },
 
-    newItemForm: {
-      title: 'Create new Project',
-      itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
-      expanded: false,
-      controller: function ( $scope ) {
-
-        $scope.newItem = {};
-
-        $scope.tags = angular.copy(availableTerms);
-
-        $scope.createItem = function ( newItem ) {
-
-          newItem.id = newItem.title;
-          projectList.items.push( newItem );
-          console.log(projectList.items);
+      newItemForm: {
+        title: 'Create new Project',
+        itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
+        expanded: false,
+        controller: function ( $scope ) {
 
           $scope.newItem = {};
 
-          config.newItemForm.expanded = false; // this is how you close the form itself
+          $scope.tags = angular.copy( availableTerms );
 
-        };
+          $scope.createItem = function ( newItem ) {
 
+            newItem.id = newItem.title;
+            projectList.items.push( newItem );
+            console.log( projectList.items );
+
+            $scope.newItem = {};
+
+            config.newItemForm.expanded = false; // this is how you close the form itself
+
+          };
+
+        }
       }
-    }
 
-  };
+    };
 
 
-} )
-.directive( 'projectBrowser', function () {
+  } )
+  .directive( 'projectBrowser', function () {
 
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectBrowserController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectBrowser.html'
-  };
-} );
+    return {
+      scope: false,
+      restrict: 'E',
+      controller: 'ProjectBrowserController',
+      replace: true,
+      templateUrl: '/ng-gme/templates/projectBrowser.html'
+    };
+  } );
 },{"../termFilter/termFilter.js":5}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
@@ -253,77 +245,67 @@ angular.module( 'gme.directives.projectService', [
 .controller( 'ProjectServiceController', function ( $scope, $log, $q, dataStoreService, projectService ) {
   var testProjects = [
     {
-      projectName:'ProjectServiceTest1',
+      projectName: 'ProjectServiceTest1',
       projectInfo: {
         visibleName: 'ProjectServiceTest1',
         description: 'project in webGME',
-        tags:{
-          tag1:'Master'
+        tags: {
+          tag1: 'Master'
         }
       }
     },
     {
-      projectName:'ProjectServiceTest2',
+      projectName: 'ProjectServiceTest2',
       projectInfo: {
         visibleName: 'ProjectServiceTest2',
         description: 'project in webGME',
-        tags:{
-          tag1:'Master'
+        tags: {
+          tag1: 'Master'
         }
       }
-    }],
-    index = 0;
+    }
+  ],
+  index = 0;
 
   $scope.projects = [];
-  dataStoreService.connectToDatabase( 'multi', {host: window.location.basename} )
+  dataStoreService.connectToDatabase( 'multi', {
+    host: window.location.basename
+  } )
   .then( function () {
-    var getProjects = function() {
-          projectService.getProjects( 'multi' )
-            .then( function ( result ) {
-              $scope.projects = Object.keys( result );
-              for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
-                result[$scope.projects[i]].info.id = $scope.projects[i];
-                $scope.projects[i] = result[$scope.projects[i]].info;
-              }
-          });
-        };
+    var getProjects = function () {
+      projectService.getProjects( 'multi' )
+      .then( function ( result ) {
+        $scope.projects = Object.keys( result );
+        for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
+          result[ $scope.projects[ i ] ].info.id = $scope.projects[ i ];
+          $scope.projects[ i ] = result[ $scope.projects[ i ] ].info;
+        }
+      } );
+    };
 
-    projectService.getAvailableProjects( 'multi').then( function (names) {
-      if (names) {
+    projectService.getAvailableProjects( 'multi' )
+    .then( function ( names ) {
+      if ( names ) {
         var createProjectPromises = [];
 
-        for(index = 0; index<testProjects.length; index++){
+        for ( index = 0; index < testProjects.length; index++ ) {
           // If testProject doesn't exist
-          if (names.indexOf(testProjects[index].projectName)===-1){
-            createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo ));
+          if ( names.indexOf( testProjects[ index ].projectName ) === -1 ) {
+            createProjectPromises.push( projectService.createProject( 'multi',
+            testProjects[ index ].projectName,
+            testProjects[ index ].projectInfo ) );
           }
         }
 
-        if (createProjectPromises.length>0){
-          $q.all(createProjectPromises).then(getProjects);
-        }
-        else{
+        if ( createProjectPromises.length > 0 ) {
+          $q.all( createProjectPromises )
+          .then( getProjects );
+        } else {
           getProjects();
         }
       }
-    });
+    } );
 
-    // Create initial test projects
-    /*var testProject1Prom = ,
-        testProject2Prom = projectService.createProject('multi', 'ProjectServiceTest2'),
-        getProjects = function() {
-        projectService.getProjects( 'multi' )
-          .then( function ( result ) {
-            $scope.projects = Object.keys( result );
-            for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
-              result[$scope.projects[i]].info.id = $scope.projects[i];
-              $scope.projects[i] = result[$scope.projects[i]].info;
-            }
-          });
-    };
-
-    $q.all([testProject1Prom, testProject2Prom]).then(getProjects,getProjects);
-*/
     return null;
   } );
 } )
@@ -336,103 +318,109 @@ angular.module( 'gme.directives.projectService', [
     templateUrl: '/ng-gme/templates/projectService.html'
   };
 } );
-
 },{}],5:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
 angular.module(
-'gme.directives.termFilter', [
-  'isis.ui.taxonomyTerm'
-]
+  'gme.directives.termFilter', [
+    'isis.ui.taxonomyTerm'
+  ]
 
 )
-.filter('isSelected', [ function(){
-  return function(input, selectedTermIds, direction) {
-    var output = [];
+  .filter( 'isSelected', [
+    function () {
+      return function ( input, selectedTermIds, direction ) {
+        var output = [];
 
-    angular.forEach(input, function(term) {
+        angular.forEach( input, function ( term ) {
 
-      if (direction === -1) {
+          if ( direction === -1 ) {
 
-        if (selectedTermIds.indexOf(term.id) === -1) {
-          output.push(term);
-        }
+            if ( selectedTermIds.indexOf( term.id ) === -1 ) {
+              output.push( term );
+            }
 
-      } else {
+          } else {
 
-        if (selectedTermIds.indexOf(term.id) > -1) {
-          output.push(term);
-        }
+            if ( selectedTermIds.indexOf( term.id ) > -1 ) {
+              output.push( term );
+            }
 
-      }
-    });
+          }
+        } );
 
-    return output;
+        return output;
 
-  };
-}])
-.filter('termFilter', function() {
-  return function(input, selectedTermIds){
+      };
+    }
+  ] )
+  .filter( 'termFilter', function () {
+    return function ( input, selectedTermIds ) {
 
-    var output = [];
+      var output = [], countOfTermHits;
 
-    if (angular.isArray(selectedTermIds) && selectedTermIds.length) {
+      if ( angular.isArray( selectedTermIds ) && selectedTermIds.length ) {
 
-      angular.forEach(input, function(elem) {
+        angular.forEach( input, function ( elem ) {
 
-        angular.forEach(elem.taxonomyTerms, function(aTerm) {
+          countOfTermHits = 0;
 
-          if (selectedTermIds.indexOf(aTerm.id) > -1) {
-            output.push(elem);
-            return;
+          angular.forEach( elem.taxonomyTerms, function ( aTerm ) {
+
+            countOfTermHits = countOfTermHits && countOfTermHits;
+
+            if ( selectedTermIds.indexOf( aTerm.id ) > -1 ) {
+              countOfTermHits += 1;
+            }
+
+          } );
+
+          if (countOfTermHits === selectedTermIds.length) {
+            output.push( elem );
           }
 
-        });
+        } );
 
-      });
+      } else {
+        output = input;
+      }
 
-    } else {
-      output = input;
-    }
+      return output;
 
-    return output;
+    };
+  } )
+  .controller( 'TermFilterController', function ( $scope ) {
 
-  };
-})
-.controller( 'TermFilterController', function ( $scope ) {
+    $scope.toggle = function ( term ) {
 
-  $scope.toggle = function(term) {
+      var index;
 
-    var index;
+      index = $scope.selectedTermIds.indexOf( term.id );
 
-    index = $scope.selectedTermIds.indexOf(term.id);
+      if ( index === -1 ) {
+        $scope.selectedTermIds.push( term.id );
+      } else {
+        $scope.selectedTermIds.splice( index, 1 );
+      }
+    };
 
-    if (index === -1) {
-      $scope.selectedTermIds.push(term.id);
-    } else {
-      $scope.selectedTermIds.splice(index, 1);
-    }
-  };
+  } )
+  .directive(
+    'termFilter',
+    function () {
 
-} )
-.directive(
-'termFilter',
-function () {
-
-  return {
-    scope: {
-      availableTerms: '=',
-      selectedTermIds: '='
-    },
-    controller: 'TermFilterController',
-    restrict: 'E',
-    replace: true,
-    templateUrl: '/ng-gme/templates/termFilter.html'
-  };
-} );
-
-
+      return {
+        scope: {
+          availableTerms: '=',
+          selectedTermIds: '='
+        },
+        controller: 'TermFilterController',
+        restrict: 'E',
+        replace: true,
+        templateUrl: '/ng-gme/templates/termFilter.html'
+      };
+    } );
 },{}],6:[function(require,module,exports){
 'use strict';
 
@@ -809,7 +797,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
    */
   this.setAttributes = function ( context, id, name, value, msg ) {
     var dbConn = dataStoreService.getDatabaseConnection( context.db );
-    return dbConn.client.setAttributes (id, name, value, msg);
+    return dbConn.client.setAttributes( id, name, value, msg );
   };
 
   /**
@@ -936,14 +924,15 @@ module.exports = function ( $q, dataStoreService, branchService ) {
    * @param {string} toId - id of node to point to
    * @param {string} [msg] - optional commit message.
    */
-  NodeObj.prototype.makePointer = function (name, toId, msg ) {
-      this.databaseConnection.client.makePointer( this.id, name, toId, msg );
+  NodeObj.prototype.makePointer = function ( name, toId, msg ) {
+    this.databaseConnection.client.makePointer( this.id, name, toId, msg );
   };
 
   // TODO: add sets
 
-  NodeObj.prototype.getCollectionPaths = function (name) {
-    return this.databaseConnection.client.getNode( this.id ).getCollectionPaths( name );
+  NodeObj.prototype.getCollectionPaths = function ( name ) {
+    return this.databaseConnection.client.getNode( this.id )
+      .getCollectionPaths( name );
   };
 
   NodeObj.prototype.getBaseNode = function () {
@@ -1174,7 +1163,7 @@ module.exports = function ( $q, dataStoreService ) {
 
   this.getAvailableProjects = function ( databaseId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = $q.defer();
+      deferred = $q.defer();
     dbConn.projectService = dbConn.projectService || {};
     dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
       if ( err ) {
@@ -1188,7 +1177,7 @@ module.exports = function ( $q, dataStoreService ) {
     return deferred.promise;
   };
 
-  this.getProjects = function( databaseId ) {
+  this.getProjects = function ( databaseId ) {
 
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
       deferred = new $q.defer();
@@ -1228,17 +1217,16 @@ module.exports = function ( $q, dataStoreService ) {
 
   this.createProject = function ( databaseId, projectname, projectInfo ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+      deferred = new $q.defer();
 
-        dbConn.client.createProjectAsync(projectname, projectInfo, function(err){
-          if ( err ) {
-              deferred.reject( err );
-              return;
-            }
-            else{
-              deferred.resolve();
-            }
-          });
+    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      } else {
+        deferred.resolve();
+      }
+    } );
 
     return deferred.promise;
   };
@@ -1371,7 +1359,6 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
-
 },{}],10:[function(require,module,exports){
 /*globals angular, require*/
 
