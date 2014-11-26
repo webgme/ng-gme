@@ -207,7 +207,7 @@ angular.module( 'gme.directives.projectBrowser', [
 
         $scope.newItem = {};
 
-        $scope.tags = availableTerms;
+        $scope.tags = angular.copy(availableTerms);
 
         $scope.createItem = function ( newItem ) {
 
