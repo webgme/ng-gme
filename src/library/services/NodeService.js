@@ -161,7 +161,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
    */
   this.setAttributes = function ( context, id, name, value, msg ) {
     var dbConn = dataStoreService.getDatabaseConnection( context.db );
-    return dbConn.client.setAttributes (id, name, value, msg);
+    return dbConn.client.setAttributes( id, name, value, msg );
   };
 
   /**
@@ -288,14 +288,15 @@ module.exports = function ( $q, dataStoreService, branchService ) {
    * @param {string} toId - id of node to point to
    * @param {string} [msg] - optional commit message.
    */
-  NodeObj.prototype.makePointer = function (name, toId, msg ) {
-      this.databaseConnection.client.makePointer( this.id, name, toId, msg );
+  NodeObj.prototype.makePointer = function ( name, toId, msg ) {
+    this.databaseConnection.client.makePointer( this.id, name, toId, msg );
   };
 
   // TODO: add sets
 
-  NodeObj.prototype.getCollectionPaths = function (name) {
-    return this.databaseConnection.client.getNode( this.id ).getCollectionPaths( name );
+  NodeObj.prototype.getCollectionPaths = function ( name ) {
+    return this.databaseConnection.client.getNode( this.id )
+      .getCollectionPaths( name );
   };
 
   NodeObj.prototype.getBaseNode = function () {

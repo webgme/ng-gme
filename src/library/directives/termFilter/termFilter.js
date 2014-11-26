@@ -2,93 +2,101 @@
 'use strict';
 
 angular.module(
-'gme.directives.termFilter', [
-  'isis.ui.taxonomyTerm'
-]
+  'gme.directives.termFilter', [
+    'isis.ui.taxonomyTerm'
+  ]
 
 )
-.filter('isSelected', [ function(){
-  return function(input, selectedTermIds, direction) {
-    var output = [];
+  .filter( 'isSelected', [
+    function () {
+      return function ( input, selectedTermIds, direction ) {
+        var output = [];
 
-    angular.forEach(input, function(term) {
+        angular.forEach( input, function ( term ) {
 
-      if (direction === -1) {
+          if ( direction === -1 ) {
 
-        if (selectedTermIds.indexOf(term.id) === -1) {
-          output.push(term);
-        }
+            if ( selectedTermIds.indexOf( term.id ) === -1 ) {
+              output.push( term );
+            }
 
-      } else {
+          } else {
 
-        if (selectedTermIds.indexOf(term.id) > -1) {
-          output.push(term);
-        }
+            if ( selectedTermIds.indexOf( term.id ) > -1 ) {
+              output.push( term );
+            }
 
-      }
-    });
+          }
+        } );
 
-    return output;
+        return output;
 
-  };
-}])
-.filter('termFilter', function() {
-  return function(input, selectedTermIds){
+      };
+    }
+  ] )
+  .filter( 'termFilter', function () {
+    return function ( input, selectedTermIds ) {
 
-    var output = [];
+      var output = [], countOfTermHits;
 
-    if (angular.isArray(selectedTermIds) && selectedTermIds.length) {
+      if ( angular.isArray( selectedTermIds ) && selectedTermIds.length ) {
 
-      angular.forEach(input, function(elem) {
+        angular.forEach( input, function ( elem ) {
 
-        angular.forEach(elem.taxonomyTerms, function(aTerm) {
+          countOfTermHits = 0;
 
-          if (selectedTermIds.indexOf(aTerm.id) > -1) {
-            output.push(elem);
-            return;
+          angular.forEach( elem.taxonomyTerms, function ( aTerm ) {
+
+            countOfTermHits = countOfTermHits && countOfTermHits;
+
+            if ( selectedTermIds.indexOf( aTerm.id ) > -1 ) {
+              countOfTermHits += 1;
+            }
+
+          } );
+
+          if (countOfTermHits === selectedTermIds.length) {
+            output.push( elem );
           }
 
-        });
+        } );
 
-      });
+      } else {
+        output = input;
+      }
 
-    } else {
-      output = input;
-    }
+      return output;
 
-    return output;
+    };
+  } )
+  .controller( 'TermFilterController', function ( $scope ) {
 
-  };
-})
-.controller( 'TermFilterController', function ( $scope ) {
+    $scope.toggle = function ( term ) {
 
-  $scope.toggle = function(term) {
+      var index;
 
-    var index;
+      index = $scope.selectedTermIds.indexOf( term.id );
 
-    index = $scope.selectedTermIds.indexOf(term.id);
+      if ( index === -1 ) {
+        $scope.selectedTermIds.push( term.id );
+      } else {
+        $scope.selectedTermIds.splice( index, 1 );
+      }
+    };
 
-    if (index === -1) {
-      $scope.selectedTermIds.push(term.id);
-    } else {
-      $scope.selectedTermIds.splice(index, 1);
-    }
-  };
+  } )
+  .directive(
+    'termFilter',
+    function () {
 
-} )
-.directive(
-'termFilter',
-function () {
-
-  return {
-    scope: {
-      availableTerms: '=',
-      selectedTermIds: '='
-    },
-    controller: 'TermFilterController',
-    restrict: 'E',
-    replace: true,
-    templateUrl: '/ng-gme/templates/termFilter.html'
-  };
-} );
-
+      return {
+        scope: {
+          availableTerms: '=',
+          selectedTermIds: '='
+        },
+        controller: 'TermFilterController',
+        restrict: 'E',
+        replace: true,
+        templateUrl: '/ng-gme/templates/termFilter.html'
+      };
+    } );

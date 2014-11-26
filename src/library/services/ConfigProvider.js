@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = function ( ) {
+module.exports = function () {
 
   var config = {};
 
-  this.getAttribute = function(key) {
-    return config[key];
+  this.getAttribute = function ( key ) {
+    return config[ key ];
   };
 
 };
