@@ -105,7 +105,7 @@ function ( $scope, $templateCache ) {
 
 demoApp.controller('');
 
-},{"../library/directives/projectBrowser/docs/demo.js":14,"../library/directives/projectService/docs/demo.js":16,"../library/ng-gme.js":19,"angular-markdown-directive":5,"angular-sanitize":6,"angular-ui-codemirror":2,"codemirror":7,"codemirror-css":4,"codemirror/mode/htmlmixed/htmlmixed":9,"codemirror/mode/javascript/javascript":10,"codemirror/mode/xml/xml":11,"showdown":25,"ui-utils":3}],2:[function(require,module,exports){
+},{"../library/directives/projectBrowser/docs/demo.js":14,"../library/directives/projectService/docs/demo.js":16,"../library/ng-gme.js":19,"angular-markdown-directive":5,"angular-sanitize":6,"angular-ui-codemirror":2,"codemirror":7,"codemirror-css":4,"codemirror/mode/htmlmixed/htmlmixed":9,"codemirror/mode/javascript/javascript":10,"codemirror/mode/xml/xml":11,"showdown":27,"ui-utils":3}],2:[function(require,module,exports){
 'use strict';
 /**
  * Binds a CodeMirror widget to a <textarea> element.
@@ -12369,99 +12369,29 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log ) {
 'use strict';
 
 
-angular.module( 'gme.directives.projectService', [
-  'gme.templates',
-  'gme.services'
-] )
-.run( function () {
+angular.module('gme.directives.projectService', [
+        'gme.templates',
+        'gme.services',
+        'gme.testServices'
+    ])
+    .run(function() {
 
-} )
-.controller( 'ProjectServiceController', function ( $scope, $log, $q, dataStoreService, projectService ) {
-  var testProjects = [
-    {
-      projectName:'ProjectServiceTest1',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest1',
-        description: 'project in webGME',
-        tags:{
-          tag1:'Master'
-        }
-      }
-    },
-    {
-      projectName:'ProjectServiceTest2',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest2',
-        description: 'project in webGME',
-        tags:{
-          tag1:'Master'
-        }
-      }
-    }],
-    index = 0;
-
-  $scope.projects = [];
-  dataStoreService.connectToDatabase( 'multi', {host: window.location.basename} )
-  .then( function () {
-    var getProjects = function() {
-          projectService.getProjects( 'multi' )
-            .then( function ( result ) {
-              $scope.projects = Object.keys( result );
-              for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
-                result[$scope.projects[i]].info.id = $scope.projects[i];
-                $scope.projects[i] = result[$scope.projects[i]].info;
-              }
-          });
+    })
+    .controller('ProjectServiceController', function($scope, $log, $q, dataStoreService, projectService, projectServiceTest) {
+      $scope.projects = [];
+      projectServiceTest.startTest().then(function(result){
+        $scope.projects = result;
+      });
+    })
+    .directive('projectService', function() {
+        return {
+            scope: false,
+            restrict: 'E',
+            controller: 'ProjectServiceController',
+            replace: true,
+            templateUrl: '/ng-gme/templates/projectService.html'
         };
-
-    projectService.getAvailableProjects( 'multi').then( function (names) {
-      if (names) {
-        var createProjectPromises = [];
-
-        for(index = 0; index<testProjects.length; index++){
-          // If testProject doesn't exist
-          if (names.indexOf(testProjects[index].projectName)===-1){
-            createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo ));
-          }
-        }
-
-        if (createProjectPromises.length>0){
-          $q.all(createProjectPromises).then(getProjects);
-        }
-        else{
-          getProjects();
-        }
-      }
     });
-
-    // Create initial test projects
-    /*var testProject1Prom = ,
-        testProject2Prom = projectService.createProject('multi', 'ProjectServiceTest2'),
-        getProjects = function() {
-        projectService.getProjects( 'multi' )
-          .then( function ( result ) {
-            $scope.projects = Object.keys( result );
-            for ( var i = $scope.projects.length - 1; i >= 0; i-- ) {
-              result[$scope.projects[i]].info.id = $scope.projects[i];
-              $scope.projects[i] = result[$scope.projects[i]].info;
-            }
-          });
-    };
-
-    $q.all([testProject1Prom, testProject2Prom]).then(getProjects,getProjects);
-*/
-    return null;
-  } );
-} )
-.directive( 'projectService', function () {
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectServiceController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectService.html'
-  };
-} );
 
 },{}],18:[function(require,module,exports){
 /*globals angular*/
@@ -12563,8 +12493,10 @@ function () {
 'use strict';
 
 require( './services/gmeServices.js' );
+require( './services/gmeTestServices.js');
 require( './directives/gmeDirectives.js' );
-},{"./directives/gmeDirectives.js":13,"./services/gmeServices.js":24}],20:[function(require,module,exports){
+
+},{"./directives/gmeDirectives.js":13,"./services/gmeServices.js":24,"./services/gmeTestServices.js":25}],20:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -13519,6 +13451,174 @@ angular.module( 'gme.services', [] )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
 },{"./BranchService.js":20,"./DataStoreService.js":21,"./NodeService.js":22,"./ProjectService.js":23}],25:[function(require,module,exports){
+/*globals angular, require*/
+
+'use strict';
+
+var ProjectServiceTestClass = require( './tests/ProjectServiceTest.js' );
+
+angular.module( 'gme.testServices', [] )
+  .service( 'projectServiceTest', ProjectServiceTestClass );
+
+},{"./tests/ProjectServiceTest.js":26}],26:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+require('../gmeServices.js');
+
+module.exports = function($q, dataStoreService, projectService){
+    var testProjects = [{
+                projectName: 'ProjectServiceTest1',
+                projectInfo: {
+                    visibleName: 'ProjectServiceTest1',
+                    description: 'project in webGME',
+                    tags: {
+                        tag1: 'Master'
+                    }
+                }
+            }, {
+                projectName: 'ProjectServiceTest2',
+                projectInfo: {
+                    visibleName: 'ProjectServiceTest2',
+                    description: 'project in webGME',
+                    tags: {
+                        tag1: 'Master'
+                    }
+                }
+            }];
+
+    function getProjects() {
+            var deferred = new $q.defer();
+            projectService.getProjects('multi')
+                .then(function(result) {
+                    var projects = Object.keys(result);
+                    for (var i = projects.length - 1; i >= 0; i--) {
+                        result[projects[i]].info.id = projects[i];
+                        projects[i] = result[projects[i]].info;
+                    }
+                    deferred.resolve(projects);
+                });
+            return deferred.promise;
+        }
+
+    this.startTest = function(){
+        var deferred = new $q.defer(),
+            index = 0;
+
+            dataStoreService.connectToDatabase('multi', {
+                    host: window.location.basename
+                })
+                .then(function() {
+                    projectService.getAvailableProjects('multi').then(function(names) {
+                        if (names) {
+                            var createProjectPromises = [];
+
+                            for (index = 0; index < testProjects.length; index++) {
+                                // If testProject doesn't exist
+                                if (names.indexOf(testProjects[index].projectName) === -1) {
+                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
+                                }
+                            }
+
+                            // Waiting for the createProject promise
+                            if (createProjectPromises.length > 0) {
+                                $q.all(createProjectPromises).then(function() {
+                                    getProjects().then(function(results){deferred.resolve(results);});
+                                });
+                            } else {
+                                getProjects().then(function(results){deferred.resolve(results);});
+                            }
+                        }
+                    });
+                });
+
+            return deferred.promise;
+    };
+};
+
+/*
+angular.module('gme.tests.projectService', [
+        'gme.services',
+        'gme.tests.projectService'
+    ])
+    .factory('TestProjectsService', function($scope, $log, $q, dataStoreService, projectService) {
+        var result = {
+                startTest: null
+            },
+            testProjects = [{
+                projectName: 'ProjectServiceTest1',
+                projectInfo: {
+                    visibleName: 'ProjectServiceTest1',
+                    description: 'project in webGME',
+                    tags: {
+                        tag1: 'Master'
+                    }
+                }
+            }, {
+                projectName: 'ProjectServiceTest2',
+                projectInfo: {
+                    visibleName: 'ProjectServiceTest2',
+                    description: 'project in webGME',
+                    tags: {
+                        tag1: 'Master'
+                    }
+                }
+            }],
+            index = 0;
+
+        function getProjects() {
+            var deferred = new $q.defer();
+            projectService.getProjects('multi')
+                .then(function(result) {
+                    var projects = Object.keys(result);
+                    for (var i = projects.length - 1; i >= 0; i--) {
+                        result[projects[i]].info.id = projects[i];
+                        projects[i] = result[projects[i]].info;
+                    }
+                    deferred.resolve(projects);
+                });
+            return deferred;
+        }
+
+        function startTest() {
+            var deferred = new $q.defer();
+
+            dataStoreService.connectToDatabase('multi', {
+                    host: window.location.basename
+                })
+                .then(function() {
+                    projectService.getAvailableProjects('multi').then(function(names) {
+                        if (names) {
+                            var createProjectPromises = [];
+
+                            for (index = 0; index < testProjects.length; index++) {
+                                // If testProject doesn't exist
+                                if (names.indexOf(testProjects[index].projectName) === -1) {
+                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
+                                }
+                            }
+
+                            // Waiting for the createProject promise
+                            if (createProjectPromises.length > 0) {
+                                $q.all(createProjectPromises).then(function() {
+                                    getProjects().then(function(results){deferred.resolve(results);});
+                                });
+                            } else {
+                                getProjects().then(function(results){deferred.resolve(results);});
+                            }
+                        }
+                    });
+                });
+
+            return deferred;
+        }
+
+        result.startTest = startTest;
+        return result;
+
+    });*/
+
+},{"../gmeServices.js":24}],27:[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 //
