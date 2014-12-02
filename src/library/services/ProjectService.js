@@ -3,9 +3,26 @@
 module.exports = function ( $q, dataStoreService ) {
 
   this.getAvailableProjectTags = function (databaseId){
-    // NOTE: Waiting for core function from Tamas
-    // GetAvailableProjectTags
-    return null;
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+    deferred = $q.defer();
+    dbConn.projectService = dbConn.projectService || {};
+    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
+      var tagKeys,
+          tags = [];
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      }
+
+      tagKeys = Object.keys(results);
+      for (var i = tagKeys.length - 1; i >= 0; i--) {
+        tags.push({id:tagKeys[i],name:results[tagKeys[i]]});
+      }
+
+      deferred.resolve( tags );
+    } );
+
+    return deferred.promise;
   };
 
   this.applyTagsOnProject = function (databaseId, projectId, tags){

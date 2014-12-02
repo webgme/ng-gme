@@ -1,9 +1,19 @@
 <div>
   <ul>
-    <li ng-repeat='project in projects'><b>Project Name (and Id):</b> {{ project.visibleName }} ({{ project.visibleName }})
+    <li><b>Available projects</b>
       <ul>
-        <li>Description: {{ project.description }}</li>
-        <li>Tags: <span ng-repeat='tag in project.tags'>{{ tag }}; </span></li>
+        <li ng-repeat='project in projects'><i>Project Name (and Id):</i> {{ project.visibleName }} ({{ project.visibleName }})
+          <ul>
+            <li>Description: {{ project.description }}</li>
+            <li>Tags: <span ng-repeat='tag in project.tags'>{{ tag }}; </span></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><b>Available tags</b>
+      <ul>
+        <li ng-repeat='tag in tags'><i>{{tag.id }}:</i> {{ tag.name }}
+        </li>
       </ul>
     </li>
   </ul>

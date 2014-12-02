@@ -12,8 +12,17 @@ angular.module('gme.directives.projectService', [
     })
     .controller('ProjectServiceController', function($scope, $log, $q, dataStoreService, projectService, projectServiceTest) {
       $scope.projects = [];
-      projectServiceTest.startTest().then(function(result){
-        $scope.projects = result;
+      $scope.tags = [];
+      projectServiceTest.startTest().then(function(){
+        projectService.getProjects('multi').then(function(results){
+          $scope.projects = results;
+        });
+
+        projectService.getAvailableProjectTags('multi').then(function(results){
+          $scope.tags = results;
+        });
+
+
       });
     })
     .directive('projectService', function() {

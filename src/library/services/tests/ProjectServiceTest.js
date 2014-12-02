@@ -60,10 +60,12 @@ module.exports = function($q, dataStoreService, projectService){
                             // Waiting for the createProject promise
                             if (createProjectPromises.length > 0) {
                                 $q.all(createProjectPromises).then(function() {
-                                    projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
+                                    deferred.resolve();
+                                    //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
                                 });
                             } else {
-                                projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
+                                deferred.resolve();
+                                //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
                             }
                         }
                     });
