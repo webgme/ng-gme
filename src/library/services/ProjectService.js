@@ -25,7 +25,7 @@ module.exports = function ( $q, dataStoreService ) {
     return deferred.promise;
   };
 
-  this.applyTagsOnProject = function (databaseId, projectId, tags){
+  this.applyTagsOnProject = function (/*databaseId, projectId, tags*/){
     // NOTE: Waiting for core fucntion form Tamas
     // GetProjectInfo
     return null;

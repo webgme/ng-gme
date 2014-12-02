@@ -1,26 +1,25 @@
 /*globals angular, chance*/
 'use strict';
 
-require('../termFilter/termFilter.js');
+require( '../termFilter/termFilter.js' );
 
-angular.module('gme.directives.projectBrowser', [
+angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
   'gme.directives.termFilter',
   'ngTagsInput',
   'gme.testServices'
-])
-.run(function () {
+] )
+.run( function () {
 
-})
-.controller('ProjectBrowserController', function ($scope, $log, $filter, projectServiceTest) {
+} )
+.controller( 'ProjectBrowserController', function ( $scope, $log, $filter, projectServiceTest, projectService ) {
 
   var config,
   dummyProjectGenerator,
   filterItems,
   projectList,
-  availableTerms,
-  i;
+  availableTerms;
 
   availableTerms = $scope.availableTerms = [
     {
@@ -71,41 +70,41 @@ angular.module('gme.directives.projectBrowser', [
 
 
   filterItems = function () {
-    $scope.filteredProjectList.items = $filter('termFilter')($scope.projectList.items,
-    $scope.filtering.selectedTermIds);
+    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+    $scope.filtering.selectedTermIds );
   };
 
-  $scope.$watch(function () {
+  $scope.$watch( function () {
 
     return $scope.filtering.selectedTermIds;
   }, function () {
     filterItems();
   },
-  true);
+  true );
 
 
-  $scope.$watch('filtering.selectedTermIds', function () {
+  $scope.$watch( 'filtering.selectedTermIds', function () {
     filterItems();
-  });
+  } );
 
-  $scope.$watch('projectList.items', function () {
+  $scope.$watch( 'projectList.items', function () {
     filterItems();
-  });
+  } );
 
-  dummyProjectGenerator = function (id) {
+  dummyProjectGenerator = function ( id ) {
 
     var projectDescriptor, i;
 
     projectDescriptor = {
       id: id,
-      title: chance.paragraph({
+      title: chance.paragraph( {
         sentences: 1
-      }),
+      } ),
       cssClass: 'project-item',
       toolTip: 'Open project',
-      description: chance.paragraph({
+      description: chance.paragraph( {
         sentences: 2
-      }),
+      } ),
       lastUpdated: {
         time: Date.now(),
         user: 'N/A'
@@ -124,15 +123,15 @@ angular.module('gme.directives.projectBrowser', [
           iconClass: 'fa fa-users'
         }
       ],
-      details: chance.paragraph({
+      details: chance.paragraph( {
         sentences: 3
-      })
+      } )
     };
 
-    for (i = 0; i < $scope.availableTerms.length - 1; i++) {
+    for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-      if (Math.random() > 0.5) {
-        projectDescriptor.taxonomyTerms.push($scope.availableTerms[ i ]);
+      if ( Math.random() > 0.5 ) {
+        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
       }
     }
 
@@ -144,7 +143,12 @@ angular.module('gme.directives.projectBrowser', [
 //    $scope.projectList.items.push(dummyProjectGenerator(i));
 //  }
 
-
+  projectServiceTest.startTest().then( function () {
+    projectService.getProjects( 'multi' ).then( function ( results ) {
+      $log.debug(results);
+      $scope.projectList.items = results;
+    } );
+  } );
 
   $scope.config = config = {
 
@@ -157,16 +161,16 @@ angular.module('gme.directives.projectBrowser', [
 
     // Event handlers
 
-    itemSort: function (jQEvent, ui) {
-      console.log('Sort happened', jQEvent, ui);
+    itemSort: function ( jQEvent, ui ) {
+      console.log( 'Sort happened', jQEvent, ui );
     },
 
-    itemClick: function (event, item) {
-      console.log('Clicked: ' + item);
+    itemClick: function ( event, item ) {
+      console.log( 'Clicked: ' + item );
     },
 
-    itemContextmenuRenderer: function (e, item) {
-      console.log('Contextmenu was triggered for node:', item);
+    itemContextmenuRenderer: function ( e, item ) {
+      console.log( 'Contextmenu was triggered for node:', item );
 
       return [
         {
@@ -183,7 +187,7 @@ angular.module('gme.directives.projectBrowser', [
       ];
     },
 
-    detailsRenderer: function (item) {
+    detailsRenderer: function ( item ) {
       item.details = 'My details are here now!';
     },
 
@@ -191,17 +195,17 @@ angular.module('gme.directives.projectBrowser', [
       title: 'Create new Project',
       itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
       expanded: false,
-      controller: function ($scope) {
+      controller: function ( $scope ) {
 
         $scope.newItem = {};
 
-        $scope.tags = angular.copy(availableTerms);
+        $scope.tags = angular.copy( availableTerms );
 
-        $scope.createItem = function (newItem) {
+        $scope.createItem = function ( newItem ) {
 
           newItem.id = newItem.title;
-          projectList.items.push(newItem);
-          console.log(projectList.items);
+          projectList.items.push( newItem );
+          console.log( projectList.items );
 
           $scope.newItem = {};
 
@@ -215,8 +219,8 @@ angular.module('gme.directives.projectBrowser', [
   };
 
 
-})
-.directive('projectBrowser', function () {
+} )
+.directive( 'projectBrowser', function () {
 
   return {
     scope: false,
@@ -225,4 +229,4 @@ angular.module('gme.directives.projectBrowser', [
     replace: true,
     templateUrl: '/ng-gme/templates/projectBrowser.html'
   };
-});
+} );

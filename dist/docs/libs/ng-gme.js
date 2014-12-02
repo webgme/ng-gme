@@ -27,156 +27,173 @@ angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
   'gme.directives.termFilter',
-  'ngTagsInput'
+  'ngTagsInput',
+  'gme.testServices'
 ] )
-  .run( function () {
+.run( function () {
 
-  } )
-  .controller( 'ProjectBrowserController', function ( $scope, $log, $filter ) {
+} )
+.controller( 'ProjectBrowserController', function ( $scope, $log, $filter, projectServiceTest, projectService ) {
 
-    var config,
-      dummyProjectGenerator,
-      filterItems,
-      projectList,
-      availableTerms,
-      i;
+  var config,
+  dummyProjectGenerator,
+  filterItems,
+  projectList,
+  availableTerms;
 
-    availableTerms = $scope.availableTerms = [ {
+  availableTerms = $scope.availableTerms = [
+    {
       id: 'tag1',
       name: 'Tag A',
       url: 'http://vanderbilt.edu'
-    }, {
+    },
+    {
       id: 'tag2',
       name: 'Tag B',
       url: 'http://vanderbilt.edu'
-    }, {
+    },
+    {
       id: 'tag3',
       name: 'Tag C',
       url: 'http://vanderbilt.edu'
-    }, {
+    },
+    {
       id: 'tag4',
       name: 'Tag D',
       url: 'http://vanderbilt.edu'
-    }, {
+    },
+    {
       id: 'tag5',
       name: 'Tag E',
       url: 'http://vanderbilt.edu'
-    }, {
+    },
+    {
       id: 'tag6',
       name: 'Tag F',
       url: 'http://vanderbilt.edu'
-    } ];
+    }
+  ];
 
-    $scope.filtering = {
-      selectedTermIds: [
+  $scope.filtering = {
+    selectedTermIds: [
 
-      ]
-    };
+    ]
+  };
 
-    projectList = $scope.projectList = {
-      items: []
-    };
+  projectList = $scope.projectList = {
+    items: []
+  };
 
-    $scope.filteredProjectList = {
-      items: []
-    };
+  $scope.filteredProjectList = {
+    items: []
+  };
 
 
-    filterItems = function () {
-      $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
-        $scope.filtering.selectedTermIds );
-    };
+  filterItems = function () {
+    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+    $scope.filtering.selectedTermIds );
+  };
 
-    $scope.$watch( function () {
+  $scope.$watch( function () {
 
-        return $scope.filtering.selectedTermIds;
-      }, function () {
-        filterItems();
+    return $scope.filtering.selectedTermIds;
+  }, function () {
+    filterItems();
+  },
+  true );
+
+
+  $scope.$watch( 'filtering.selectedTermIds', function () {
+    filterItems();
+  } );
+
+  $scope.$watch( 'projectList.items', function () {
+    filterItems();
+  } );
+
+  dummyProjectGenerator = function ( id ) {
+
+    var projectDescriptor, i;
+
+    projectDescriptor = {
+      id: id,
+      title: chance.paragraph( {
+        sentences: 1
+      } ),
+      cssClass: 'project-item',
+      toolTip: 'Open project',
+      description: chance.paragraph( {
+        sentences: 2
+      } ),
+      lastUpdated: {
+        time: Date.now(),
+        user: 'N/A'
+
       },
-      true );
-
-
-    $scope.$watch( 'filtering.selectedTermIds', function () {
-      filterItems();
-    } );
-
-    $scope.$watch( 'projectList.items', function () {
-      filterItems();
-    } );
-
-    dummyProjectGenerator = function ( id ) {
-
-      var projectDescriptor, i;
-
-      projectDescriptor = {
-        id: id,
-        title: chance.paragraph( {
-          sentences: 1
-        } ),
-        cssClass: 'project-item',
-        toolTip: 'Open project',
-        description: chance.paragraph( {
-          sentences: 2
-        } ),
-        lastUpdated: {
-          time: Date.now(),
-          user: 'N/A'
-
-        },
-        taxonomyTerms: [],
-        stats: [ {
+      taxonomyTerms: [],
+      stats: [
+        {
           value: id,
           toolTip: 'Commits',
           iconClass: 'fa fa-cloud-upload'
-        }, {
+        },
+        {
           value: id,
           toolTip: 'Users',
           iconClass: 'fa fa-users'
-        } ],
-        details: chance.paragraph( {
-          sentences: 3
-        } )
-      };
-
-      for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
-
-        if ( Math.random() > 0.5 ) {
-          projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
         }
-      }
-
-      return projectDescriptor;
-
+      ],
+      details: chance.paragraph( {
+        sentences: 3
+      } )
     };
 
+    for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-    for ( i = 0; i < 20; i++ ) {
-      $scope.projectList.items.push( dummyProjectGenerator( i ) );
+      if ( Math.random() > 0.5 ) {
+        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
+      }
     }
 
-    $scope.config = config = {
+    return projectDescriptor;
 
-      sortable: true,
-      secondaryItemMenu: true,
-      detailsCollapsible: true,
-      showDetailsLabel: 'Show details',
-      hideDetailsLabel: 'Hide details',
-      filter: {},
+  };
 
-      // Event handlers
+//  for (i = 0; i < 20; i++) {
+//    $scope.projectList.items.push(dummyProjectGenerator(i));
+//  }
 
-      itemSort: function ( jQEvent, ui ) {
-        console.log( 'Sort happened', jQEvent, ui );
-      },
+  projectServiceTest.startTest().then( function () {
+    projectService.getProjects( 'multi' ).then( function ( results ) {
+      $log.debug(results);
+      $scope.projectList.items = results;
+    } );
+  } );
 
-      itemClick: function ( event, item ) {
-        console.log( 'Clicked: ' + item );
-      },
+  $scope.config = config = {
 
-      itemContextmenuRenderer: function ( e, item ) {
-        console.log( 'Contextmenu was triggered for node:', item );
+    sortable: true,
+    secondaryItemMenu: true,
+    detailsCollapsible: true,
+    showDetailsLabel: 'Show details',
+    hideDetailsLabel: 'Hide details',
+    filter: {},
 
-        return [ {
+    // Event handlers
+
+    itemSort: function ( jQEvent, ui ) {
+      console.log( 'Sort happened', jQEvent, ui );
+    },
+
+    itemClick: function ( event, item ) {
+      console.log( 'Clicked: ' + item );
+    },
+
+    itemContextmenuRenderer: function ( e, item ) {
+      console.log( 'Contextmenu was triggered for node:', item );
+
+      return [
+        {
           items: [
 
             {
@@ -186,52 +203,53 @@ angular.module( 'gme.directives.projectBrowser', [
               iconClass: 'fa fa-plus'
             }
           ]
-        } ];
-      },
+        }
+      ];
+    },
 
-      detailsRenderer: function ( item ) {
-        item.details = 'My details are here now!';
-      },
+    detailsRenderer: function ( item ) {
+      item.details = 'My details are here now!';
+    },
 
-      newItemForm: {
-        title: 'Create new Project',
-        itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
-        expanded: false,
-        controller: function ( $scope ) {
+    newItemForm: {
+      title: 'Create new Project',
+      itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
+      expanded: false,
+      controller: function ( $scope ) {
+
+        $scope.newItem = {};
+
+        $scope.tags = angular.copy( availableTerms );
+
+        $scope.createItem = function ( newItem ) {
+
+          newItem.id = newItem.title;
+          projectList.items.push( newItem );
+          console.log( projectList.items );
 
           $scope.newItem = {};
 
-          $scope.tags = angular.copy( availableTerms );
+          config.newItemForm.expanded = false; // this is how you close the form itself
 
-          $scope.createItem = function ( newItem ) {
+        };
 
-            newItem.id = newItem.title;
-            projectList.items.push( newItem );
-            console.log( projectList.items );
-
-            $scope.newItem = {};
-
-            config.newItemForm.expanded = false; // this is how you close the form itself
-
-          };
-
-        }
       }
+    }
 
-    };
+  };
 
 
-  } )
-  .directive( 'projectBrowser', function () {
+} )
+.directive( 'projectBrowser', function () {
 
-    return {
-      scope: false,
-      restrict: 'E',
-      controller: 'ProjectBrowserController',
-      replace: true,
-      templateUrl: '/ng-gme/templates/projectBrowser.html'
-    };
-  } );
+  return {
+    scope: false,
+    restrict: 'E',
+    controller: 'ProjectBrowserController',
+    replace: true,
+    templateUrl: '/ng-gme/templates/projectBrowser.html'
+  };
+} );
 },{"../termFilter/termFilter.js":5}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
@@ -247,8 +265,17 @@ angular.module('gme.directives.projectService', [
     })
     .controller('ProjectServiceController', function($scope, $log, $q, dataStoreService, projectService, projectServiceTest) {
       $scope.projects = [];
-      projectServiceTest.startTest().then(function(result){
-        $scope.projects = result;
+      $scope.tags = [];
+      projectServiceTest.startTest().then(function(){
+        projectService.getProjects('multi').then(function(results){
+          $scope.projects = results;
+        });
+
+        projectService.getAvailableProjectTags('multi').then(function(results){
+          $scope.tags = results;
+        });
+
+
       });
     })
     .directive('projectService', function() {
@@ -1104,9 +1131,38 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
 module.exports = function ( $q, dataStoreService ) {
 
+  this.getAvailableProjectTags = function (databaseId){
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+    deferred = $q.defer();
+    dbConn.projectService = dbConn.projectService || {};
+    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
+      var tagKeys,
+          tags = [];
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      }
+
+      tagKeys = Object.keys(results);
+      for (var i = tagKeys.length - 1; i >= 0; i--) {
+        tags.push({id:tagKeys[i],name:results[tagKeys[i]]});
+      }
+
+      deferred.resolve( tags );
+    } );
+
+    return deferred.promise;
+  };
+
+  this.applyTagsOnProject = function (/*databaseId, projectId, tags*/){
+    // NOTE: Waiting for core fucntion form Tamas
+    // GetProjectInfo
+    return null;
+  };
+
   this.getAvailableProjects = function ( databaseId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = $q.defer();
+    deferred = $q.defer();
     dbConn.projectService = dbConn.projectService || {};
     dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
       if ( err ) {
@@ -1127,10 +1183,16 @@ module.exports = function ( $q, dataStoreService ) {
 
     dbConn.projectService = dbConn.projectService || {};
 
-    dbConn.client.getFullProjectsInfoAsync( function ( err, projects ) {
+    dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
       if ( err ) {
         deferred.reject( err );
         return;
+      }
+
+      var projects = Object.keys(result);
+      for (var i = projects.length - 1; i >= 0; i--) {
+        result[projects[i]].info.id = projects[i];
+        projects[i] = result[projects[i]].info;
       }
 
       deferred.resolve( projects );
@@ -1302,6 +1364,7 @@ module.exports = function ( $q, dataStoreService ) {
     }
   };
 };
+
 },{}],10:[function(require,module,exports){
 /*globals angular, require*/
 
@@ -1328,161 +1391,166 @@ angular.module( 'gme.testServices', [] )
   .service( 'projectServiceTest', ProjectServiceTestClass );
 
 },{"./tests/ProjectServiceTest.js":12}],12:[function(require,module,exports){
-/*globals angular*/
 'use strict';
 
-require('../gmeServices.js');
+require( '../gmeServices.js' );
 
-module.exports = function($q, dataStoreService, projectService){
-    var testProjects = [{
-                projectName: 'ProjectServiceTest1',
-                projectInfo: {
-                    visibleName: 'ProjectServiceTest1',
-                    description: 'project in webGME',
-                    tags: {
-                        tag1: 'Master'
-                    }
-                }
-            }, {
-                projectName: 'ProjectServiceTest2',
-                projectInfo: {
-                    visibleName: 'ProjectServiceTest2',
-                    description: 'project in webGME',
-                    tags: {
-                        tag1: 'Master'
-                    }
-                }
-            }];
-
-    function getProjects() {
-            var deferred = new $q.defer();
-            projectService.getProjects('multi')
-                .then(function(result) {
-                    var projects = Object.keys(result);
-                    for (var i = projects.length - 1; i >= 0; i--) {
-                        result[projects[i]].info.id = projects[i];
-                        projects[i] = result[projects[i]].info;
-                    }
-                    deferred.resolve(projects);
-                });
-            return deferred.promise;
+module.exports = function ( $q, dataStoreService, projectService ) {
+  var testProjects = [
+    {
+      projectName: 'ProjectServiceTest1',
+      projectInfo: {
+        visibleName: 'ProjectServiceTest1',
+        description: 'project in webGME',
+        tags: {
+          tag1: 'Master'
         }
+      }
+    },
+    {
+      projectName: 'ProjectServiceTest2',
+      projectInfo: {
+        visibleName: 'ProjectServiceTest2',
+        description: 'project in webGME',
+        tags: {
+          tag1: 'Master'
+        }
+      }
+    }
+  ];
 
-    this.startTest = function(){
-        var deferred = new $q.defer(),
-            index = 0;
+  /*function getProjects() {
+   var deferred = new $q.defer();
+   projectService.getProjects('multi')
+   .then(function(result) {
+   var projects = Object.keys(result);
+   for (var i = projects.length - 1; i >= 0; i--) {
+   result[projects[i]].info.id = projects[i];
+   projects[i] = result[projects[i]].info;
+   }
+   deferred.resolve(projects);
+   });
+   return deferred.promise;
+   }*/
 
-            dataStoreService.connectToDatabase('multi', {
-                    host: window.location.basename
-                })
-                .then(function() {
-                    projectService.getAvailableProjects('multi').then(function(names) {
-                        if (names) {
-                            var createProjectPromises = [];
+  this.startTest = function () {
+    var deferred = new $q.defer(),
+    index = 0;
 
-                            for (index = 0; index < testProjects.length; index++) {
-                                // If testProject doesn't exist
-                                if (names.indexOf(testProjects[index].projectName) === -1) {
-                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
-                                }
-                            }
+    dataStoreService.connectToDatabase( 'multi', {
+      host: window.location.basename
+    } )
+    .then( function () {
+      projectService.getAvailableProjects( 'multi' ).then( function ( names ) {
+        if ( names ) {
+          var createProjectPromises = [];
 
-                            // Waiting for the createProject promise
-                            if (createProjectPromises.length > 0) {
-                                $q.all(createProjectPromises).then(function() {
-                                    getProjects().then(function(results){deferred.resolve(results);});
-                                });
-                            } else {
-                                getProjects().then(function(results){deferred.resolve(results);});
-                            }
-                        }
-                    });
-                });
+          for ( index = 0; index < testProjects.length; index++ ) {
+            // If testProject doesn't exist
+            if ( names.indexOf( testProjects[index].projectName ) === -1 ) {
+              createProjectPromises.push( projectService.createProject( 'multi', testProjects[index].projectName,
+              testProjects[index].projectInfo ) );
+            }
+          }
 
-            return deferred.promise;
-    };
+          // Waiting for the createProject promise
+          if ( createProjectPromises.length > 0 ) {
+            $q.all( createProjectPromises ).then( function () {
+              deferred.resolve();
+              //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
+            } );
+          } else {
+            deferred.resolve();
+            //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
+          }
+        }
+      } );
+    } );
+
+    return deferred.promise;
+  };
 };
 
 /*
-angular.module('gme.tests.projectService', [
-        'gme.services',
-        'gme.tests.projectService'
-    ])
-    .factory('TestProjectsService', function($scope, $log, $q, dataStoreService, projectService) {
-        var result = {
-                startTest: null
-            },
-            testProjects = [{
-                projectName: 'ProjectServiceTest1',
-                projectInfo: {
-                    visibleName: 'ProjectServiceTest1',
-                    description: 'project in webGME',
-                    tags: {
-                        tag1: 'Master'
-                    }
-                }
-            }, {
-                projectName: 'ProjectServiceTest2',
-                projectInfo: {
-                    visibleName: 'ProjectServiceTest2',
-                    description: 'project in webGME',
-                    tags: {
-                        tag1: 'Master'
-                    }
-                }
-            }],
-            index = 0;
+ angular.module('gme.tests.projectService', [
+ 'gme.services',
+ 'gme.tests.projectService'
+ ])
+ .factory('TestProjectsService', function($scope, $log, $q, dataStoreService, projectService) {
+ var result = {
+ startTest: null
+ },
+ testProjects = [{
+ projectName: 'ProjectServiceTest1',
+ projectInfo: {
+ visibleName: 'ProjectServiceTest1',
+ description: 'project in webGME',
+ tags: {
+ tag1: 'Master'
+ }
+ }
+ }, {
+ projectName: 'ProjectServiceTest2',
+ projectInfo: {
+ visibleName: 'ProjectServiceTest2',
+ description: 'project in webGME',
+ tags: {
+ tag1: 'Master'
+ }
+ }
+ }],
+ index = 0;
 
-        function getProjects() {
-            var deferred = new $q.defer();
-            projectService.getProjects('multi')
-                .then(function(result) {
-                    var projects = Object.keys(result);
-                    for (var i = projects.length - 1; i >= 0; i--) {
-                        result[projects[i]].info.id = projects[i];
-                        projects[i] = result[projects[i]].info;
-                    }
-                    deferred.resolve(projects);
-                });
-            return deferred;
-        }
+ function getProjects() {
+ var deferred = new $q.defer();
+ projectService.getProjects('multi')
+ .then(function(result) {
+ var projects = Object.keys(result);
+ for (var i = projects.length - 1; i >= 0; i--) {
+ result[projects[i]].info.id = projects[i];
+ projects[i] = result[projects[i]].info;
+ }
+ deferred.resolve(projects);
+ });
+ return deferred;
+ }
 
-        function startTest() {
-            var deferred = new $q.defer();
+ function startTest() {
+ var deferred = new $q.defer();
 
-            dataStoreService.connectToDatabase('multi', {
-                    host: window.location.basename
-                })
-                .then(function() {
-                    projectService.getAvailableProjects('multi').then(function(names) {
-                        if (names) {
-                            var createProjectPromises = [];
+ dataStoreService.connectToDatabase('multi', {
+ host: window.location.basename
+ })
+ .then(function() {
+ projectService.getAvailableProjects('multi').then(function(names) {
+ if (names) {
+ var createProjectPromises = [];
 
-                            for (index = 0; index < testProjects.length; index++) {
-                                // If testProject doesn't exist
-                                if (names.indexOf(testProjects[index].projectName) === -1) {
-                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
-                                }
-                            }
+ for (index = 0; index < testProjects.length; index++) {
+ // If testProject doesn't exist
+ if (names.indexOf(testProjects[index].projectName) === -1) {
+ createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
+ }
+ }
 
-                            // Waiting for the createProject promise
-                            if (createProjectPromises.length > 0) {
-                                $q.all(createProjectPromises).then(function() {
-                                    getProjects().then(function(results){deferred.resolve(results);});
-                                });
-                            } else {
-                                getProjects().then(function(results){deferred.resolve(results);});
-                            }
-                        }
-                    });
-                });
+ // Waiting for the createProject promise
+ if (createProjectPromises.length > 0) {
+ $q.all(createProjectPromises).then(function() {
+ getProjects().then(function(results){deferred.resolve(results);});
+ });
+ } else {
+ getProjects().then(function(results){deferred.resolve(results);});
+ }
+ }
+ });
+ });
 
-            return deferred;
-        }
+ return deferred;
+ }
 
-        result.startTest = startTest;
-        return result;
+ result.startTest = startTest;
+ return result;
 
-    });*/
+ });*/
 
 },{"../gmeServices.js":10}]},{},[1]);
