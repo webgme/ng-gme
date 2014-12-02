@@ -2,9 +2,21 @@
 
 module.exports = function ( $q, dataStoreService ) {
 
+  this.getAvailableProjectTags = function (databaseId){
+    // NOTE: Waiting for core function from Tamas
+    // GetAvailableProjectTags
+    return null;
+  };
+
+  this.applyTagsOnProject = function (databaseId, projectId, tags){
+    // NOTE: Waiting for core fucntion form Tamas
+    // GetProjectInfo
+    return null;
+  };
+
   this.getAvailableProjects = function ( databaseId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = $q.defer();
+    deferred = $q.defer();
     dbConn.projectService = dbConn.projectService || {};
     dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
       if ( err ) {
@@ -25,10 +37,16 @@ module.exports = function ( $q, dataStoreService ) {
 
     dbConn.projectService = dbConn.projectService || {};
 
-    dbConn.client.getFullProjectsInfoAsync( function ( err, projects ) {
+    dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
       if ( err ) {
         deferred.reject( err );
         return;
+      }
+
+      var projects = Object.keys(result);
+      for (var i = projects.length - 1; i >= 0; i--) {
+        result[projects[i]].info.id = projects[i];
+        projects[i] = result[projects[i]].info;
       }
 
       deferred.resolve( projects );

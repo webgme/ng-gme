@@ -24,7 +24,7 @@ module.exports = function($q, dataStoreService, projectService){
                 }
             }];
 
-    function getProjects() {
+    /*function getProjects() {
             var deferred = new $q.defer();
             projectService.getProjects('multi')
                 .then(function(result) {
@@ -36,7 +36,7 @@ module.exports = function($q, dataStoreService, projectService){
                     deferred.resolve(projects);
                 });
             return deferred.promise;
-        }
+        }*/
 
     this.startTest = function(){
         var deferred = new $q.defer(),
@@ -60,10 +60,10 @@ module.exports = function($q, dataStoreService, projectService){
                             // Waiting for the createProject promise
                             if (createProjectPromises.length > 0) {
                                 $q.all(createProjectPromises).then(function() {
-                                    getProjects().then(function(results){deferred.resolve(results);});
+                                    projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
                                 });
                             } else {
-                                getProjects().then(function(results){deferred.resolve(results);});
+                                projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
                             }
                         }
                     });
