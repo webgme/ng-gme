@@ -1,3 +1,5 @@
+/*globals angular*/
+
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
@@ -55,15 +57,40 @@ module.exports = function ( $q, dataStoreService ) {
     dbConn.projectService = dbConn.projectService || {};
 
     dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
+
+      var i,
+        projectTags,
+        projects,
+        projectTagsMapper;
+
+      projectTagsMapper = function(tagName, tagId) {
+          projectTags.push({
+            id: tagId,
+            name: tagName
+          });
+        };
+
       if ( err ) {
         deferred.reject( err );
         return;
       }
 
-      var projects = Object.keys(result);
-      for (var i = projects.length - 1; i >= 0; i--) {
+      if (result === null){
+        result = [];
+      }
+
+      projects = Object.keys(result);
+
+      for (i = projects.length - 1; i >= 0; i--) {
         result[projects[i]].info.id = projects[i];
         projects[i] = result[projects[i]].info;
+
+        projectTags = [];
+
+        angular.forEach(projects[i].tags, projectTagsMapper );
+
+        projects[i].tags = projectTags;
+
       }
 
       deferred.resolve( projects );

@@ -12381,7 +12381,8 @@ angular.module( 'gme.directives.projectBrowser', [
 
           id: projectDescriptor.id,
           description: projectDescriptor.description,
-          title: projectDescriptor.visibleName
+          title: projectDescriptor.visibleName,
+          taxonomyTerms: projectDescriptor.tags
 
         });
 
@@ -12493,6 +12494,7 @@ angular.module( 'gme.directives.projectBrowser', [
     templateUrl: '/ng-gme/templates/projectBrowser.html'
   };
 } );
+
 },{"../termFilter/termFilter.js":18}],16:[function(require,module,exports){
 /*globals angular*/
 'use strict';
@@ -12507,38 +12509,69 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log ) {
 'use strict';
 
 
-angular.module('gme.directives.projectService', [
-        'gme.templates',
-        'gme.services',
-        'gme.testServices'
-    ])
-    .run(function() {
+angular.module( 'gme.directives.projectService', [
+  'gme.templates',
+  'gme.services',
+  'gme.testServices'
+] )
+.run( function () {
 
-    })
-    .controller('ProjectServiceController', function($scope, $log, $q, dataStoreService, projectService, projectServiceTest) {
-      $scope.projects = [];
-      $scope.tags = [];
-//      projectServiceTest.startTest().then(function(){
-//        projectService.getProjects('multi').then(function(results){
-//          $scope.projects = results;
-//        });
-//
-//        projectService.getAvailableProjectTags('multi').then(function(results){
-//          $scope.tags = results;
-//        });
-//
-//
-//      });
-    })
-    .directive('projectService', function() {
-        return {
-            scope: false,
-            restrict: 'E',
-            controller: 'ProjectServiceController',
-            replace: true,
-            templateUrl: '/ng-gme/templates/projectService.html'
-        };
-    });
+} )
+.controller( 'ProjectServiceController',
+function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
+  $scope.projects = [];
+  $scope.tags = [];
+  projectServiceTest.startTest().then( function () {
+//    projectService.getProjects( 'multi' ).then( function ( results ) {
+//      $scope.projects = results;
+//    }, function ( err ) {
+//      console.log( 'Cannot get projects: ' + err );
+//    } );
+
+    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
+      $scope.tags = results;
+    }, function ( err ) {
+      console.log( 'Cannot get tags: ' + err );
+    } );
+
+
+  } );
+
+
+  /*var a = projectServiceTest.startTest();
+   a.then(function(){
+   console.log('start: ' + 1);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 1);
+   });
+   }, function(){console.log('cannot start: ' + 1);});
+
+   var b = projectServiceTest.startTest();
+   b.then(function(){
+   console.log('start: ' + 2);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 2);
+   });
+   }, function(){console.log('cannot start: ' + 2);});
+
+   var c = projectServiceTest.startTest();
+   c.then(function(){
+   console.log('start: ' + 3);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 3);
+   });
+   }, function(){console.log('cannot start: ' + 3);});*/
+
+} )
+.directive( 'projectService', function () {
+  return {
+    scope: false,
+    restrict: 'E',
+    controller: 'ProjectServiceController',
+    replace: true,
+    templateUrl: '/ng-gme/templates/projectService.html'
+  };
+} );
 
 },{}],18:[function(require,module,exports){
 /*globals angular*/
@@ -12808,60 +12841,161 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
 'use strict';
 
-module.exports = function ( $q ) {
-  var dataStores = {};
+module.exports = function($q) {
+    var dataStores = {},
+        connectQueue = [],
+        queueProcessing = false,
+        connectNextInQueue,
+        processQueue;
 
-  this.connectToDatabase = function ( databaseId, options ) {
-    var deferred = $q.defer(),
-      client;
+    /*isAnotherThreadConnecting = function(databaseId) {
+        if (connectingProgress.indexOf(databaseId) !== -1) {
+            return true;
+        }
+        return false;
+    };
 
-    if ( dataStores.hasOwnProperty( databaseId ) ) {
-      // FIXME: this may or may not ready yet...
-      deferred.resolve();
-    } else {
-      client = new WebGMEGlobal.classes.Client( options );
+    connect = function(databaseId, options, deferred) {
+        var client;
 
-      // hold a reference to the client instance
-      dataStores[ databaseId ] = {
-        client: client
-      };
+        connectingProgress.push(databaseId);
 
-      // TODO: add event listeners to client
+        if (dataStores.hasOwnProperty(databaseId)) {
+            console.log('connection already exists, remove from connecting phase');
+            connectingProgress.splice(connectingProgress.indexOf(databaseId), 1);
 
-      // FIXME: deferred should not be used from closure
-      client.connectToDatabaseAsync( {}, function ( err ) {
-        if ( err ) {
-          deferred.reject( err );
-          return;
+            // FIXME: this may or may not ready yet...
+            deferred.resolve();
+        } else {
+
+
+            client = new WebGMEGlobal.classes.Client(options);
+
+            // hold a reference to the client instance
+            dataStores[databaseId] = {
+                client: client
+            };
+
+            // TODO: add event listeners to client
+
+            // FIXME: deferred should not be used from closure
+            client.connectToDatabaseAsync({}, function(err) {
+                console.log('connected, remove from connecting phase');
+                connectingProgress.splice(connectingProgress.indexOf(databaseId), 1);
+                if (err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                deferred.resolve();
+            });
+        }
+    };
+
+    waitForAnotherThread = function(databaseId, options, deferred, maxTry) {
+        if (isAnotherThreadConnecting(databaseId)) {
+            console.log('another thread is connecting: ' + maxTry);
+            timer = setTimeout(function() {
+                clearTimeout(timer);
+                if (maxTry-- > 0) {
+                    waitForAnotherThread(databaseId, options, deferred, maxTry);
+                }
+            }, 100);
+        } else {
+            console.log('connecting, remaining tries' + maxTry);
+            connect(databaseId, options, deferred);
+        }
+    };*/
+
+
+    // Picks up the next connectionmeta and tries to connect
+    // After a(n) (un)successful connection, the defered resolve/promise is called
+    // and the function picks up the next item from the queue
+    connectNextInQueue = function() {
+        if (connectQueue.length > 0) {
+            var currentItem = connectQueue[0];
+
+            if (dataStores.hasOwnProperty(currentItem.databaseId)) {
+                // FIXME: this may or may not ready yet...
+                currentItem.deferred.resolve();
+                connectQueue.splice(0, 1);
+                connectNextInQueue();
+            } else {
+                var client = new WebGMEGlobal.classes.Client(currentItem.options);
+
+                // hold a reference to the client instance
+                dataStores[currentItem.databaseId] = {
+                    client: client
+                };
+
+                // TODO: add event listeners to client
+                // FIXME: deferred should not be used from closure
+                client.connectToDatabaseAsync({}, function(err) {
+                    if (err) {
+                        currentItem.deferred.reject(err);
+                    } else {
+                      currentItem.deferred.resolve();
+                    }
+
+                    connectQueue.splice(0, 1);
+                    connectNextInQueue();
+                });
+            }
+        } else {
+            queueProcessing = false;
+            if (connectQueue.length > 0) {
+              processQueue();
+            }
+        }
+    };
+
+    // Check if there are any processing phase
+    // No simultaneous processing
+    processQueue = function() {
+        if (!queueProcessing) {
+            queueProcessing = true;
+            connectNextInQueue();
+        }
+    };
+
+    // Just one connection phase at one time.
+    // Multiple connection phase may cause 'unexpected results'
+    this.connectToDatabase = function(databaseId, options) {
+        var deferred = $q.defer();
+
+        // Put the connection metadata into a queue
+        connectQueue.push({
+            databaseId: databaseId, // Where to connect? Default: 'multi'
+            deferred: deferred,     // defered object, where the notifications are sent if the connection succesful (or not)
+            options: options        // Connection oprtions
+        });
+
+        processQueue();
+
+        return deferred.promise;
+    };
+
+    this.getDatabaseConnection = function(databaseId) {
+        if (dataStores.hasOwnProperty(databaseId) && typeof dataStores[databaseId] === 'object') {
+            return dataStores[databaseId];
         }
 
-        deferred.resolve();
-      } );
-    }
+        console.error(databaseId + ' does not have an active database connection.');
+    };
 
-    return deferred.promise;
-  };
+    this.watchConnection = function( /*databaseId*/ ) {
+        // TODO: handle events
+        // TODO: CONNECTED
+        // TODO: DISCONNECTED
 
-  this.getDatabaseConnection = function ( databaseId ) {
-    if ( dataStores.hasOwnProperty( databaseId ) && typeof dataStores[ databaseId ] === 'object' ) {
-      return dataStores[ databaseId ];
-    }
+        // TODO: NETWORKSTATUS_CHANGED
 
-    console.error( databaseId + ' does not have an active database connection.' );
-  };
+        throw new Error('Not implemented yet.');
+    };
 
-  this.watchConnection = function ( /*databaseId*/) {
-    // TODO: handle events
-    // TODO: CONNECTED
-    // TODO: DISCONNECTED
-
-    // TODO: NETWORKSTATUS_CHANGED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
+    // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
+
 },{}],22:[function(require,module,exports){
 'use strict';
 
@@ -13386,6 +13520,8 @@ module.exports = function ( $q, dataStoreService, branchService ) {
   };
 };
 },{}],23:[function(require,module,exports){
+/*globals angular*/
+
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
@@ -13443,15 +13579,40 @@ module.exports = function ( $q, dataStoreService ) {
     dbConn.projectService = dbConn.projectService || {};
 
     dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
+
+      var i,
+        projectTags,
+        projects,
+        projectTagsMapper;
+
+      projectTagsMapper = function(tagName, tagId) {
+          projectTags.push({
+            id: tagId,
+            name: tagName
+          });
+        };
+
       if ( err ) {
         deferred.reject( err );
         return;
       }
 
-      var projects = Object.keys(result);
-      for (var i = projects.length - 1; i >= 0; i--) {
+      if (result === null){
+        result = [];
+      }
+
+      projects = Object.keys(result);
+
+      for (i = projects.length - 1; i >= 0; i--) {
         result[projects[i]].info.id = projects[i];
         projects[i] = result[projects[i]].info;
+
+        projectTags = [];
+
+        angular.forEach(projects[i].tags, projectTagsMapper );
+
+        projects[i].tags = projectTags;
+
       }
 
       deferred.resolve( projects );
@@ -13701,6 +13862,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     } )
     .then( function () {
       projectService.getAvailableProjects( 'multi' ).then( function ( names ) {
+        //console.log('AvailableProjects: ' + names);
         if ( names ) {
           var createProjectPromises = [];
 
@@ -13723,8 +13885,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
             //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
           }
         }
-      } );
-    } );
+      }/*, function(err){
+            console.log('Available project error: ' + err);
+      } */);
+    }/*, function(err){
+        console.log('database connection error: ' + err);
+    } */);
 
     return deferred.promise;
   };

@@ -49,6 +49,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     } )
     .then( function () {
       projectService.getAvailableProjects( 'multi' ).then( function ( names ) {
+        //console.log('AvailableProjects: ' + names);
         if ( names ) {
           var createProjectPromises = [];
 
@@ -71,8 +72,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
             //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
           }
         }
-      } );
-    } );
+      }/*, function(err){
+            console.log('Available project error: ' + err);
+      } */);
+    }/*, function(err){
+        console.log('database connection error: ' + err);
+    } */);
 
     return deferred.promise;
   };

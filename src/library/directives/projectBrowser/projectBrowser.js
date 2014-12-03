@@ -159,7 +159,8 @@ angular.module( 'gme.directives.projectBrowser', [
 
           id: projectDescriptor.id,
           description: projectDescriptor.description,
-          title: projectDescriptor.visibleName
+          title: projectDescriptor.visibleName,
+          taxonomyTerms: projectDescriptor.tags
 
         });
 
