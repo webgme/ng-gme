@@ -12239,42 +12239,48 @@ angular.module( 'gme.directives.projectBrowser', [
 
   var config,
   dummyProjectGenerator,
+
+  projectDescriptorMapper,
+
   filterItems,
   projectList,
   availableTerms;
 
-  availableTerms = $scope.availableTerms = [
-    {
-      id: 'tag1',
-      name: 'Tag A',
-      url: 'http://vanderbilt.edu'
-    },
-    {
-      id: 'tag2',
-      name: 'Tag B',
-      url: 'http://vanderbilt.edu'
-    },
-    {
-      id: 'tag3',
-      name: 'Tag C',
-      url: 'http://vanderbilt.edu'
-    },
-    {
-      id: 'tag4',
-      name: 'Tag D',
-      url: 'http://vanderbilt.edu'
-    },
-    {
-      id: 'tag5',
-      name: 'Tag E',
-      url: 'http://vanderbilt.edu'
-    },
-    {
-      id: 'tag6',
-      name: 'Tag F',
-      url: 'http://vanderbilt.edu'
-    }
-  ];
+  availableTerms = $scope.availableTerms = [];
+
+//  availableTerms = $scope.availableTerms = [
+//    {
+//      id: 'tag1',
+//      name: 'Tag A',
+//      url: 'http://vanderbilt.edu'
+//    },
+//    {
+//      id: 'tag2',
+//      name: 'Tag B',
+//      url: 'http://vanderbilt.edu'
+//    },
+//    {
+//      id: 'tag3',
+//      name: 'Tag C',
+//      url: 'http://vanderbilt.edu'
+//    },
+//    {
+//      id: 'tag4',
+//      name: 'Tag D',
+//      url: 'http://vanderbilt.edu'
+//    },
+//    {
+//      id: 'tag5',
+//      name: 'Tag E',
+//      url: 'http://vanderbilt.edu'
+//    },
+//    {
+//      id: 'tag6',
+//      name: 'Tag F',
+//      url: 'http://vanderbilt.edu'
+//    }
+//  ];
+
 
   $scope.filtering = {
     selectedTermIds: [
@@ -12365,12 +12371,47 @@ angular.module( 'gme.directives.projectBrowser', [
 //    $scope.projectList.items.push(dummyProjectGenerator(i));
 //  }
 
+  projectDescriptorMapper = function(projectDescriptors) {
+
+    var result = [];
+
+    angular.forEach(projectDescriptors, function(projectDescriptor) {
+
+        result.push({
+
+          id: projectDescriptor.id,
+          description: projectDescriptor.description,
+          title: projectDescriptor.visibleName
+
+        });
+
+      });
+
+    return result;
+
+  };
+
+  // Making sure we have test project in DB
+
   projectServiceTest.startTest().then( function () {
-    projectService.getProjects( 'multi' ).then( function ( results ) {
-      $log.debug(results);
-      $scope.projectList.items = results;
-    } );
-  } );
+
+
+    projectService.getAvailableProjectTags( 'multi' ).then( function(tagList) {
+
+      $scope.availableTerms = tagList;
+
+    });
+
+    projectService.getProjects( 'multi' ).then( function ( gmeProjectDescriptors ) {
+      $log.debug(gmeProjectDescriptors);
+
+      $scope.projectList.items = [];
+      $scope.projectList.items = projectDescriptorMapper(gmeProjectDescriptors);
+
+      //$scope.projectList.items = results;
+    });
+
+  });
 
   $scope.config = config = {
 
@@ -12477,17 +12518,17 @@ angular.module('gme.directives.projectService', [
     .controller('ProjectServiceController', function($scope, $log, $q, dataStoreService, projectService, projectServiceTest) {
       $scope.projects = [];
       $scope.tags = [];
-      projectServiceTest.startTest().then(function(){
-        projectService.getProjects('multi').then(function(results){
-          $scope.projects = results;
-        });
-
-        projectService.getAvailableProjectTags('multi').then(function(results){
-          $scope.tags = results;
-        });
-
-
-      });
+//      projectServiceTest.startTest().then(function(){
+//        projectService.getProjects('multi').then(function(results){
+//          $scope.projects = results;
+//        });
+//
+//        projectService.getAvailableProjectTags('multi').then(function(results){
+//          $scope.tags = results;
+//        });
+//
+//
+//      });
     })
     .directive('projectService', function() {
         return {
