@@ -2,10 +2,14 @@
 /*globals angular, require, Chance*/
 'use strict';
 
-var components = [ {
+var directiveComponents, serviceComponents;
+
+directiveComponents = [ {
   name: 'projectBrowser',
   sources: [ 'demo.html', 'demo.js' ]
-}, {
+} ];
+
+serviceComponents = [ {
   name: 'projectService',
   sources: [ 'demo.html', 'demo.js' ]
 } ];
@@ -14,7 +18,7 @@ window.chance = new Chance();
 
 require( '../library/ng-gme.js' );
 require( '../library/directives/projectBrowser/docs/demo.js' );
-require( '../library/directives/projectService/docs/demo.js' );
+require( '../library/services/projectService/docs/demo.js' );
 
 
 require( 'angular-sanitize' );
@@ -39,8 +43,11 @@ var demoApp = angular.module(
     'gme.docs.templates',
     'btford.markdown',
     'ui.codemirror',
-    'ui.bootstrap',
-  ].concat( components.map( function ( e ) {
+    'ui.bootstrap'
+  ].concat( directiveComponents.map( function ( e ) {
+    return 'gme.' + e.name + '.demo';
+  } ) )
+  .concat( serviceComponents.map( function ( e ) {
     return 'gme.' + e.name + '.demo';
   } ) )
 );
@@ -64,7 +71,7 @@ demoApp.controller(
       'html': 'htmlmixed'
     };
 
-    $scope.components = components.map( function ( component ) {
+    $scope.components = directiveComponents.map( function ( component ) {
       var sources,
         viewerOptions,
         fileExtension;
@@ -98,11 +105,45 @@ demoApp.controller(
       };
     } );
 
+    $scope.components = $scope.components.concat(serviceComponents.map( function ( component ) {
+      var sources,
+        viewerOptions,
+        fileExtension;
+
+      if ( angular.isArray( component.sources ) ) {
+        sources = component.sources.map( function ( sourceFile ) {
+
+          fileExtension = fileExtensionRE.exec( sourceFile );
+
+          viewerOptions = {
+            lineWrapping: true,
+            lineNumbers: true,
+            readOnly: true,
+            mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
+          };
+
+          return {
+            fileName: sourceFile,
+            code: $templateCache.get( '/library/services/' + component.name + '/docs/' +
+              sourceFile ),
+            viewerOptions: viewerOptions
+          };
+        } );
+      }
+
+      return {
+        name: component.name,
+        template: '/library/services/' + component.name + '/docs/demo.html',
+        docs: '/library/services/' + component.name + '/docs/readme.md',
+        sources: sources
+      };
+    } )
+    );
   } );
 
 
 demoApp.controller( '' );
-},{"../library/directives/projectBrowser/docs/demo.js":14,"../library/directives/projectService/docs/demo.js":16,"../library/ng-gme.js":19,"angular-markdown-directive":5,"angular-sanitize":6,"angular-ui-codemirror":2,"codemirror":7,"codemirror-css":4,"codemirror/mode/htmlmixed/htmlmixed":9,"codemirror/mode/javascript/javascript":10,"codemirror/mode/xml/xml":11,"showdown":27,"ui-utils":3}],2:[function(require,module,exports){
+},{"../library/directives/projectBrowser/docs/demo.js":14,"../library/ng-gme.js":17,"../library/services/projectService/docs/demo.js":24,"angular-markdown-directive":5,"angular-sanitize":6,"angular-ui-codemirror":2,"codemirror":7,"codemirror-css":4,"codemirror/mode/htmlmixed/htmlmixed":9,"codemirror/mode/javascript/javascript":10,"codemirror/mode/xml/xml":11,"showdown":26,"ui-utils":3}],2:[function(require,module,exports){
 'use strict';
 /**
  * Binds a CodeMirror widget to a <textarea> element.
@@ -12203,14 +12244,12 @@ module.exports.byUrl = function(url) {
 'use strict';
 
 require( './projectBrowser/projectBrowser.js' );
-require( './projectService/projectService.js' );
 
 angular.module( 'gme.directives', [
   'gme.templates',
-  'gme.directives.projectBrowser',
-  'gme.directives.projectService'
+  'gme.directives.projectBrowser'
 ] );
-},{"./projectBrowser/projectBrowser.js":15,"./projectService/projectService.js":17}],14:[function(require,module,exports){
+},{"./projectBrowser/projectBrowser.js":15}],14:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -12508,85 +12547,7 @@ angular.module( 'gme.directives.projectBrowser', [
   };
 } );
 
-},{"../termFilter/termFilter.js":18}],16:[function(require,module,exports){
-/*globals angular*/
-'use strict';
-
-var demoApp = angular.module( 'gme.projectService.demo', [ 'gme.directives.projectService' ] );
-
-demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log ) {
-  $log.debug( 'In ProjectServiceDemoController' );
-} );
-},{}],17:[function(require,module,exports){
-/*globals angular*/
-'use strict';
-
-
-angular.module( 'gme.directives.projectService', [
-  'gme.templates',
-  'gme.services',
-  'gme.testServices'
-] )
-.run( function () {
-
-} )
-.controller( 'ProjectServiceController',
-function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
-  $scope.projects = [];
-  $scope.tags = [];
-  projectServiceTest.startTest().then( function () {
-//    projectService.getProjects( 'multi' ).then( function ( results ) {
-//      $scope.projects = results;
-//    }, function ( err ) {
-//      console.log( 'Cannot get projects: ' + err );
-//    } );
-
-    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
-      $scope.tags = results;
-    }, function ( err ) {
-      console.log( 'Cannot get tags: ' + err );
-    } );
-
-
-  } );
-
-
-  /*var a = projectServiceTest.startTest();
-   a.then(function(){
-   console.log('start: ' + 1);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 1);
-   });
-   }, function(){console.log('cannot start: ' + 1);});
-
-   var b = projectServiceTest.startTest();
-   b.then(function(){
-   console.log('start: ' + 2);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 2);
-   });
-   }, function(){console.log('cannot start: ' + 2);});
-
-   var c = projectServiceTest.startTest();
-   c.then(function(){
-   console.log('start: ' + 3);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 3);
-   });
-   }, function(){console.log('cannot start: ' + 3);});*/
-
-} )
-.directive( 'projectService', function () {
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectServiceController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectService.html'
-  };
-} );
-
-},{}],18:[function(require,module,exports){
+},{"../termFilter/termFilter.js":16}],16:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -12689,14 +12650,14 @@ angular.module(
         templateUrl: '/ng-gme/templates/termFilter.html'
       };
     } );
-},{}],19:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 require( './services/gmeServices.js' );
 require( './services/gmeTestServices.js');
 require( './directives/gmeDirectives.js' );
 
-},{"./directives/gmeDirectives.js":13,"./services/gmeServices.js":24,"./services/gmeTestServices.js":25}],20:[function(require,module,exports){
+},{"./directives/gmeDirectives.js":13,"./services/gmeServices.js":22,"./services/gmeTestServices.js":23}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -12849,7 +12810,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     // TODO: register for branch change event OR BranchService onInitialize
   };
 };
-},{}],21:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
@@ -13009,7 +12970,7 @@ module.exports = function($q) {
     // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
 
-},{}],22:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
@@ -13532,7 +13493,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     }
   };
 };
-},{}],23:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*globals angular*/
 
 'use strict';
@@ -13798,13 +13759,13 @@ module.exports = function ( $q, dataStoreService ) {
   };
 };
 
-},{}],24:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
 
 var DataStoreServiceClass = require( './DataStoreService.js' ),
-  ProjectServiceClass = require( './ProjectService.js' ),
+  ProjectServiceClass = require( './ProjectService/ProjectService.js' ),
   BranchServiceClass = require( './BranchService.js' ),
   NodeServiceClass = require( './NodeService.js' );
 
@@ -13813,7 +13774,7 @@ angular.module( 'gme.services', [] )
   .service( 'projectService', ProjectServiceClass )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
-},{"./BranchService.js":20,"./DataStoreService.js":21,"./NodeService.js":22,"./ProjectService.js":23}],25:[function(require,module,exports){
+},{"./BranchService.js":18,"./DataStoreService.js":19,"./NodeService.js":20,"./ProjectService/ProjectService.js":21}],23:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
@@ -13823,7 +13784,61 @@ var ProjectServiceTestClass = require( './tests/ProjectServiceTest.js' );
 angular.module( 'gme.testServices', [] )
   .service( 'projectServiceTest', ProjectServiceTestClass );
 
-},{"./tests/ProjectServiceTest.js":26}],26:[function(require,module,exports){
+},{"./tests/ProjectServiceTest.js":25}],24:[function(require,module,exports){
+/*globals angular*/
+'use strict';
+
+var demoApp = angular.module( 'gme.projectService.demo', [
+  'gme.services',
+  'gme.testServices'
+] );
+
+demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
+  $scope.projects = [];
+  $scope.tags = [];
+  projectServiceTest.startTest().then( function () {
+//    projectService.getProjects( 'multi' ).then( function ( results ) {
+//      $scope.projects = results;
+//    }, function ( err ) {
+//      console.log( 'Cannot get projects: ' + err );
+//    } );
+
+    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
+      $scope.tags = results;
+    }, function ( err ) {
+      console.log( 'Cannot get tags: ' + err );
+    } );
+
+
+  } );
+
+
+  /*var a = projectServiceTest.startTest();
+   a.then(function(){
+   console.log('start: ' + 1);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 1);
+   });
+   }, function(){console.log('cannot start: ' + 1);});
+
+   var b = projectServiceTest.startTest();
+   b.then(function(){
+   console.log('start: ' + 2);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 2);
+   });
+   }, function(){console.log('cannot start: ' + 2);});
+
+   var c = projectServiceTest.startTest();
+   c.then(function(){
+   console.log('start: ' + 3);
+   projectService.getProjects('multi').then(function(results){
+   console.log('ended: ' + 3);
+   });
+   }, function(){console.log('cannot start: ' + 3);});*/
+
+} );
+},{}],25:[function(require,module,exports){
 'use strict';
 
 require( '../gmeServices.js' );
@@ -13991,7 +14006,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
  });*/
 
-},{"../gmeServices.js":24}],27:[function(require,module,exports){
+},{"../gmeServices.js":22}],26:[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 //

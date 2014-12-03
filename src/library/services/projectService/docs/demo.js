@@ -1,17 +1,12 @@
 /*globals angular*/
 'use strict';
 
-
-angular.module( 'gme.directives.projectService', [
-  'gme.templates',
+var demoApp = angular.module( 'gme.projectService.demo', [
   'gme.services',
   'gme.testServices'
-] )
-.run( function () {
+] );
 
-} )
-.controller( 'ProjectServiceController',
-function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
+demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
   $scope.projects = [];
   $scope.tags = [];
   projectServiceTest.startTest().then( function () {
@@ -55,13 +50,4 @@ function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTes
    });
    }, function(){console.log('cannot start: ' + 3);});*/
 
-} )
-.directive( 'projectService', function () {
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectServiceController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectService.html'
-  };
 } );

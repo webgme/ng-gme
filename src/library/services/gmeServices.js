@@ -3,7 +3,7 @@
 'use strict';
 
 var DataStoreServiceClass = require( './DataStoreService.js' ),
-  ProjectServiceClass = require( './ProjectService.js' ),
+  ProjectServiceClass = require( './ProjectService/ProjectService.js' ),
   BranchServiceClass = require( './BranchService.js' ),
   NodeServiceClass = require( './NodeService.js' );
 

@@ -1,10 +1,14 @@
 /*globals angular, require, Chance*/
 'use strict';
 
-var components = [ {
+var directiveComponents, serviceComponents;
+
+directiveComponents = [ {
   name: 'projectBrowser',
   sources: [ 'demo.html', 'demo.js' ]
-}, {
+} ];
+
+serviceComponents = [ {
   name: 'projectService',
   sources: [ 'demo.html', 'demo.js' ]
 } ];
@@ -13,7 +17,7 @@ window.chance = new Chance();
 
 require( '../library/ng-gme.js' );
 require( '../library/directives/projectBrowser/docs/demo.js' );
-require( '../library/directives/projectService/docs/demo.js' );
+require( '../library/services/projectService/docs/demo.js' );
 
 
 require( 'angular-sanitize' );
@@ -38,8 +42,11 @@ var demoApp = angular.module(
     'gme.docs.templates',
     'btford.markdown',
     'ui.codemirror',
-    'ui.bootstrap',
-  ].concat( components.map( function ( e ) {
+    'ui.bootstrap'
+  ].concat( directiveComponents.map( function ( e ) {
+    return 'gme.' + e.name + '.demo';
+  } ) )
+  .concat( serviceComponents.map( function ( e ) {
     return 'gme.' + e.name + '.demo';
   } ) )
 );
@@ -63,7 +70,7 @@ demoApp.controller(
       'html': 'htmlmixed'
     };
 
-    $scope.components = components.map( function ( component ) {
+    $scope.components = directiveComponents.map( function ( component ) {
       var sources,
         viewerOptions,
         fileExtension;
@@ -97,6 +104,40 @@ demoApp.controller(
       };
     } );
 
+    $scope.components = $scope.components.concat(serviceComponents.map( function ( component ) {
+      var sources,
+        viewerOptions,
+        fileExtension;
+
+      if ( angular.isArray( component.sources ) ) {
+        sources = component.sources.map( function ( sourceFile ) {
+
+          fileExtension = fileExtensionRE.exec( sourceFile );
+
+          viewerOptions = {
+            lineWrapping: true,
+            lineNumbers: true,
+            readOnly: true,
+            mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
+          };
+
+          return {
+            fileName: sourceFile,
+            code: $templateCache.get( '/library/services/' + component.name + '/docs/' +
+              sourceFile ),
+            viewerOptions: viewerOptions
+          };
+        } );
+      }
+
+      return {
+        name: component.name,
+        template: '/library/services/' + component.name + '/docs/demo.html',
+        docs: '/library/services/' + component.name + '/docs/readme.md',
+        sources: sources
+      };
+    } )
+    );
   } );
 
 

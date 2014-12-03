@@ -5,19 +5,17 @@ require( './services/gmeServices.js' );
 require( './services/gmeTestServices.js');
 require( './directives/gmeDirectives.js' );
 
-},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":10,"./services/gmeTestServices.js":11}],2:[function(require,module,exports){
+},{"./directives/gmeDirectives.js":2,"./services/gmeServices.js":9,"./services/gmeTestServices.js":10}],2:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
 require( './projectBrowser/projectBrowser.js' );
-require( './projectService/projectService.js' );
 
 angular.module( 'gme.directives', [
   'gme.templates',
-  'gme.directives.projectBrowser',
-  'gme.directives.projectService'
+  'gme.directives.projectBrowser'
 ] );
-},{"./projectBrowser/projectBrowser.js":3,"./projectService/projectService.js":4}],3:[function(require,module,exports){
+},{"./projectBrowser/projectBrowser.js":3}],3:[function(require,module,exports){
 /*globals angular, chance*/
 'use strict';
 
@@ -306,76 +304,7 @@ angular.module( 'gme.directives.projectBrowser', [
   };
 } );
 
-},{"../termFilter/termFilter.js":5}],4:[function(require,module,exports){
-/*globals angular*/
-'use strict';
-
-
-angular.module( 'gme.directives.projectService', [
-  'gme.templates',
-  'gme.services',
-  'gme.testServices'
-] )
-.run( function () {
-
-} )
-.controller( 'ProjectServiceController',
-function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
-  $scope.projects = [];
-  $scope.tags = [];
-  projectServiceTest.startTest().then( function () {
-//    projectService.getProjects( 'multi' ).then( function ( results ) {
-//      $scope.projects = results;
-//    }, function ( err ) {
-//      console.log( 'Cannot get projects: ' + err );
-//    } );
-
-    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
-      $scope.tags = results;
-    }, function ( err ) {
-      console.log( 'Cannot get tags: ' + err );
-    } );
-
-
-  } );
-
-
-  /*var a = projectServiceTest.startTest();
-   a.then(function(){
-   console.log('start: ' + 1);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 1);
-   });
-   }, function(){console.log('cannot start: ' + 1);});
-
-   var b = projectServiceTest.startTest();
-   b.then(function(){
-   console.log('start: ' + 2);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 2);
-   });
-   }, function(){console.log('cannot start: ' + 2);});
-
-   var c = projectServiceTest.startTest();
-   c.then(function(){
-   console.log('start: ' + 3);
-   projectService.getProjects('multi').then(function(results){
-   console.log('ended: ' + 3);
-   });
-   }, function(){console.log('cannot start: ' + 3);});*/
-
-} )
-.directive( 'projectService', function () {
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectServiceController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectService.html'
-  };
-} );
-
-},{}],5:[function(require,module,exports){
+},{"../termFilter/termFilter.js":4}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
@@ -478,7 +407,7 @@ angular.module(
         templateUrl: '/ng-gme/templates/termFilter.html'
       };
     } );
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
@@ -631,7 +560,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     // TODO: register for branch change event OR BranchService onInitialize
   };
 };
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
@@ -791,7 +720,7 @@ module.exports = function($q) {
     // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
@@ -1314,7 +1243,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     }
   };
 };
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*globals angular*/
 
 'use strict';
@@ -1580,13 +1509,13 @@ module.exports = function ( $q, dataStoreService ) {
   };
 };
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
 
 var DataStoreServiceClass = require( './DataStoreService.js' ),
-  ProjectServiceClass = require( './ProjectService.js' ),
+  ProjectServiceClass = require( './ProjectService/ProjectService.js' ),
   BranchServiceClass = require( './BranchService.js' ),
   NodeServiceClass = require( './NodeService.js' );
 
@@ -1595,7 +1524,7 @@ angular.module( 'gme.services', [] )
   .service( 'projectService', ProjectServiceClass )
   .service( 'branchService', BranchServiceClass )
   .service( 'nodeService', NodeServiceClass );
-},{"./BranchService.js":6,"./DataStoreService.js":7,"./NodeService.js":8,"./ProjectService.js":9}],11:[function(require,module,exports){
+},{"./BranchService.js":5,"./DataStoreService.js":6,"./NodeService.js":7,"./ProjectService/ProjectService.js":8}],10:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
@@ -1605,7 +1534,7 @@ var ProjectServiceTestClass = require( './tests/ProjectServiceTest.js' );
 angular.module( 'gme.testServices', [] )
   .service( 'projectServiceTest', ProjectServiceTestClass );
 
-},{"./tests/ProjectServiceTest.js":12}],12:[function(require,module,exports){
+},{"./tests/ProjectServiceTest.js":11}],11:[function(require,module,exports){
 'use strict';
 
 require( '../gmeServices.js' );
@@ -1773,4 +1702,4 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
  });*/
 
-},{"../gmeServices.js":10}]},{},[1]);
+},{"../gmeServices.js":9}]},{},[1]);
