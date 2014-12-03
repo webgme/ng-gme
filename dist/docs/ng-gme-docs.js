@@ -13061,6 +13061,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
             deferred.resolve( nodes[ id ] );
           } else if ( event.etype === 'update' ) {
             nodes[ id ]._onUpdate( event.eid );
+            nodes[ id ].__onUpdate( event.eid );
           } else if ( event.etype === 'unload' ) {
             nodes[ id ]._onUnload( event.eid );
             nodes[ id ].__onUnload();
@@ -13211,6 +13212,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     this.databaseConnection = dataStoreService.getDatabaseConnection( context.db );
     // TODO: Should these be arrays of functions? The controller may want to add more methods.
     this._onUpdate = function ( /*id*/) {};
+    this.__onUpdate = function ( /*id*/) {};
     this._onUnload = function ( /*id*/) {};
     // This will always be called on unload.
     this.__onUnload = function () {
@@ -13233,7 +13235,16 @@ module.exports = function ( $q, dataStoreService, branchService ) {
   };
 
   NodeObj.prototype.setAttribute = function ( name, value, msg ) {
+    var self = this,
+      deferred = $q.defer();
+    this.__onUpdate = function (id) {
+      if (self.getAttribute(name) === value) {  // FIXME: This won't work for non-primitive attributes.
+        self.__onUpdate = function () {};
+        deferred.resolve();
+      }
+    };
     this.databaseConnection.client.setAttributes( this.id, name, value, msg );
+    return deferred.promise;
   };
 
   NodeObj.prototype.getRegistry = function ( /*name*/) {
