@@ -219,10 +219,22 @@ angular.module( 'gme.directives.projectBrowser', [
           items: [
 
             {
-              id: 'create',
-              label: 'Create new',
+              id: 'open',
+              label: 'Open Project',
               disabled: true,
-              iconClass: 'fa fa-plus'
+              iconClass: ''
+            },
+            {
+              id: 'edit',
+              label: 'Edit Project Details',
+              disabled: true,
+              iconClass: ''
+            },
+            {
+              id: 'delete',
+              label: 'Delete Project',
+              disabled: true,
+              iconClass: ''
             }
           ]
         }
@@ -246,6 +258,7 @@ angular.module( 'gme.directives.projectBrowser', [
         $scope.createItem = function ( newItem ) {
 
           newItem.id = newItem.title;
+          console.log(newItem.tags);
           projectList.items.push( newItem );
           console.log( projectList.items );
 
