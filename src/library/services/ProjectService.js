@@ -59,6 +59,9 @@ module.exports = function ( $q, dataStoreService ) {
         deferred.reject( err );
         return;
       }
+      if (result === null){
+        result = [];
+      }
 
       var projects = Object.keys(result);
       for (var i = projects.length - 1; i >= 0; i--) {
