@@ -3,10 +3,10 @@
   <ul>
     <li><b>Available projects</b>
       <ul>
-        <li ng-repeat='project in projects'><i>Project Name (and Id):</i> {{ project.visibleName }} ({{ project.visibleName }})
+        <li ng-repeat='project in projects'><i>Project Name (and Id):</i> {{ project.info.visibleName }} ({{ project.id }})
           <ul>
-            <li>Description: {{ project.description }}</li>
-            <li>Tags: <span ng-repeat='tag in project.tags'>{{ tag }}; </span></li>
+            <li>Description: {{ project.info.description }}</li>
+            <li>Tags: <span ng-repeat='tag in project.info.tags'>{{ tag }}; </span></li>
           </ul>
         </li>
       </ul>

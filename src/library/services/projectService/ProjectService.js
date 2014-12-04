@@ -75,17 +75,15 @@ module.exports = function($q, dataStoreService) {
     };
 
     this.getProjects = function(databaseId) {
-
         var dbConn = dataStoreService.getDatabaseConnection(databaseId),
             deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
         dbConn.client.getFullProjectsInfoAsync(function(err, result) {
-
-            var i,
-                projectTags,
-                projects,
+            var projectTags,
+                projects = [],
+                projectMapper,
                 projectTagsMapper;
 
             projectTagsMapper = function(tagName, tagId) {
@@ -95,34 +93,31 @@ module.exports = function($q, dataStoreService) {
                 });
             };
 
+            projectMapper = function(project, projectId) {
+              projectTags = [];
+
+              // Transform tags
+              angular.forEach(project.info.tags, projectTagsMapper);
+              project.info.tags = projectTags;
+
+              // Transform project
+              projects.push({
+                id: projectId,
+                branches: project.branches,
+                info: project.info,
+                rights: project.rights
+              });
+            };
+
             if (err) {
                 deferred.reject(err);
                 return;
             }
 
-            if (result === null) {
-                result = [];
-            }
-
-            projects = Object.keys(result);
-
-            for (i = projects.length - 1; i >= 0; i--) {
-                result[projects[i]].info.id = projects[i];
-                projects[i] = result[projects[i]].info;
-
-                projectTags = [];
-
-                angular.forEach(projects[i].tags, projectTagsMapper);
-
-                projects[i].tags = projectTags;
-
-            }
-
+            angular.forEach(result, projectMapper);
             deferred.resolve(projects);
         });
-
         return deferred.promise;
-
     };
 
     this.getProjectsIds = function(databaseId) {
