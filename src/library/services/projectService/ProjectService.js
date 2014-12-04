@@ -134,6 +134,22 @@ module.exports = function ( $q, dataStoreService ) {
     return deferred.promise;
   };
 
+  this.deleteProject = function ( databaseId, projectname ) {
+    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+      deferred = new $q.defer();
+
+    dbConn.client.deleteProjectAsync( projectname, function ( err ) {
+      if ( err ) {
+        deferred.reject( err );
+        return;
+      } else {
+        deferred.resolve();
+      }
+    } );
+
+    return deferred.promise;
+  };
+
   this.selectProject = function ( databaseId, projectId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
       deferred = new $q.defer();

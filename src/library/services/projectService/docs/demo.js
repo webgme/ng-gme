@@ -10,11 +10,11 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q,
   $scope.projects = [];
   $scope.tags = [];
   projectServiceTest.startTest().then( function () {
-//    projectService.getProjects( 'multi' ).then( function ( results ) {
-//      $scope.projects = results;
-//    }, function ( err ) {
-//      console.log( 'Cannot get projects: ' + err );
-//    } );
+    projectService.getProjects( 'multi' ).then( function ( results ) {
+      $scope.projects = results;
+    }, function ( err ) {
+      console.log( 'Cannot get projects: ' + err );
+    } );
 
     projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
       $scope.tags = results;
