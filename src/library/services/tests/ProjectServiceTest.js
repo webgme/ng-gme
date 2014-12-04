@@ -31,6 +31,7 @@ module.exports = function($q, dataStoreService, projectService) {
                 host: window.location.basename
             })
             .then(function() {
+              //projectService.applyTagsOnProject('multi','ProjectServiceTest2',[{id:'t1', name:'alma1'},{id:'t2', name:'korte2'}]);
                 //projectService.deleteProject('multi', 'ProjectServiceTest1').then(function() {
                     projectService.getAvailableProjects('multi').then(function(names) {
                         if (names) {
