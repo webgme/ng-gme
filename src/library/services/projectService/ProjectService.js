@@ -43,7 +43,6 @@ module.exports = function($q, dataStoreService) {
                 deferred.reject(err);
                 return;
             }
-            debugger;
             // Transform the tags to key-value format
             angular.forEach(newTags, tagMapper);
             existingInfo.tags = mappedTags;
