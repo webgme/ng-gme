@@ -1248,265 +1248,314 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
 'use strict';
 
-module.exports = function ( $q, dataStoreService ) {
+module.exports = function($q, dataStoreService) {
 
-  this.getAvailableProjectTags = function (databaseId){
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
-      var tagKeys,
-          tags = [];
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      tagKeys = Object.keys(results);
-      for (var i = tagKeys.length - 1; i >= 0; i--) {
-        tags.push({id:tagKeys[i],name:results[tagKeys[i]]});
-      }
-
-      deferred.resolve( tags );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.applyTagsOnProject = function (/*databaseId, projectId, tags*/){
-    // NOTE: Waiting for core fucntion form Tamas
-    // GetProjectInfo
-    return null;
-  };
-
-  this.getAvailableProjects = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projects );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.getProjects = function ( databaseId ) {
-
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
-
-      var i,
-        projectTags,
-        projects,
-        projectTagsMapper;
-
-      projectTagsMapper = function(tagName, tagId) {
-          projectTags.push({
-            id: tagId,
-            name: tagName
-          });
-        };
-
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      if (result === null){
-        result = [];
-      }
-
-      projects = Object.keys(result);
-
-      for (i = projects.length - 1; i >= 0; i--) {
-        result[projects[i]].info.id = projects[i];
-        projects[i] = result[projects[i]].info;
-
-        projectTags = [];
-
-        angular.forEach(projects[i].tags, projectTagsMapper );
-
-        projects[i].tags = projectTags;
-
-      }
-
-      deferred.resolve( projects );
-    } );
-
-    return deferred.promise;
-
-  };
-
-  this.getProjectsIds = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getAvailableProjectsAsync( function ( err, projectIds ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projectIds );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.createProject = function ( databaseId, projectname, projectInfo ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      } else {
-        deferred.resolve();
-      }
-    } );
-
-    return deferred.promise;
-  };
-
-  this.selectProject = function ( databaseId, projectId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    this.getProjectsIds( databaseId )
-      .then( function ( projectIds ) {
-        if ( projectIds.indexOf( projectId ) > -1 ) {
-          dbConn.client.selectProjectAsync( projectId, function ( err ) {
-            if ( err ) {
-              deferred.reject( err );
-              return;
+    this.getAvailableProjectTags = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAllInfoTagsAsync(function(err, results) {
+            var tagKeys,
+                tags = [];
+            if (err) {
+                deferred.reject(err);
+                return;
             }
 
-            dbConn.projectService.projectId = projectId;
+            tagKeys = Object.keys(results);
+            for (var i = tagKeys.length - 1; i >= 0; i--) {
+                tags.push({
+                    id: tagKeys[i],
+                    name: results[tagKeys[i]]
+                });
+            }
 
-            deferred.resolve( projectId );
-          } );
-        } else {
-          deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
-            databaseId ) );
-        }
-      } )
-      .
-    catch ( function ( reason ) {
-      deferred.reject( reason );
-    } );
+            deferred.resolve(tags);
+        });
 
-    return deferred.promise;
-  };
+        return deferred.promise;
+    };
 
-  this.watchProjects = function ( /*databaseId*/) {
-    // TODO: register for project events
-    // TODO: SERVER_PROJECT_CREATED
-    // TODO: SERVER_PROJECT_DELETED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.on = function ( databaseId, eventName, fn ) {
-    var dbConn,
-      i;
-
-    console.assert( typeof databaseId === 'string' );
-    console.assert( typeof eventName === 'string' );
-    console.assert( typeof fn === 'function' );
-
-    dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
-
-    if ( typeof dbConn.projectService.events === 'undefined' ) {
-      // this should not be an inline function
-
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
-        function ( dummy /* FIXME */ , projectId ) {
-
-          if ( dbConn.projectService.projectId !== projectId ) {
-            dbConn.projectService.projectId = projectId;
-
-            console.log( 'There was a PROJECT_OPENED event', projectId );
-            if ( projectId ) {
-              // initialize
-              if ( dbConn.projectService &&
-                dbConn.projectService.events &&
-                dbConn.projectService.events.initialize ) {
-
-                dbConn.projectService.isInitialized = true;
-
-                for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
-                  dbConn.projectService.events.initialize[ i ]( databaseId );
+    this.applyTagsOnProject = function(databaseId, projectId, newTags) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer(),
+            mappedTags = {},
+            tagMapper = function(tag){
+              mappedTags[tag.id] = tag.name;
+            };
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getProjectInfoAsync(projectId, function(err, existingInfo) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+            // Transform the tags to key-value format
+            angular.forEach(newTags, tagMapper);
+            existingInfo.tags = mappedTags;
+            dbConn.client.setProjectInfoAsync(projectId, existingInfo, function(errInfo) {
+                if (errInfo) {
+                    deferred.reject(errInfo);
+                    return;
                 }
-              }
+                deferred.resolve();
+            });
+        });
+
+        return deferred.promise;
+    };
+
+    this.getAvailableProjects = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAvailableProjectsAsync(function(err, projects) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(projects);
+        });
+
+        return deferred.promise;
+    };
+
+    this.getProjects = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getFullProjectsInfoAsync(function(err, result) {
+            var projectTags,
+                branches,
+                projects = [],
+                projectMapper,
+                projectTagsMapper,
+                branchMapper;
+
+            projectTagsMapper = function(tagName, tagId) {
+                projectTags.push({
+                    id: tagId,
+                    name: tagName
+                });
+            };
+
+            branchMapper = function(commitId, branchId) {
+                branches.push({
+                    branchId: branchId,
+                    commitId: commitId
+                });
+            };
+
+            projectMapper = function(project, projectId) {
+              projectTags = [];
+              branches = [];
+
+              // Transform tags
+              angular.forEach(project.info.tags, projectTagsMapper);
+              project.info.tags = projectTags;
+
+              // Transform branches
+              angular.forEach(project.branches, branchMapper);
+
+              // Transform project
+              projects.push({
+                id: projectId,
+                branches: branches,
+                info: project.info,
+                rights: project.rights
+              });
+            };
+
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            angular.forEach(result, projectMapper);
+            deferred.resolve(projects);
+        });
+        return deferred.promise;
+    };
+
+    this.getProjectsIds = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getAvailableProjectsAsync(function(err, projectIds) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(projectIds);
+        });
+
+        return deferred.promise;
+    };
+
+    this.createProject = function(databaseId, projectname, projectInfo) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.client.createProjectAsync(projectname, projectInfo, function(err) {
+            if (err) {
+                deferred.reject(err);
+                return;
             } else {
-              // branchId is falsy, empty or null or undefined
-              // destroy
-              if ( dbConn.projectService &&
-                dbConn.projectService.events &&
-                dbConn.projectService.events.destroy ) {
+                deferred.resolve();
+            }
+        });
 
-                dbConn.projectService.isInitialized = false;
+        return deferred.promise;
+    };
 
-                for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-                  dbConn.projectService.events.destroy[ i ]( databaseId );
+    this.deleteProject = function(databaseId, projectname) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.client.deleteProjectAsync(projectname, function(err) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    this.selectProject = function(databaseId, projectId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        this.getProjectsIds(databaseId)
+            .then(function(projectIds) {
+                if (projectIds.indexOf(projectId) > -1) {
+                    dbConn.client.selectProjectAsync(projectId, function(err) {
+                        if (err) {
+                            deferred.reject(err);
+                            return;
+                        }
+
+                        dbConn.projectService.projectId = projectId;
+
+                        deferred.resolve(projectId);
+                    });
+                } else {
+                    deferred.reject(new Error('Project does not exist. ' + projectId + ' databaseId: ' +
+                        databaseId));
                 }
-              }
+            })
+            .
+        catch(function(reason) {
+            deferred.reject(reason);
+        });
+
+        return deferred.promise;
+    };
+
+    this.watchProjects = function( /*databaseId*/ ) {
+        // TODO: register for project events
+        // TODO: SERVER_PROJECT_CREATED
+        // TODO: SERVER_PROJECT_DELETED
+
+        throw new Error('Not implemented yet.');
+    };
+
+    this.on = function(databaseId, eventName, fn) {
+        var dbConn,
+            i;
+
+        console.assert(typeof databaseId === 'string');
+        console.assert(typeof eventName === 'string');
+        console.assert(typeof fn === 'function');
+
+        dbConn = dataStoreService.getDatabaseConnection(databaseId);
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
+
+        if (typeof dbConn.projectService.events === 'undefined') {
+            // this should not be an inline function
+
+            dbConn.client.addEventListener(dbConn.client.events.PROJECT_OPENED,
+                function(dummy /* FIXME */ , projectId) {
+
+                    if (dbConn.projectService.projectId !== projectId) {
+                        dbConn.projectService.projectId = projectId;
+
+                        console.log('There was a PROJECT_OPENED event', projectId);
+                        if (projectId) {
+                            // initialize
+                            if (dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.initialize) {
+
+                                dbConn.projectService.isInitialized = true;
+
+                                for (i = 0; i < dbConn.projectService.events.initialize.length; i += 1) {
+                                    dbConn.projectService.events.initialize[i](databaseId);
+                                }
+                            }
+                        } else {
+                            // branchId is falsy, empty or null or undefined
+                            // destroy
+                            if (dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.destroy) {
+
+                                dbConn.projectService.isInitialized = false;
+
+                                for (i = 0; i < dbConn.projectService.events.destroy.length; i += 1) {
+                                    dbConn.projectService.events.destroy[i](databaseId);
+                                }
+                            }
+                        }
+                    }
+                });
+
+            dbConn.client.addEventListener(dbConn.client.events.PROJECT_CLOSED,
+                function( /*dummy*/ /* FIXME */ ) {
+                    console.log('There was a PROJECT_CLOSED event', dbConn.projectService.projectId);
+
+                    delete dbConn.projectService.projectId;
+
+                    // destroy
+                    if (dbConn.projectService &&
+                        dbConn.projectService.events &&
+                        dbConn.projectService.events.destroy) {
+
+                        dbConn.projectService.isInitialized = false;
+
+                        for (i = 0; i < dbConn.projectService.events.destroy.length; i += 1) {
+                            dbConn.projectService.events.destroy[i](databaseId);
+                        }
+                    }
+
+                });
+        }
+
+        dbConn.projectService.events = dbConn.projectService.events || {};
+        dbConn.projectService.events[eventName] = dbConn.projectService.events[eventName] || [];
+        dbConn.projectService.events[eventName].push(fn);
+
+        if (dbConn.projectService.isInitialized) {
+            if (eventName === 'initialize') {
+                fn(databaseId);
             }
-          }
-        } );
-
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
-        function ( /*dummy*/ /* FIXME */) {
-          console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
-
-          delete dbConn.projectService.projectId;
-
-          // destroy
-          if ( dbConn.projectService &&
-            dbConn.projectService.events &&
-            dbConn.projectService.events.destroy ) {
-
-            dbConn.projectService.isInitialized = false;
-
-            for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-              dbConn.projectService.events.destroy[ i ]( databaseId );
+        } else {
+            if (eventName === 'destroy') {
+                fn(databaseId);
             }
-          }
-
-        } );
-    }
-
-    dbConn.projectService.events = dbConn.projectService.events || {};
-    dbConn.projectService.events[ eventName ] = dbConn.projectService.events[ eventName ] || [];
-    dbConn.projectService.events[ eventName ].push( fn );
-
-    if ( dbConn.projectService.isInitialized ) {
-      if ( eventName === 'initialize' ) {
-        fn( databaseId );
-      }
-    } else {
-      if ( eventName === 'destroy' ) {
-        fn( databaseId );
-      }
-    }
-  };
+        }
+    };
 };
 
 },{}],9:[function(require,module,exports){
@@ -1537,169 +1586,66 @@ angular.module( 'gme.testServices', [] )
 },{"./tests/ProjectServiceTest.js":11}],11:[function(require,module,exports){
 'use strict';
 
-require( '../gmeServices.js' );
+require('../gmeServices.js');
 
-module.exports = function ( $q, dataStoreService, projectService ) {
-  var testProjects = [
-    {
-      projectName: 'ProjectServiceTest1',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest1',
-        description: 'project in webGME',
-        tags: {
-          tag1: 'Master'
-        }
-      }
-    },
-    {
-      projectName: 'ProjectServiceTest2',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest2',
-        description: 'project in webGME',
-        tags: {
-          tag1: 'Master'
-        }
-      }
-    }
-  ];
-
-  /*function getProjects() {
-   var deferred = new $q.defer();
-   projectService.getProjects('multi')
-   .then(function(result) {
-   var projects = Object.keys(result);
-   for (var i = projects.length - 1; i >= 0; i--) {
-   result[projects[i]].info.id = projects[i];
-   projects[i] = result[projects[i]].info;
-   }
-   deferred.resolve(projects);
-   });
-   return deferred.promise;
-   }*/
-
-  this.startTest = function () {
-    var deferred = new $q.defer(),
-    index = 0;
-
-    dataStoreService.connectToDatabase( 'multi', {
-      host: window.location.basename
-    } )
-    .then( function () {
-      projectService.getAvailableProjects( 'multi' ).then( function ( names ) {
-        //console.log('AvailableProjects: ' + names);
-        if ( names ) {
-          var createProjectPromises = [];
-
-          for ( index = 0; index < testProjects.length; index++ ) {
-            // If testProject doesn't exist
-            if ( names.indexOf( testProjects[index].projectName ) === -1 ) {
-              createProjectPromises.push( projectService.createProject( 'multi', testProjects[index].projectName,
-              testProjects[index].projectInfo ) );
+module.exports = function($q, dataStoreService, projectService) {
+    var testProjects = [{
+        projectName: 'ProjectServiceTest1',
+        projectInfo: {
+            visibleName: 'ProjectServiceTest1',
+            description: 'project in webGME',
+            tags: {
+                tag1: 'Master'
             }
-          }
-
-          // Waiting for the createProject promise
-          if ( createProjectPromises.length > 0 ) {
-            $q.all( createProjectPromises ).then( function () {
-              deferred.resolve();
-              //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
-            } );
-          } else {
-            deferred.resolve();
-            //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
-          }
         }
-      }/*, function(err){
-            console.log('Available project error: ' + err);
-      } */);
-    }/*, function(err){
-        console.log('database connection error: ' + err);
-    } */);
+    }, {
+        projectName: 'ProjectServiceTest2',
+        projectInfo: {
+            visibleName: 'ProjectServiceTest2',
+            description: 'project in webGME',
+            tags: {
+                tag1: 'Master'
+            }
+        }
+    }];
 
-    return deferred.promise;
-  };
+    this.startTest = function() {
+        var deferred = new $q.defer(),
+            index = 0;
+
+        dataStoreService.connectToDatabase('multi', {
+                host: window.location.basename
+            })
+            .then(function() {
+              //projectService.applyTagsOnProject('multi','ProjectServiceTest2',[{id:'t1', name:'alma1'},{id:'t2', name:'korte2'}]);
+                //projectService.deleteProject('multi', 'ProjectServiceTest1').then(function() {
+                    projectService.getAvailableProjects('multi').then(function(names) {
+                        if (names) {
+                            var createProjectPromises = [];
+
+                            for (index = 0; index < testProjects.length; index++) {
+                                // If testProject doesn't exist
+                                if (names.indexOf(testProjects[index].projectName) === -1) {
+                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName,
+                                        testProjects[index].projectInfo));
+                                }
+                            }
+
+                            // Waiting for the createProject promise
+                            if (createProjectPromises.length > 0) {
+                                $q.all(createProjectPromises).then(function() {
+                                    deferred.resolve();
+                                });
+                            } else {
+                                deferred.resolve();
+                            }
+                        }
+                    });
+                //});
+            });
+
+        return deferred.promise;
+    };
 };
-
-/*
- angular.module('gme.tests.projectService', [
- 'gme.services',
- 'gme.tests.projectService'
- ])
- .factory('TestProjectsService', function($scope, $log, $q, dataStoreService, projectService) {
- var result = {
- startTest: null
- },
- testProjects = [{
- projectName: 'ProjectServiceTest1',
- projectInfo: {
- visibleName: 'ProjectServiceTest1',
- description: 'project in webGME',
- tags: {
- tag1: 'Master'
- }
- }
- }, {
- projectName: 'ProjectServiceTest2',
- projectInfo: {
- visibleName: 'ProjectServiceTest2',
- description: 'project in webGME',
- tags: {
- tag1: 'Master'
- }
- }
- }],
- index = 0;
-
- function getProjects() {
- var deferred = new $q.defer();
- projectService.getProjects('multi')
- .then(function(result) {
- var projects = Object.keys(result);
- for (var i = projects.length - 1; i >= 0; i--) {
- result[projects[i]].info.id = projects[i];
- projects[i] = result[projects[i]].info;
- }
- deferred.resolve(projects);
- });
- return deferred;
- }
-
- function startTest() {
- var deferred = new $q.defer();
-
- dataStoreService.connectToDatabase('multi', {
- host: window.location.basename
- })
- .then(function() {
- projectService.getAvailableProjects('multi').then(function(names) {
- if (names) {
- var createProjectPromises = [];
-
- for (index = 0; index < testProjects.length; index++) {
- // If testProject doesn't exist
- if (names.indexOf(testProjects[index].projectName) === -1) {
- createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
- }
- }
-
- // Waiting for the createProject promise
- if (createProjectPromises.length > 0) {
- $q.all(createProjectPromises).then(function() {
- getProjects().then(function(results){deferred.resolve(results);});
- });
- } else {
- getProjects().then(function(results){deferred.resolve(results);});
- }
- }
- });
- });
-
- return deferred;
- }
-
- result.startTest = startTest;
- return result;
-
- });*/
 
 },{"../gmeServices.js":9}]},{},[1]);

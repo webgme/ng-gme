@@ -2307,8 +2307,8 @@ angular.module('ui.utils',  [
 ]);
 
 },{}],4:[function(require,module,exports){
-var css = "/* BASICS */\n\n.CodeMirror {\n  /* Set height, width, borders, and global font properties here */\n  font-family: monospace;\n  height: 300px;\n}\n.CodeMirror-scroll {\n  /* Set scrolling behaviour here */\n  overflow: auto;\n}\n\n/* PADDING */\n\n.CodeMirror-lines {\n  padding: 4px 0; /* Vertical padding around content */\n}\n.CodeMirror pre {\n  padding: 0 4px; /* Horizontal padding of content */\n}\n\n.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {\n  background-color: white; /* The little square between H and V scrollbars */\n}\n\n/* GUTTER */\n\n.CodeMirror-gutters {\n  border-right: 1px solid #ddd;\n  background-color: #f7f7f7;\n  white-space: nowrap;\n}\n.CodeMirror-linenumbers {}\n.CodeMirror-linenumber {\n  padding: 0 3px 0 5px;\n  min-width: 20px;\n  text-align: right;\n  color: #999;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n\n.CodeMirror-guttermarker { color: black; }\n.CodeMirror-guttermarker-subtle { color: #999; }\n\n/* CURSOR */\n\n.CodeMirror div.CodeMirror-cursor {\n  border-left: 1px solid black;\n}\n/* Shown when moving in bi-directional text */\n.CodeMirror div.CodeMirror-secondarycursor {\n  border-left: 1px solid silver;\n}\n.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {\n  width: auto;\n  border: 0;\n  background: #7e7;\n}\n.cm-animate-fat-cursor {\n  width: auto;\n  border: 0;\n  -webkit-animation: blink 1.06s steps(1) infinite;\n  -moz-animation: blink 1.06s steps(1) infinite;\n  animation: blink 1.06s steps(1) infinite;\n}\n@-moz-keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n@-webkit-keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n@keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n\n/* Can style cursor different in overwrite (non-insert) mode */\ndiv.CodeMirror-overwrite div.CodeMirror-cursor {}\n\n.cm-tab { display: inline-block; }\n\n.CodeMirror-ruler {\n  border-left: 1px solid #ccc;\n  position: absolute;\n}\n\n/* DEFAULT THEME */\n\n.cm-s-default .cm-keyword {color: #708;}\n.cm-s-default .cm-atom {color: #219;}\n.cm-s-default .cm-number {color: #164;}\n.cm-s-default .cm-def {color: #00f;}\n.cm-s-default .cm-variable,\n.cm-s-default .cm-punctuation,\n.cm-s-default .cm-property,\n.cm-s-default .cm-operator {}\n.cm-s-default .cm-variable-2 {color: #05a;}\n.cm-s-default .cm-variable-3 {color: #085;}\n.cm-s-default .cm-comment {color: #a50;}\n.cm-s-default .cm-string {color: #a11;}\n.cm-s-default .cm-string-2 {color: #f50;}\n.cm-s-default .cm-meta {color: #555;}\n.cm-s-default .cm-qualifier {color: #555;}\n.cm-s-default .cm-builtin {color: #30a;}\n.cm-s-default .cm-bracket {color: #997;}\n.cm-s-default .cm-tag {color: #170;}\n.cm-s-default .cm-attribute {color: #00c;}\n.cm-s-default .cm-header {color: blue;}\n.cm-s-default .cm-quote {color: #090;}\n.cm-s-default .cm-hr {color: #999;}\n.cm-s-default .cm-link {color: #00c;}\n\n.cm-negative {color: #d44;}\n.cm-positive {color: #292;}\n.cm-header, .cm-strong {font-weight: bold;}\n.cm-em {font-style: italic;}\n.cm-link {text-decoration: underline;}\n\n.cm-s-default .cm-error {color: #f00;}\n.cm-invalidchar {color: #f00;}\n\n/* Default styles for common addons */\n\ndiv.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}\ndiv.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}\n.CodeMirror-matchingtag { background: rgba(255, 150, 0, .3); }\n.CodeMirror-activeline-background {background: #e8f2ff;}\n\n/* STOP */\n\n/* The rest of this file contains styles related to the mechanics of\n   the editor. You probably shouldn't touch them. */\n\n.CodeMirror {\n  line-height: 1;\n  position: relative;\n  overflow: hidden;\n  background: white;\n  color: black;\n}\n\n.CodeMirror-scroll {\n  /* 30px is the magic margin used to hide the element's real scrollbars */\n  /* See overflow: hidden in .CodeMirror */\n  margin-bottom: -30px; margin-right: -30px;\n  padding-bottom: 30px;\n  height: 100%;\n  outline: none; /* Prevent dragging from highlighting the element */\n  position: relative;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n.CodeMirror-sizer {\n  position: relative;\n  border-right: 30px solid transparent;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n\n/* The fake, visible scrollbars. Used to force redraw during scrolling\n   before actuall scrolling happens, thus preventing shaking and\n   flickering artifacts. */\n.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {\n  position: absolute;\n  z-index: 6;\n  display: none;\n}\n.CodeMirror-vscrollbar {\n  right: 0; top: 0;\n  overflow-x: hidden;\n  overflow-y: scroll;\n}\n.CodeMirror-hscrollbar {\n  bottom: 0; left: 0;\n  overflow-y: hidden;\n  overflow-x: scroll;\n}\n.CodeMirror-scrollbar-filler {\n  right: 0; bottom: 0;\n}\n.CodeMirror-gutter-filler {\n  left: 0; bottom: 0;\n}\n\n.CodeMirror-gutters {\n  position: absolute; left: 0; top: 0;\n  padding-bottom: 30px;\n  z-index: 3;\n}\n.CodeMirror-gutter {\n  white-space: normal;\n  height: 100%;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n  padding-bottom: 30px;\n  margin-bottom: -32px;\n  display: inline-block;\n  /* Hack to make IE7 behave */\n  *zoom:1;\n  *display:inline;\n}\n.CodeMirror-gutter-elt {\n  position: absolute;\n  cursor: default;\n  z-index: 4;\n}\n\n.CodeMirror-lines {\n  cursor: text;\n}\n.CodeMirror pre {\n  /* Reset some styles that the rest of the page might have set */\n  -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0;\n  border-width: 0;\n  background: transparent;\n  font-family: inherit;\n  font-size: inherit;\n  margin: 0;\n  white-space: pre;\n  word-wrap: normal;\n  line-height: inherit;\n  color: inherit;\n  z-index: 2;\n  position: relative;\n  overflow: visible;\n}\n.CodeMirror-wrap pre {\n  word-wrap: break-word;\n  white-space: pre-wrap;\n  word-break: normal;\n}\n\n.CodeMirror-linebackground {\n  position: absolute;\n  left: 0; right: 0; top: 0; bottom: 0;\n  z-index: 0;\n}\n\n.CodeMirror-linewidget {\n  position: relative;\n  z-index: 2;\n  overflow: auto;\n}\n\n.CodeMirror-widget {}\n\n.CodeMirror-wrap .CodeMirror-scroll {\n  overflow-x: hidden;\n}\n\n.CodeMirror-measure {\n  position: absolute;\n  width: 100%;\n  height: 0;\n  overflow: hidden;\n  visibility: hidden;\n}\n.CodeMirror-measure pre { position: static; }\n\n.CodeMirror div.CodeMirror-cursor {\n  position: absolute;\n  border-right: none;\n  width: 0;\n}\n\ndiv.CodeMirror-cursors {\n  visibility: hidden;\n  position: relative;\n  z-index: 1;\n}\n.CodeMirror-focused div.CodeMirror-cursors {\n  visibility: visible;\n}\n\n.CodeMirror-selected { background: #d9d9d9; }\n.CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }\n.CodeMirror-crosshair { cursor: crosshair; }\n\n.cm-searching {\n  background: #ffa;\n  background: rgba(255, 255, 0, .4);\n}\n\n/* IE7 hack to prevent it from returning funny offsetTops on the spans */\n.CodeMirror span { *vertical-align: text-bottom; }\n\n/* Used to force a border model for a node */\n.cm-force-border { padding-right: .1px; }\n\n@media print {\n  /* Hide the cursor when printing */\n  .CodeMirror div.CodeMirror-cursors {\n    visibility: hidden;\n  }\n}\n"; (require("/Volumes/Projects/webgme/ng-gme/node_modules/cssify"))(css); module.exports = css;
-},{"/Volumes/Projects/webgme/ng-gme/node_modules/cssify":12}],5:[function(require,module,exports){
+var css = "/* BASICS */\n\n.CodeMirror {\n  /* Set height, width, borders, and global font properties here */\n  font-family: monospace;\n  height: 300px;\n}\n.CodeMirror-scroll {\n  /* Set scrolling behaviour here */\n  overflow: auto;\n}\n\n/* PADDING */\n\n.CodeMirror-lines {\n  padding: 4px 0; /* Vertical padding around content */\n}\n.CodeMirror pre {\n  padding: 0 4px; /* Horizontal padding of content */\n}\n\n.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {\n  background-color: white; /* The little square between H and V scrollbars */\n}\n\n/* GUTTER */\n\n.CodeMirror-gutters {\n  border-right: 1px solid #ddd;\n  background-color: #f7f7f7;\n  white-space: nowrap;\n}\n.CodeMirror-linenumbers {}\n.CodeMirror-linenumber {\n  padding: 0 3px 0 5px;\n  min-width: 20px;\n  text-align: right;\n  color: #999;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n\n.CodeMirror-guttermarker { color: black; }\n.CodeMirror-guttermarker-subtle { color: #999; }\n\n/* CURSOR */\n\n.CodeMirror div.CodeMirror-cursor {\n  border-left: 1px solid black;\n}\n/* Shown when moving in bi-directional text */\n.CodeMirror div.CodeMirror-secondarycursor {\n  border-left: 1px solid silver;\n}\n.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {\n  width: auto;\n  border: 0;\n  background: #7e7;\n}\n.cm-animate-fat-cursor {\n  width: auto;\n  border: 0;\n  -webkit-animation: blink 1.06s steps(1) infinite;\n  -moz-animation: blink 1.06s steps(1) infinite;\n  animation: blink 1.06s steps(1) infinite;\n}\n@-moz-keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n@-webkit-keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n@keyframes blink {\n  0% { background: #7e7; }\n  50% { background: none; }\n  100% { background: #7e7; }\n}\n\n/* Can style cursor different in overwrite (non-insert) mode */\ndiv.CodeMirror-overwrite div.CodeMirror-cursor {}\n\n.cm-tab { display: inline-block; }\n\n.CodeMirror-ruler {\n  border-left: 1px solid #ccc;\n  position: absolute;\n}\n\n/* DEFAULT THEME */\n\n.cm-s-default .cm-keyword {color: #708;}\n.cm-s-default .cm-atom {color: #219;}\n.cm-s-default .cm-number {color: #164;}\n.cm-s-default .cm-def {color: #00f;}\n.cm-s-default .cm-variable,\n.cm-s-default .cm-punctuation,\n.cm-s-default .cm-property,\n.cm-s-default .cm-operator {}\n.cm-s-default .cm-variable-2 {color: #05a;}\n.cm-s-default .cm-variable-3 {color: #085;}\n.cm-s-default .cm-comment {color: #a50;}\n.cm-s-default .cm-string {color: #a11;}\n.cm-s-default .cm-string-2 {color: #f50;}\n.cm-s-default .cm-meta {color: #555;}\n.cm-s-default .cm-qualifier {color: #555;}\n.cm-s-default .cm-builtin {color: #30a;}\n.cm-s-default .cm-bracket {color: #997;}\n.cm-s-default .cm-tag {color: #170;}\n.cm-s-default .cm-attribute {color: #00c;}\n.cm-s-default .cm-header {color: blue;}\n.cm-s-default .cm-quote {color: #090;}\n.cm-s-default .cm-hr {color: #999;}\n.cm-s-default .cm-link {color: #00c;}\n\n.cm-negative {color: #d44;}\n.cm-positive {color: #292;}\n.cm-header, .cm-strong {font-weight: bold;}\n.cm-em {font-style: italic;}\n.cm-link {text-decoration: underline;}\n\n.cm-s-default .cm-error {color: #f00;}\n.cm-invalidchar {color: #f00;}\n\n/* Default styles for common addons */\n\ndiv.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}\ndiv.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}\n.CodeMirror-matchingtag { background: rgba(255, 150, 0, .3); }\n.CodeMirror-activeline-background {background: #e8f2ff;}\n\n/* STOP */\n\n/* The rest of this file contains styles related to the mechanics of\n   the editor. You probably shouldn't touch them. */\n\n.CodeMirror {\n  line-height: 1;\n  position: relative;\n  overflow: hidden;\n  background: white;\n  color: black;\n}\n\n.CodeMirror-scroll {\n  /* 30px is the magic margin used to hide the element's real scrollbars */\n  /* See overflow: hidden in .CodeMirror */\n  margin-bottom: -30px; margin-right: -30px;\n  padding-bottom: 30px;\n  height: 100%;\n  outline: none; /* Prevent dragging from highlighting the element */\n  position: relative;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n.CodeMirror-sizer {\n  position: relative;\n  border-right: 30px solid transparent;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n\n/* The fake, visible scrollbars. Used to force redraw during scrolling\n   before actuall scrolling happens, thus preventing shaking and\n   flickering artifacts. */\n.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {\n  position: absolute;\n  z-index: 6;\n  display: none;\n}\n.CodeMirror-vscrollbar {\n  right: 0; top: 0;\n  overflow-x: hidden;\n  overflow-y: scroll;\n}\n.CodeMirror-hscrollbar {\n  bottom: 0; left: 0;\n  overflow-y: hidden;\n  overflow-x: scroll;\n}\n.CodeMirror-scrollbar-filler {\n  right: 0; bottom: 0;\n}\n.CodeMirror-gutter-filler {\n  left: 0; bottom: 0;\n}\n\n.CodeMirror-gutters {\n  position: absolute; left: 0; top: 0;\n  padding-bottom: 30px;\n  z-index: 3;\n}\n.CodeMirror-gutter {\n  white-space: normal;\n  height: 100%;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n  padding-bottom: 30px;\n  margin-bottom: -32px;\n  display: inline-block;\n  /* Hack to make IE7 behave */\n  *zoom:1;\n  *display:inline;\n}\n.CodeMirror-gutter-elt {\n  position: absolute;\n  cursor: default;\n  z-index: 4;\n}\n\n.CodeMirror-lines {\n  cursor: text;\n}\n.CodeMirror pre {\n  /* Reset some styles that the rest of the page might have set */\n  -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0;\n  border-width: 0;\n  background: transparent;\n  font-family: inherit;\n  font-size: inherit;\n  margin: 0;\n  white-space: pre;\n  word-wrap: normal;\n  line-height: inherit;\n  color: inherit;\n  z-index: 2;\n  position: relative;\n  overflow: visible;\n}\n.CodeMirror-wrap pre {\n  word-wrap: break-word;\n  white-space: pre-wrap;\n  word-break: normal;\n}\n\n.CodeMirror-linebackground {\n  position: absolute;\n  left: 0; right: 0; top: 0; bottom: 0;\n  z-index: 0;\n}\n\n.CodeMirror-linewidget {\n  position: relative;\n  z-index: 2;\n  overflow: auto;\n}\n\n.CodeMirror-widget {}\n\n.CodeMirror-wrap .CodeMirror-scroll {\n  overflow-x: hidden;\n}\n\n.CodeMirror-measure {\n  position: absolute;\n  width: 100%;\n  height: 0;\n  overflow: hidden;\n  visibility: hidden;\n}\n.CodeMirror-measure pre { position: static; }\n\n.CodeMirror div.CodeMirror-cursor {\n  position: absolute;\n  border-right: none;\n  width: 0;\n}\n\ndiv.CodeMirror-cursors {\n  visibility: hidden;\n  position: relative;\n  z-index: 1;\n}\n.CodeMirror-focused div.CodeMirror-cursors {\n  visibility: visible;\n}\n\n.CodeMirror-selected { background: #d9d9d9; }\n.CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }\n.CodeMirror-crosshair { cursor: crosshair; }\n\n.cm-searching {\n  background: #ffa;\n  background: rgba(255, 255, 0, .4);\n}\n\n/* IE7 hack to prevent it from returning funny offsetTops on the spans */\n.CodeMirror span { *vertical-align: text-bottom; }\n\n/* Used to force a border model for a node */\n.cm-force-border { padding-right: .1px; }\n\n@media print {\n  /* Hide the cursor when printing */\n  .CodeMirror div.CodeMirror-cursors {\n    visibility: hidden;\n  }\n}\n"; (require("/Users/istvan/Work/ng-gme/node_modules/cssify"))(css); module.exports = css;
+},{"/Users/istvan/Work/ng-gme/node_modules/cssify":12}],5:[function(require,module,exports){
 /*
  * angular-markdown-directive v0.3.0
  * (c) 2013-2014 Brian Ford http://briantford.com
@@ -2451,8 +2451,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
       suppressEdits: false, // used to disable editing during key handlers when in readOnly mode
       pasteIncoming: false, cutIncoming: false, // help recognize paste/cut edits in readInput
       draggingText: false,
-      highlight: new Delayed(), // stores highlight worker timeout
-      keySeq: null  // Unfinished key sequence
+      highlight: new Delayed() // stores highlight worker timeout
     };
 
     // Override magic textarea content restore that IE sometimes does
@@ -2550,10 +2549,8 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     // Need to set a minimum width to see the scrollbar on IE7 (but must not set it on IE8).
     if (ie && ie_version < 8) d.scrollbarH.style.minHeight = d.scrollbarV.style.minWidth = "18px";
 
-    if (place) {
-      if (place.appendChild) place.appendChild(d.wrapper);
-      else place(d.wrapper);
-    }
+    if (place.appendChild) place.appendChild(d.wrapper);
+    else place(d.wrapper);
 
     // Current rendered range (may be bigger than the view window).
     d.viewFrom = d.viewTo = doc.first;
@@ -2564,7 +2561,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     d.externalMeasured = null;
     // Empty space (in pixels) above the view
     d.viewOffset = 0;
-    d.lastWrapHeight = d.lastWrapWidth = 0;
+    d.lastSizeC = 0;
     d.updateLineNumbers = null;
 
     // Used to only resize the line number gutter when necessary (when
@@ -2667,6 +2664,12 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
       var estHeight = est(line);
       if (estHeight != line.height) updateLineHeight(line, estHeight);
     });
+  }
+
+  function keyMapChanged(cm) {
+    var map = keyMap[cm.options.keyMap], style = map.style;
+    cm.display.wrapper.className = cm.display.wrapper.className.replace(/\s*cm-keymap-\S+/g, "") +
+      (style ? " cm-keymap-" + style : "");
   }
 
   function themeChanged(cm) {
@@ -2913,7 +2916,6 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     this.visible = visibleLines(display, cm.doc, viewport);
     this.editorIsHidden = !display.wrapper.offsetWidth;
     this.wrapperHeight = display.wrapper.clientHeight;
-    this.wrapperWidth = display.wrapper.clientWidth;
     this.oldViewFrom = display.viewFrom; this.oldViewTo = display.viewTo;
     this.oldScrollerWidth = display.scroller.clientWidth;
     this.force = force;
@@ -2954,7 +2956,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     }
 
     var different = from != display.viewFrom || to != display.viewTo ||
-      display.lastWrapHeight != update.wrapperHeight || display.lastWrapWidth != update.wrapperWidth;
+      display.lastSizeC != update.wrapperHeight;
     adjustView(cm, from, to);
 
     display.viewOffset = heightAtLine(getLine(cm.doc, display.viewFrom));
@@ -2982,8 +2984,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     removeChildren(display.selectionDiv);
 
     if (different) {
-      display.lastWrapHeight = update.wrapperHeight;
-      display.lastWrapWidth = update.wrapperWidth;
+      display.lastSizeC = update.wrapperHeight;
       startWorker(cm, 400);
     }
 
@@ -3232,12 +3233,9 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     if (cm.options.lineNumbers || markers) {
       var wrap = ensureLineWrapped(lineView);
       var gutterWrap = lineView.gutter =
-        wrap.insertBefore(elt("div", null, "CodeMirror-gutter-wrapper", "left: " +
-                              (cm.options.fixedGutter ? dims.fixedPos : -dims.gutterTotalWidth) +
-                              "px; width: " + dims.gutterTotalWidth + "px"),
+        wrap.insertBefore(elt("div", null, "CodeMirror-gutter-wrapper", "position: absolute; left: " +
+                              (cm.options.fixedGutter ? dims.fixedPos : -dims.gutterTotalWidth) + "px"),
                           lineView.text);
-      if (lineView.line.gutterClass)
-        gutterWrap.className += " " + lineView.line.gutterClass;
       if (cm.options.lineNumbers && (!markers || !markers["CodeMirror-linenumbers"]))
         lineView.lineNumber = gutterWrap.appendChild(
           elt("div", lineNumberFor(cm.options, lineN),
@@ -4764,7 +4762,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     // possible when it is clear that nothing happened. hasSelection
     // will be the case when there is a lot of text in the textarea,
     // in which case reading its value would be expensive.
-    if (!cm.state.focused || (hasSelection(input) && !prevInput) || isReadOnly(cm) || cm.options.disableInput || cm.state.keySeq)
+    if (!cm.state.focused || (hasSelection(input) && !prevInput) || isReadOnly(cm) || cm.options.disableInput)
       return false;
     // See paste handler for more on the fakedLastChar kludge
     if (cm.state.pasteIncoming && cm.state.fakedLastChar) {
@@ -5019,10 +5017,8 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
 
   // Called when the window resizes
   function onResize(cm) {
-    var d = cm.display;
-    if (d.lastWrapHeight == d.wrapper.clientHeight && d.lastWrapWidth == d.wrapper.clientWidth)
-      return;
     // Might be a text scaling operation, clear size caches.
+    var d = cm.display;
     d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
     cm.setSize();
   }
@@ -5536,70 +5532,62 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     return done;
   }
 
-  function lookupKeyForEditor(cm, name, handle) {
-    for (var i = 0; i < cm.state.keyMaps.length; i++) {
-      var result = lookupKey(name, cm.state.keyMaps[i], handle);
-      if (result) return result;
-    }
-    return (cm.options.extraKeys && lookupKey(name, cm.options.extraKeys, handle))
-      || lookupKey(name, cm.options.keyMap, handle);
+  // Collect the currently active keymaps.
+  function allKeyMaps(cm) {
+    var maps = cm.state.keyMaps.slice(0);
+    if (cm.options.extraKeys) maps.push(cm.options.extraKeys);
+    maps.push(cm.options.keyMap);
+    return maps;
   }
 
-  var stopSeq = new Delayed;
-  function dispatchKey(cm, name, e, handle) {
-    var seq = cm.state.keySeq;
-    if (seq) {
-      if (isModifierKey(name)) return "handled";
-      stopSeq.set(50, function() {
-        if (cm.state.keySeq == seq) {
-          cm.state.keySeq = null;
-          resetInput(cm);
-        }
-      });
-      name = seq + " " + name;
-    }
-    var result = lookupKeyForEditor(cm, name, handle);
-
-    if (result == "multi")
-      cm.state.keySeq = name;
-    if (result == "handled")
-      signalLater(cm, "keyHandled", cm, name, e);
-
-    if (result == "handled" || result == "multi") {
-      e_preventDefault(e);
-      restartBlink(cm);
-    }
-
-    if (seq && !result && /\'$/.test(name)) {
-      e_preventDefault(e);
-      return true;
-    }
-    return !!result;
-  }
-
+  var maybeTransition;
   // Handle a key from the keydown event.
   function handleKeyBinding(cm, e) {
-    var name = keyName(e, true);
-    if (!name) return false;
+    // Handle automatic keymap transitions
+    var startMap = getKeyMap(cm.options.keyMap), next = startMap.auto;
+    clearTimeout(maybeTransition);
+    if (next && !isModifierKey(e)) maybeTransition = setTimeout(function() {
+      if (getKeyMap(cm.options.keyMap) == startMap) {
+        cm.options.keyMap = (next.call ? next.call(null, cm) : next);
+        keyMapChanged(cm);
+      }
+    }, 50);
 
-    if (e.shiftKey && !cm.state.keySeq) {
+    var name = keyName(e, true), handled = false;
+    if (!name) return false;
+    var keymaps = allKeyMaps(cm);
+
+    if (e.shiftKey) {
       // First try to resolve full name (including 'Shift-'). Failing
       // that, see if there is a cursor-motion command (starting with
       // 'go') bound to the keyname without 'Shift-'.
-      return dispatchKey(cm, "Shift-" + name, e, function(b) {return doHandleBinding(cm, b, true);})
-          || dispatchKey(cm, name, e, function(b) {
-               if (typeof b == "string" ? /^go[A-Z]/.test(b) : b.motion)
-                 return doHandleBinding(cm, b);
-             });
+      handled = lookupKey("Shift-" + name, keymaps, function(b) {return doHandleBinding(cm, b, true);})
+             || lookupKey(name, keymaps, function(b) {
+                  if (typeof b == "string" ? /^go[A-Z]/.test(b) : b.motion)
+                    return doHandleBinding(cm, b);
+                });
     } else {
-      return dispatchKey(cm, name, e, function(b) { return doHandleBinding(cm, b); });
+      handled = lookupKey(name, keymaps, function(b) { return doHandleBinding(cm, b); });
     }
+
+    if (handled) {
+      e_preventDefault(e);
+      restartBlink(cm);
+      signalLater(cm, "keyHandled", cm, name, e);
+    }
+    return handled;
   }
 
   // Handle a key from the keypress event
   function handleCharBinding(cm, e, ch) {
-    return dispatchKey(cm, "'" + ch + "'", e,
-                       function(b) { return doHandleBinding(cm, b, true); });
+    var handled = lookupKey("'" + ch + "'", allKeyMaps(cm),
+                            function(b) { return doHandleBinding(cm, b, true); });
+    if (handled) {
+      e_preventDefault(e);
+      restartBlink(cm);
+      signalLater(cm, "keyHandled", cm, "'" + ch + "'", e);
+    }
+    return handled;
   }
 
   var lastStoppedKey = null;
@@ -6078,8 +6066,6 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
   // If an editor sits on the top or bottom of the window, partially
   // scrolled out of view, this ensures that the cursor is visible.
   function maybeScrollWindow(cm, coords) {
-    if (signalDOMEvent(cm, "scrollCursorIntoView")) return;
-
     var display = cm.display, box = display.sizer.getBoundingClientRect(), doScroll = null;
     if (coords.top + box.top < 0) doScroll = true;
     else if (coords.bottom + box.top > (window.innerHeight || document.documentElement.clientHeight)) doScroll = false;
@@ -6403,12 +6389,12 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     getDoc: function() {return this.doc;},
 
     addKeyMap: function(map, bottom) {
-      this.state.keyMaps[bottom ? "push" : "unshift"](getKeyMap(map));
+      this.state.keyMaps[bottom ? "push" : "unshift"](map);
     },
     removeKeyMap: function(map) {
       var maps = this.state.keyMaps;
       for (var i = 0; i < maps.length; ++i)
-        if (maps[i] == map || maps[i].name == map) {
+        if (maps[i] == map || (typeof maps[i] != "string" && maps[i].name == map)) {
           maps.splice(i, 1);
           return true;
         }
@@ -6465,11 +6451,20 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     // Fetch the parser token for a given character. Useful for hacks
     // that want to inspect the mode state (say, for completion).
     getTokenAt: function(pos, precise) {
-      return takeToken(this, pos, precise);
-    },
-
-    getLineTokens: function(line, precise) {
-      return takeToken(this, Pos(line), precise, true);
+      var doc = this.doc;
+      pos = clipPos(doc, pos);
+      var state = getStateBefore(this, pos.line, precise), mode = this.doc.mode;
+      var line = getLine(doc, pos.line);
+      var stream = new StringStream(line.text, this.options.tabSize);
+      while (stream.pos < pos.ch && !stream.eol()) {
+        stream.start = stream.pos;
+        var style = readToken(mode, stream, state);
+      }
+      return {start: stream.start,
+              end: stream.pos,
+              string: stream.current(),
+              type: style || null,
+              state: state};
     },
 
     getTokenTypeAt: function(pos) {
@@ -6872,12 +6867,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     themeChanged(cm);
     guttersChanged(cm);
   }, true);
-  option("keyMap", "default", function(cm, val, old) {
-    var next = getKeyMap(val);
-    var prev = old != CodeMirror.Init && getKeyMap(old);
-    if (prev && prev.detach) prev.detach(cm, next);
-    if (next.attach) next.attach(cm, prev || null);
-  });
+  option("keyMap", "default", keyMapChanged);
   option("extraKeys", null);
 
   option("lineWrapping", false, wrappingChanged, true);
@@ -7222,11 +7212,9 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     toggleOverwrite: function(cm) {cm.toggleOverwrite();}
   };
 
-
   // STANDARD KEYMAPS
 
   var keyMap = CodeMirror.keyMap = {};
-
   keyMap.basic = {
     "Left": "goCharLeft", "Right": "goCharRight", "Up": "goLineUp", "Down": "goLineDown",
     "End": "goLineEnd", "Home": "goLineStartSmart", "PageUp": "goPageUp", "PageDown": "goPageDown",
@@ -7248,13 +7236,6 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     "Ctrl-U": "undoSelection", "Shift-Ctrl-U": "redoSelection", "Alt-U": "redoSelection",
     fallthrough: "basic"
   };
-  // Very basic readline/emacs-style bindings, which are standard on Mac.
-  keyMap.emacsy = {
-    "Ctrl-F": "goCharRight", "Ctrl-B": "goCharLeft", "Ctrl-P": "goLineUp", "Ctrl-N": "goLineDown",
-    "Alt-F": "goWordRight", "Alt-B": "goWordLeft", "Ctrl-A": "goLineStart", "Ctrl-E": "goLineEnd",
-    "Ctrl-V": "goPageDown", "Shift-Ctrl-V": "goPageUp", "Ctrl-D": "delCharAfter", "Ctrl-H": "delCharBefore",
-    "Alt-D": "delWordAfter", "Alt-Backspace": "delWordBefore", "Ctrl-K": "killLine", "Ctrl-T": "transposeChars"
-  };
   keyMap.macDefault = {
     "Cmd-A": "selectAll", "Cmd-D": "deleteLine", "Cmd-Z": "undo", "Shift-Cmd-Z": "redo", "Cmd-Y": "redo",
     "Cmd-Home": "goDocStart", "Cmd-Up": "goDocStart", "Cmd-End": "goDocEnd", "Cmd-Down": "goDocEnd", "Alt-Left": "goGroupLeft",
@@ -7265,99 +7246,69 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     "Cmd-U": "undoSelection", "Shift-Cmd-U": "redoSelection", "Ctrl-Up": "goDocStart", "Ctrl-Down": "goDocEnd",
     fallthrough: ["basic", "emacsy"]
   };
+  // Very basic readline/emacs-style bindings, which are standard on Mac.
+  keyMap.emacsy = {
+    "Ctrl-F": "goCharRight", "Ctrl-B": "goCharLeft", "Ctrl-P": "goLineUp", "Ctrl-N": "goLineDown",
+    "Alt-F": "goWordRight", "Alt-B": "goWordLeft", "Ctrl-A": "goLineStart", "Ctrl-E": "goLineEnd",
+    "Ctrl-V": "goPageDown", "Shift-Ctrl-V": "goPageUp", "Ctrl-D": "delCharAfter", "Ctrl-H": "delCharBefore",
+    "Alt-D": "delWordAfter", "Alt-Backspace": "delWordBefore", "Ctrl-K": "killLine", "Ctrl-T": "transposeChars"
+  };
   keyMap["default"] = mac ? keyMap.macDefault : keyMap.pcDefault;
 
   // KEYMAP DISPATCH
 
-  function normalizeKeyName(name) {
-    var parts = name.split(/-(?!$)/), name = parts[parts.length - 1];
-    var alt, ctrl, shift, cmd;
-    for (var i = 0; i < parts.length - 1; i++) {
-      var mod = parts[i];
-      if (/^(cmd|meta|m)$/i.test(mod)) cmd = true;
-      else if (/^a(lt)?$/i.test(mod)) alt = true;
-      else if (/^(c|ctrl|control)$/i.test(mod)) ctrl = true;
-      else if (/^s(hift)$/i.test(mod)) shift = true;
-      else throw new Error("Unrecognized modifier name: " + mod);
-    }
-    if (alt) name = "Alt-" + name;
-    if (ctrl) name = "Ctrl-" + name;
-    if (cmd) name = "Cmd-" + name;
-    if (shift) name = "Shift-" + name;
-    return name;
+  function getKeyMap(val) {
+    if (typeof val == "string") return keyMap[val];
+    else return val;
   }
 
-  // This is a kludge to keep keymaps mostly working as raw objects
-  // (backwards compatibility) while at the same time support features
-  // like normalization and multi-stroke key bindings. It compiles a
-  // new normalized keymap, and then updates the old object to reflect
-  // this.
-  CodeMirror.normalizeKeyMap = function(keymap) {
-    var copy = {};
-    for (var keyname in keymap) if (keymap.hasOwnProperty(keyname)) {
-      var value = keymap[keyname];
-      if (/^(name|fallthrough|(de|at)tach)$/.test(keyname)) continue;
-      if (value == "...") { delete keymap[keyname]; continue; }
+  // Given an array of keymaps and a key name, call handle on any
+  // bindings found, until that returns a truthy value, at which point
+  // we consider the key handled. Implements things like binding a key
+  // to false stopping further handling and keymap fallthrough.
+  var lookupKey = CodeMirror.lookupKey = function(name, maps, handle) {
+    function lookup(map) {
+      map = getKeyMap(map);
+      var found = map[name];
+      if (found === false) return "stop";
+      if (found != null && handle(found)) return true;
+      if (map.nofallthrough) return "stop";
 
-      var keys = map(keyname.split(" "), normalizeKeyName);
-      for (var i = 0; i < keys.length; i++) {
-        var val, name;
-        if (i == keys.length - 1) {
-          name = keyname;
-          val = value;
-        } else {
-          name = keys.slice(0, i + 1).join(" ");
-          val = "...";
-        }
-        var prev = copy[name];
-        if (!prev) copy[name] = val;
-        else if (prev != val) throw new Error("Inconsistent bindings for " + name);
+      var fallthrough = map.fallthrough;
+      if (fallthrough == null) return false;
+      if (Object.prototype.toString.call(fallthrough) != "[object Array]")
+        return lookup(fallthrough);
+      for (var i = 0; i < fallthrough.length; ++i) {
+        var done = lookup(fallthrough[i]);
+        if (done) return done;
       }
-      delete keymap[keyname];
+      return false;
     }
-    for (var prop in copy) keymap[prop] = copy[prop];
-    return keymap;
-  };
 
-  var lookupKey = CodeMirror.lookupKey = function(key, map, handle) {
-    map = getKeyMap(map);
-    var found = map.call ? map.call(key) : map[key];
-    if (found === false) return "nothing";
-    if (found === "...") return "multi";
-    if (found != null && handle(found)) return "handled";
-
-    if (map.fallthrough) {
-      if (Object.prototype.toString.call(map.fallthrough) != "[object Array]")
-        return lookupKey(key, map.fallthrough, handle);
-      for (var i = 0; i < map.fallthrough.length; i++) {
-        var result = lookupKey(key, map.fallthrough[i], handle);
-        if (result) return result;
-      }
+    for (var i = 0; i < maps.length; ++i) {
+      var done = lookup(maps[i]);
+      if (done) return done != "stop";
     }
   };
 
   // Modifier key presses don't count as 'real' key presses for the
   // purpose of keymap fallthrough.
-  var isModifierKey = CodeMirror.isModifierKey = function(value) {
-    var name = typeof value == "string" ? value : keyNames[value.keyCode];
+  var isModifierKey = CodeMirror.isModifierKey = function(event) {
+    var name = keyNames[event.keyCode];
     return name == "Ctrl" || name == "Alt" || name == "Shift" || name == "Mod";
   };
 
   // Look up the name of a key as indicated by an event object.
   var keyName = CodeMirror.keyName = function(event, noShift) {
     if (presto && event.keyCode == 34 && event["char"]) return false;
-    var base = keyNames[event.keyCode], name = base;
+    var name = keyNames[event.keyCode];
     if (name == null || event.altGraphKey) return false;
-    if (event.altKey && base != "Alt") name = "Alt-" + name;
-    if ((flipCtrlCmd ? event.metaKey : event.ctrlKey) && base != "Ctrl") name = "Ctrl-" + name;
-    if ((flipCtrlCmd ? event.ctrlKey : event.metaKey) && base != "Cmd") name = "Cmd-" + name;
-    if (!noShift && event.shiftKey && base != "Shift") name = "Shift-" + name;
+    if (event.altKey) name = "Alt-" + name;
+    if (flipCtrlCmd ? event.metaKey : event.ctrlKey) name = "Ctrl-" + name;
+    if (flipCtrlCmd ? event.ctrlKey : event.metaKey) name = "Cmd-" + name;
+    if (!noShift && event.shiftKey) name = "Shift-" + name;
     return name;
   };
-
-  function getKeyMap(val) {
-    return typeof val == "string" ? keyMap[val] : val;
-  }
 
   // FROMTEXTAREA
 
@@ -8208,35 +8159,12 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     if (inner.mode.blankLine) return inner.mode.blankLine(inner.state);
   }
 
-  function readToken(mode, stream, state, inner) {
+  function readToken(mode, stream, state) {
     for (var i = 0; i < 10; i++) {
-      if (inner) inner[0] = CodeMirror.innerMode(mode, state).mode;
       var style = mode.token(stream, state);
       if (stream.pos > stream.start) return style;
     }
     throw new Error("Mode " + mode.name + " failed to advance stream.");
-  }
-
-  // Utility for getTokenAt and getLineTokens
-  function takeToken(cm, pos, precise, asArray) {
-    function getObj(copy) {
-      return {start: stream.start, end: stream.pos,
-              string: stream.current(),
-              type: style || null,
-              state: copy ? copyState(doc.mode, state) : state};
-    }
-
-    var doc = cm.doc, mode = doc.mode, style;
-    pos = clipPos(doc, pos);
-    var line = getLine(doc, pos.line), state = getStateBefore(cm, pos.line, precise);
-    var stream = new StringStream(line.text, cm.options.tabSize), tokens;
-    if (asArray) tokens = [];
-    while ((asArray || stream.pos < pos.ch) && !stream.eol()) {
-      stream.start = stream.pos;
-      style = readToken(mode, stream, state);
-      if (asArray) tokens.push(getObj(true));
-    }
-    return asArray ? tokens : getObj();
   }
 
   // Run the given mode's parser over a line, calling f for each token.
@@ -8245,7 +8173,6 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     if (flattenSpans == null) flattenSpans = cm.options.flattenSpans;
     var curStart = 0, curStyle = null;
     var stream = new StringStream(text, cm.options.tabSize), style;
-    var inner = cm.options.addModeClass && [null];
     if (text == "") extractLineClasses(callBlankLine(mode, state), lineClasses);
     while (!stream.eol()) {
       if (stream.pos > cm.options.maxHighlightLength) {
@@ -8254,10 +8181,10 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
         stream.pos = text.length;
         style = null;
       } else {
-        style = extractLineClasses(readToken(mode, stream, state, inner), lineClasses);
+        style = extractLineClasses(readToken(mode, stream, state), lineClasses);
       }
-      if (inner) {
-        var mName = inner[0].name;
+      if (cm.options.addModeClass) {
+        var mName = CodeMirror.innerMode(mode, state).mode.name;
         if (mName) style = "m-" + (style ? mName + " " + style : mName);
       }
       if (!flattenSpans || curStyle != style) {
@@ -8316,13 +8243,12 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     return {styles: st, classes: lineClasses.bgClass || lineClasses.textClass ? lineClasses : null};
   }
 
-  function getLineStyles(cm, line, updateFrontier) {
+  function getLineStyles(cm, line) {
     if (!line.styles || line.styles[0] != cm.state.modeGen) {
       var result = highlightLine(cm, line, line.stateAfter = getStateBefore(cm, lineNo(line)));
       line.styles = result.styles;
       if (result.classes) line.styleClasses = result.classes;
       else if (line.styleClasses) line.styleClasses = null;
-      if (updateFrontier === cm.doc.frontier) cm.doc.frontier++;
     }
     return line.styles;
   }
@@ -8377,8 +8303,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
       if (hasBadBidiRects(cm.display.measure) && (order = getOrder(line)))
         builder.addToken = buildTokenBadBidi(builder.addToken, order);
       builder.map = [];
-      var allowFrontierUpdate = lineView != cm.display.externalMeasured && lineNo(line);
-      insertLineContent(line, builder, getLineStyles(cm, line, allowFrontierUpdate));
+      insertLineContent(line, builder, getLineStyles(cm, line));
       if (line.styleClasses) {
         if (line.styleClasses.bgClass)
           builder.bgClass = joinClasses(line.styleClasses.bgClass, builder.bgClass || "");
@@ -8400,14 +8325,9 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
       }
     }
 
-    // See issue #2901
-    if (webkit && /\bcm-tab\b/.test(builder.content.lastChild.className))
-      builder.content.className = "cm-tab-wrap-hack";
-
     signal(cm, "renderLine", cm, lineView.line, builder.pre);
     if (builder.pre.className)
       builder.textClass = joinClasses(builder.pre.className, builder.textClass || "");
-
     return builder;
   }
 
@@ -8976,26 +8896,22 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     },
 
     addLineClass: docMethodOp(function(handle, where, cls) {
-      return changeLine(this, handle, where == "gutter" ? "gutter" : "class", function(line) {
-        var prop = where == "text" ? "textClass"
-                 : where == "background" ? "bgClass"
-                 : where == "gutter" ? "gutterClass" : "wrapClass";
+      return changeLine(this, handle, "class", function(line) {
+        var prop = where == "text" ? "textClass" : where == "background" ? "bgClass" : "wrapClass";
         if (!line[prop]) line[prop] = cls;
-        else if (classTest(cls).test(line[prop])) return false;
+        else if (new RegExp("(?:^|\\s)" + cls + "(?:$|\\s)").test(line[prop])) return false;
         else line[prop] += " " + cls;
         return true;
       });
     }),
     removeLineClass: docMethodOp(function(handle, where, cls) {
       return changeLine(this, handle, "class", function(line) {
-        var prop = where == "text" ? "textClass"
-                 : where == "background" ? "bgClass"
-                 : where == "gutter" ? "gutterClass" : "wrapClass";
+        var prop = where == "text" ? "textClass" : where == "background" ? "bgClass" : "wrapClass";
         var cur = line[prop];
         if (!cur) return false;
         else if (cls == null) line[prop] = null;
         else {
-          var found = cur.match(classTest(cls));
+          var found = cur.match(new RegExp("(?:^|\\s+)" + cls + "(?:$|\\s+)"));
           if (!found) return false;
           var end = found.index + found[0].length;
           line[prop] = cur.slice(0, found.index) + (!found.index || end == cur.length ? "" : " ") + cur.slice(end) || null;
@@ -9614,8 +9530,6 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
   // registering a (non-DOM) handler on the editor for the event name,
   // and preventDefault-ing the event in that handler.
   function signalDOMEvent(cm, e, override) {
-    if (typeof e == "string")
-      e = {type: e, preventDefault: function() { this.defaultPrevented = true; }};
     signal(cm, override || e.type, cm, e);
     return e_defaultPrevented(e) || e.codemirrorIgnore;
   }
@@ -9789,8 +9703,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
   };
   else range = function(node, start, end) {
     var r = document.body.createTextRange();
-    try { r.moveToElementText(node.parentNode); }
-    catch(e) { return r; }
+    r.moveToElementText(node.parentNode);
     r.collapse(true);
     r.moveEnd("character", end);
     r.moveStart("character", start);
@@ -9822,19 +9735,14 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
     catch(e) { return document.body; }
   };
 
-  function classTest(cls) { return new RegExp("(^|\\s)" + cls + "(?:$|\\s)\\s*"); }
-  var rmClass = CodeMirror.rmClass = function(node, cls) {
-    var current = node.className;
-    var match = classTest(cls).exec(current);
-    if (match) {
-      var after = current.slice(match.index + match[0].length);
-      node.className = current.slice(0, match.index) + (after ? match[1] + after : "");
-    }
-  };
-  var addClass = CodeMirror.addClass = function(node, cls) {
-    var current = node.className;
-    if (!classTest(cls).test(current)) node.className += (current ? " " : "") + cls;
-  };
+  function classTest(cls) { return new RegExp("\\b" + cls + "\\b\\s*"); }
+  function rmClass(node, cls) {
+    var test = classTest(cls);
+    if (test.test(node.className)) node.className = node.className.replace(test, "");
+  }
+  function addClass(node, cls) {
+    if (!classTest(cls).test(node.className)) node.className += " " + cls;
+  }
   function joinClasses(a, b) {
     var as = a.split(" ");
     for (var i = 0; i < as.length; i++)
@@ -10281,7 +10189,7 @@ n=document.createElement("pre"),M=/^(\s*)([\s\S]*?)(\s*)$/;h.module("ngSanitize"
 
   // THE END
 
-  CodeMirror.version = "4.8.0";
+  CodeMirror.version = "4.7.0";
 
   return CodeMirror;
 });
@@ -10471,7 +10379,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
         override = "string-2";
         return "maybeprop";
       } else if (allowNested) {
-        override = stream.match(/^\s*:(?:\s|$)/, false) ? "property" : "tag";
+        override = stream.match(/^\s*:/, false) ? "property" : "tag";
         return "block";
       } else {
         override += " error";
@@ -11077,7 +10985,7 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
     if (stream.match(/^<\/\s*script\s*>/i, false)) {
       state.token = html;
       state.localState = state.localMode = null;
-      return null;
+      return html(stream, state);
     }
     return maybeBackup(stream, /<\/\s*script\s*>/,
                        state.localMode.token(stream, state.localState));
@@ -11086,7 +10994,7 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
     if (stream.match(/^<\/\s*style\s*>/i, false)) {
       state.token = html;
       state.localState = state.localMode = null;
-      return null;
+      return html(stream, state);
     }
     return maybeBackup(stream, /<\/\s*style\s*>/,
                        cssMode.token(stream, state.localState));
@@ -13498,265 +13406,314 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
 'use strict';
 
-module.exports = function ( $q, dataStoreService ) {
+module.exports = function($q, dataStoreService) {
 
-  this.getAvailableProjectTags = function (databaseId){
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
-      var tagKeys,
-          tags = [];
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      tagKeys = Object.keys(results);
-      for (var i = tagKeys.length - 1; i >= 0; i--) {
-        tags.push({id:tagKeys[i],name:results[tagKeys[i]]});
-      }
-
-      deferred.resolve( tags );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.applyTagsOnProject = function (/*databaseId, projectId, tags*/){
-    // NOTE: Waiting for core fucntion form Tamas
-    // GetProjectInfo
-    return null;
-  };
-
-  this.getAvailableProjects = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projects );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.getProjects = function ( databaseId ) {
-
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
-
-      var i,
-        projectTags,
-        projects,
-        projectTagsMapper;
-
-      projectTagsMapper = function(tagName, tagId) {
-          projectTags.push({
-            id: tagId,
-            name: tagName
-          });
-        };
-
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      if (result === null){
-        result = [];
-      }
-
-      projects = Object.keys(result);
-
-      for (i = projects.length - 1; i >= 0; i--) {
-        result[projects[i]].info.id = projects[i];
-        projects[i] = result[projects[i]].info;
-
-        projectTags = [];
-
-        angular.forEach(projects[i].tags, projectTagsMapper );
-
-        projects[i].tags = projectTags;
-
-      }
-
-      deferred.resolve( projects );
-    } );
-
-    return deferred.promise;
-
-  };
-
-  this.getProjectsIds = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getAvailableProjectsAsync( function ( err, projectIds ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projectIds );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.createProject = function ( databaseId, projectname, projectInfo ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      } else {
-        deferred.resolve();
-      }
-    } );
-
-    return deferred.promise;
-  };
-
-  this.selectProject = function ( databaseId, projectId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    this.getProjectsIds( databaseId )
-      .then( function ( projectIds ) {
-        if ( projectIds.indexOf( projectId ) > -1 ) {
-          dbConn.client.selectProjectAsync( projectId, function ( err ) {
-            if ( err ) {
-              deferred.reject( err );
-              return;
+    this.getAvailableProjectTags = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAllInfoTagsAsync(function(err, results) {
+            var tagKeys,
+                tags = [];
+            if (err) {
+                deferred.reject(err);
+                return;
             }
 
-            dbConn.projectService.projectId = projectId;
+            tagKeys = Object.keys(results);
+            for (var i = tagKeys.length - 1; i >= 0; i--) {
+                tags.push({
+                    id: tagKeys[i],
+                    name: results[tagKeys[i]]
+                });
+            }
 
-            deferred.resolve( projectId );
-          } );
-        } else {
-          deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
-            databaseId ) );
-        }
-      } )
-      .
-    catch ( function ( reason ) {
-      deferred.reject( reason );
-    } );
+            deferred.resolve(tags);
+        });
 
-    return deferred.promise;
-  };
+        return deferred.promise;
+    };
 
-  this.watchProjects = function ( /*databaseId*/) {
-    // TODO: register for project events
-    // TODO: SERVER_PROJECT_CREATED
-    // TODO: SERVER_PROJECT_DELETED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.on = function ( databaseId, eventName, fn ) {
-    var dbConn,
-      i;
-
-    console.assert( typeof databaseId === 'string' );
-    console.assert( typeof eventName === 'string' );
-    console.assert( typeof fn === 'function' );
-
-    dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
-
-    if ( typeof dbConn.projectService.events === 'undefined' ) {
-      // this should not be an inline function
-
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
-        function ( dummy /* FIXME */ , projectId ) {
-
-          if ( dbConn.projectService.projectId !== projectId ) {
-            dbConn.projectService.projectId = projectId;
-
-            console.log( 'There was a PROJECT_OPENED event', projectId );
-            if ( projectId ) {
-              // initialize
-              if ( dbConn.projectService &&
-                dbConn.projectService.events &&
-                dbConn.projectService.events.initialize ) {
-
-                dbConn.projectService.isInitialized = true;
-
-                for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
-                  dbConn.projectService.events.initialize[ i ]( databaseId );
+    this.applyTagsOnProject = function(databaseId, projectId, newTags) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer(),
+            mappedTags = {},
+            tagMapper = function(tag){
+              mappedTags[tag.id] = tag.name;
+            };
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getProjectInfoAsync(projectId, function(err, existingInfo) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+            // Transform the tags to key-value format
+            angular.forEach(newTags, tagMapper);
+            existingInfo.tags = mappedTags;
+            dbConn.client.setProjectInfoAsync(projectId, existingInfo, function(errInfo) {
+                if (errInfo) {
+                    deferred.reject(errInfo);
+                    return;
                 }
-              }
+                deferred.resolve();
+            });
+        });
+
+        return deferred.promise;
+    };
+
+    this.getAvailableProjects = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAvailableProjectsAsync(function(err, projects) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(projects);
+        });
+
+        return deferred.promise;
+    };
+
+    this.getProjects = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getFullProjectsInfoAsync(function(err, result) {
+            var projectTags,
+                branches,
+                projects = [],
+                projectMapper,
+                projectTagsMapper,
+                branchMapper;
+
+            projectTagsMapper = function(tagName, tagId) {
+                projectTags.push({
+                    id: tagId,
+                    name: tagName
+                });
+            };
+
+            branchMapper = function(commitId, branchId) {
+                branches.push({
+                    branchId: branchId,
+                    commitId: commitId
+                });
+            };
+
+            projectMapper = function(project, projectId) {
+              projectTags = [];
+              branches = [];
+
+              // Transform tags
+              angular.forEach(project.info.tags, projectTagsMapper);
+              project.info.tags = projectTags;
+
+              // Transform branches
+              angular.forEach(project.branches, branchMapper);
+
+              // Transform project
+              projects.push({
+                id: projectId,
+                branches: branches,
+                info: project.info,
+                rights: project.rights
+              });
+            };
+
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            angular.forEach(result, projectMapper);
+            deferred.resolve(projects);
+        });
+        return deferred.promise;
+    };
+
+    this.getProjectsIds = function(databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getAvailableProjectsAsync(function(err, projectIds) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(projectIds);
+        });
+
+        return deferred.promise;
+    };
+
+    this.createProject = function(databaseId, projectname, projectInfo) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.client.createProjectAsync(projectname, projectInfo, function(err) {
+            if (err) {
+                deferred.reject(err);
+                return;
             } else {
-              // branchId is falsy, empty or null or undefined
-              // destroy
-              if ( dbConn.projectService &&
-                dbConn.projectService.events &&
-                dbConn.projectService.events.destroy ) {
+                deferred.resolve();
+            }
+        });
 
-                dbConn.projectService.isInitialized = false;
+        return deferred.promise;
+    };
 
-                for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-                  dbConn.projectService.events.destroy[ i ]( databaseId );
+    this.deleteProject = function(databaseId, projectname) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.client.deleteProjectAsync(projectname, function(err) {
+            if (err) {
+                deferred.reject(err);
+                return;
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    this.selectProject = function(databaseId, projectId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        this.getProjectsIds(databaseId)
+            .then(function(projectIds) {
+                if (projectIds.indexOf(projectId) > -1) {
+                    dbConn.client.selectProjectAsync(projectId, function(err) {
+                        if (err) {
+                            deferred.reject(err);
+                            return;
+                        }
+
+                        dbConn.projectService.projectId = projectId;
+
+                        deferred.resolve(projectId);
+                    });
+                } else {
+                    deferred.reject(new Error('Project does not exist. ' + projectId + ' databaseId: ' +
+                        databaseId));
                 }
-              }
+            })
+            .
+        catch(function(reason) {
+            deferred.reject(reason);
+        });
+
+        return deferred.promise;
+    };
+
+    this.watchProjects = function( /*databaseId*/ ) {
+        // TODO: register for project events
+        // TODO: SERVER_PROJECT_CREATED
+        // TODO: SERVER_PROJECT_DELETED
+
+        throw new Error('Not implemented yet.');
+    };
+
+    this.on = function(databaseId, eventName, fn) {
+        var dbConn,
+            i;
+
+        console.assert(typeof databaseId === 'string');
+        console.assert(typeof eventName === 'string');
+        console.assert(typeof fn === 'function');
+
+        dbConn = dataStoreService.getDatabaseConnection(databaseId);
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
+
+        if (typeof dbConn.projectService.events === 'undefined') {
+            // this should not be an inline function
+
+            dbConn.client.addEventListener(dbConn.client.events.PROJECT_OPENED,
+                function(dummy /* FIXME */ , projectId) {
+
+                    if (dbConn.projectService.projectId !== projectId) {
+                        dbConn.projectService.projectId = projectId;
+
+                        console.log('There was a PROJECT_OPENED event', projectId);
+                        if (projectId) {
+                            // initialize
+                            if (dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.initialize) {
+
+                                dbConn.projectService.isInitialized = true;
+
+                                for (i = 0; i < dbConn.projectService.events.initialize.length; i += 1) {
+                                    dbConn.projectService.events.initialize[i](databaseId);
+                                }
+                            }
+                        } else {
+                            // branchId is falsy, empty or null or undefined
+                            // destroy
+                            if (dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.destroy) {
+
+                                dbConn.projectService.isInitialized = false;
+
+                                for (i = 0; i < dbConn.projectService.events.destroy.length; i += 1) {
+                                    dbConn.projectService.events.destroy[i](databaseId);
+                                }
+                            }
+                        }
+                    }
+                });
+
+            dbConn.client.addEventListener(dbConn.client.events.PROJECT_CLOSED,
+                function( /*dummy*/ /* FIXME */ ) {
+                    console.log('There was a PROJECT_CLOSED event', dbConn.projectService.projectId);
+
+                    delete dbConn.projectService.projectId;
+
+                    // destroy
+                    if (dbConn.projectService &&
+                        dbConn.projectService.events &&
+                        dbConn.projectService.events.destroy) {
+
+                        dbConn.projectService.isInitialized = false;
+
+                        for (i = 0; i < dbConn.projectService.events.destroy.length; i += 1) {
+                            dbConn.projectService.events.destroy[i](databaseId);
+                        }
+                    }
+
+                });
+        }
+
+        dbConn.projectService.events = dbConn.projectService.events || {};
+        dbConn.projectService.events[eventName] = dbConn.projectService.events[eventName] || [];
+        dbConn.projectService.events[eventName].push(fn);
+
+        if (dbConn.projectService.isInitialized) {
+            if (eventName === 'initialize') {
+                fn(databaseId);
             }
-          }
-        } );
-
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
-        function ( /*dummy*/ /* FIXME */) {
-          console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
-
-          delete dbConn.projectService.projectId;
-
-          // destroy
-          if ( dbConn.projectService &&
-            dbConn.projectService.events &&
-            dbConn.projectService.events.destroy ) {
-
-            dbConn.projectService.isInitialized = false;
-
-            for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-              dbConn.projectService.events.destroy[ i ]( databaseId );
+        } else {
+            if (eventName === 'destroy') {
+                fn(databaseId);
             }
-          }
-
-        } );
-    }
-
-    dbConn.projectService.events = dbConn.projectService.events || {};
-    dbConn.projectService.events[ eventName ] = dbConn.projectService.events[ eventName ] || [];
-    dbConn.projectService.events[ eventName ].push( fn );
-
-    if ( dbConn.projectService.isInitialized ) {
-      if ( eventName === 'initialize' ) {
-        fn( databaseId );
-      }
-    } else {
-      if ( eventName === 'destroy' ) {
-        fn( databaseId );
-      }
-    }
-  };
+        }
+    };
 };
 
 },{}],22:[function(require,module,exports){
@@ -13797,11 +13754,11 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q,
   $scope.projects = [];
   $scope.tags = [];
   projectServiceTest.startTest().then( function () {
-//    projectService.getProjects( 'multi' ).then( function ( results ) {
-//      $scope.projects = results;
-//    }, function ( err ) {
-//      console.log( 'Cannot get projects: ' + err );
-//    } );
+    projectService.getProjects( 'multi' ).then( function ( results ) {
+      $scope.projects = results;
+    }, function ( err ) {
+      console.log( 'Cannot get projects: ' + err );
+    } );
 
     projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
       $scope.tags = results;
@@ -13838,173 +13795,71 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q,
    }, function(){console.log('cannot start: ' + 3);});*/
 
 } );
+
 },{}],25:[function(require,module,exports){
 'use strict';
 
-require( '../gmeServices.js' );
+require('../gmeServices.js');
 
-module.exports = function ( $q, dataStoreService, projectService ) {
-  var testProjects = [
-    {
-      projectName: 'ProjectServiceTest1',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest1',
-        description: 'project in webGME',
-        tags: {
-          tag1: 'Master'
-        }
-      }
-    },
-    {
-      projectName: 'ProjectServiceTest2',
-      projectInfo: {
-        visibleName: 'ProjectServiceTest2',
-        description: 'project in webGME',
-        tags: {
-          tag1: 'Master'
-        }
-      }
-    }
-  ];
-
-  /*function getProjects() {
-   var deferred = new $q.defer();
-   projectService.getProjects('multi')
-   .then(function(result) {
-   var projects = Object.keys(result);
-   for (var i = projects.length - 1; i >= 0; i--) {
-   result[projects[i]].info.id = projects[i];
-   projects[i] = result[projects[i]].info;
-   }
-   deferred.resolve(projects);
-   });
-   return deferred.promise;
-   }*/
-
-  this.startTest = function () {
-    var deferred = new $q.defer(),
-    index = 0;
-
-    dataStoreService.connectToDatabase( 'multi', {
-      host: window.location.basename
-    } )
-    .then( function () {
-      projectService.getAvailableProjects( 'multi' ).then( function ( names ) {
-        //console.log('AvailableProjects: ' + names);
-        if ( names ) {
-          var createProjectPromises = [];
-
-          for ( index = 0; index < testProjects.length; index++ ) {
-            // If testProject doesn't exist
-            if ( names.indexOf( testProjects[index].projectName ) === -1 ) {
-              createProjectPromises.push( projectService.createProject( 'multi', testProjects[index].projectName,
-              testProjects[index].projectInfo ) );
+module.exports = function($q, dataStoreService, projectService) {
+    var testProjects = [{
+        projectName: 'ProjectServiceTest1',
+        projectInfo: {
+            visibleName: 'ProjectServiceTest1',
+            description: 'project in webGME',
+            tags: {
+                tag1: 'Master'
             }
-          }
-
-          // Waiting for the createProject promise
-          if ( createProjectPromises.length > 0 ) {
-            $q.all( createProjectPromises ).then( function () {
-              deferred.resolve();
-              //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
-            } );
-          } else {
-            deferred.resolve();
-            //projectService.getProjects('multi').then(function(results){deferred.resolve(results);});
-          }
         }
-      }/*, function(err){
-            console.log('Available project error: ' + err);
-      } */);
-    }/*, function(err){
-        console.log('database connection error: ' + err);
-    } */);
+    }, {
+        projectName: 'ProjectServiceTest2',
+        projectInfo: {
+            visibleName: 'ProjectServiceTest2',
+            description: 'project in webGME',
+            tags: {
+                tag1: 'Master'
+            }
+        }
+    }];
 
-    return deferred.promise;
-  };
+    this.startTest = function() {
+        var deferred = new $q.defer(),
+            index = 0;
+
+        dataStoreService.connectToDatabase('multi', {
+                host: window.location.basename
+            })
+            .then(function() {
+              //projectService.applyTagsOnProject('multi','ProjectServiceTest2',[{id:'t1', name:'alma1'},{id:'t2', name:'korte2'}]);
+                //projectService.deleteProject('multi', 'ProjectServiceTest1').then(function() {
+                    projectService.getAvailableProjects('multi').then(function(names) {
+                        if (names) {
+                            var createProjectPromises = [];
+
+                            for (index = 0; index < testProjects.length; index++) {
+                                // If testProject doesn't exist
+                                if (names.indexOf(testProjects[index].projectName) === -1) {
+                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName,
+                                        testProjects[index].projectInfo));
+                                }
+                            }
+
+                            // Waiting for the createProject promise
+                            if (createProjectPromises.length > 0) {
+                                $q.all(createProjectPromises).then(function() {
+                                    deferred.resolve();
+                                });
+                            } else {
+                                deferred.resolve();
+                            }
+                        }
+                    });
+                //});
+            });
+
+        return deferred.promise;
+    };
 };
-
-/*
- angular.module('gme.tests.projectService', [
- 'gme.services',
- 'gme.tests.projectService'
- ])
- .factory('TestProjectsService', function($scope, $log, $q, dataStoreService, projectService) {
- var result = {
- startTest: null
- },
- testProjects = [{
- projectName: 'ProjectServiceTest1',
- projectInfo: {
- visibleName: 'ProjectServiceTest1',
- description: 'project in webGME',
- tags: {
- tag1: 'Master'
- }
- }
- }, {
- projectName: 'ProjectServiceTest2',
- projectInfo: {
- visibleName: 'ProjectServiceTest2',
- description: 'project in webGME',
- tags: {
- tag1: 'Master'
- }
- }
- }],
- index = 0;
-
- function getProjects() {
- var deferred = new $q.defer();
- projectService.getProjects('multi')
- .then(function(result) {
- var projects = Object.keys(result);
- for (var i = projects.length - 1; i >= 0; i--) {
- result[projects[i]].info.id = projects[i];
- projects[i] = result[projects[i]].info;
- }
- deferred.resolve(projects);
- });
- return deferred;
- }
-
- function startTest() {
- var deferred = new $q.defer();
-
- dataStoreService.connectToDatabase('multi', {
- host: window.location.basename
- })
- .then(function() {
- projectService.getAvailableProjects('multi').then(function(names) {
- if (names) {
- var createProjectPromises = [];
-
- for (index = 0; index < testProjects.length; index++) {
- // If testProject doesn't exist
- if (names.indexOf(testProjects[index].projectName) === -1) {
- createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName, testProjects[index].projectInfo));
- }
- }
-
- // Waiting for the createProject promise
- if (createProjectPromises.length > 0) {
- $q.all(createProjectPromises).then(function() {
- getProjects().then(function(results){deferred.resolve(results);});
- });
- } else {
- getProjects().then(function(results){deferred.resolve(results);});
- }
- }
- });
- });
-
- return deferred;
- }
-
- result.startTest = startTest;
- return result;
-
- });*/
 
 },{"../gmeServices.js":22}],26:[function(require,module,exports){
 (function (global){

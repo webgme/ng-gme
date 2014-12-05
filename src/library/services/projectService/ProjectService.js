@@ -82,9 +82,11 @@ module.exports = function($q, dataStoreService) {
 
         dbConn.client.getFullProjectsInfoAsync(function(err, result) {
             var projectTags,
+                branches,
                 projects = [],
                 projectMapper,
-                projectTagsMapper;
+                projectTagsMapper,
+                branchMapper;
 
             projectTagsMapper = function(tagName, tagId) {
                 projectTags.push({
@@ -93,17 +95,28 @@ module.exports = function($q, dataStoreService) {
                 });
             };
 
+            branchMapper = function(commitId, branchId) {
+                branches.push({
+                    branchId: branchId,
+                    commitId: commitId
+                });
+            };
+
             projectMapper = function(project, projectId) {
               projectTags = [];
+              branches = [];
 
               // Transform tags
               angular.forEach(project.info.tags, projectTagsMapper);
               project.info.tags = projectTags;
 
+              // Transform branches
+              angular.forEach(project.branches, branchMapper);
+
               // Transform project
               projects.push({
                 id: projectId,
-                branches: project.branches,
+                branches: branches,
                 info: project.info,
                 rights: project.rights
               });
