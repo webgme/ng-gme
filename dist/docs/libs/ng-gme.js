@@ -1363,6 +1363,8 @@ module.exports = function($q, dataStoreService) {
               projectTags = [];
               branches = [];
 
+              project.info = project.info || {};
+
               // Transform tags
               angular.forEach(project.info.tags, projectTagsMapper);
               project.info.tags = projectTags;
