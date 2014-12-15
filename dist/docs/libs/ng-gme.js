@@ -43,7 +43,9 @@ angular.module( 'gme.directives.projectBrowser', [
   filterItems,
   projectList,
   availableTerms,
-  databaseId;
+  databaseId,
+
+  updateProjectList;
   
   databaseId = 'multi';
 
@@ -195,10 +197,7 @@ angular.module( 'gme.directives.projectBrowser', [
 
   };
 
-  // Making sure we have test project in DB
-
-  projectServiceTest.startTest().then( function () {
-
+  updateProjectList = function() {
 
     projectService.getAvailableProjectTags( databaseId ).then( function ( tagList ) {
 
@@ -216,6 +215,13 @@ angular.module( 'gme.directives.projectBrowser', [
       //$scope.projectList.items = results;
     } );
 
+  };
+
+
+  // Making sure we have test project in DB
+
+  projectServiceTest.startTest().then( function () {
+    updateProjectList();
   } );
 
   $scope.config = config = {
@@ -248,7 +254,11 @@ angular.module( 'gme.directives.projectBrowser', [
               id: 'open',
               label: 'Open Project',
               disabled: false,
-              iconClass: ''
+              iconClass: '',
+              action: function() {
+                projectService.selectProject(databaseId, item.id);
+              }
+
             }
           ]
         },
@@ -269,8 +279,9 @@ angular.module( 'gme.directives.projectBrowser', [
                   dialogTitle: 'Are you sure?',
                   dialogContentTemplate: '/ng-gme/templates/confirmProjectDelete.html',
                   onOk: function () {
-                    projectService.deleteProject(databaseId, item.id ).then(function(e){
-                      console.log('deleted');
+
+                    projectService.deleteProject(databaseId, item.id ).then(function(){
+                      updateProjectList();
                     });
                     
                   },
@@ -322,7 +333,7 @@ angular.module( 'gme.directives.projectBrowser', [
             description: newItem.description
           }
           ).then( function () {
-            console.log( 'created');
+            updateProjectList();
           } );
 
           $scope.newItem = {};
