@@ -167,11 +167,13 @@ module.exports = function ( $q, dataStoreService ) {
     return deferred.promise;
   };
 
-  this.deleteProject = function ( databaseId, projectname ) {
+  this.deleteProject = function ( databaseId, projectId ) {
     var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
     deferred = new $q.defer();
 
-    dbConn.client.deleteProjectAsync( projectname, function ( err ) {
+    console.log(projectId);
+
+    dbConn.client.deleteProjectAsync( projectId, function ( err ) {
       if ( err ) {
         deferred.reject( err );
         return;

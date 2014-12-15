@@ -6,6 +6,7 @@ require( '../termFilter/termFilter.js' );
 angular.module( 'gme.directives.projectBrowser', [
   'gme.templates',
   'isis.ui.itemList',
+  'isis.ui.simpleDialog',
   'gme.directives.termFilter',
   'ngTagsInput',
   'gme.testServices'
@@ -13,7 +14,8 @@ angular.module( 'gme.directives.projectBrowser', [
 .run( function () {
 
 } )
-.controller( 'ProjectBrowserController', function ( $scope, $log, $filter, projectServiceTest, projectService ) {
+.controller( 'ProjectBrowserController', function (
+  $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
 
   var config,
   dummyProjectGenerator,
@@ -22,7 +24,10 @@ angular.module( 'gme.directives.projectBrowser', [
 
   filterItems,
   projectList,
-  availableTerms;
+  availableTerms,
+  databaseId;
+  
+  databaseId = 'multi';
 
   availableTerms = $scope.availableTerms = [];
 
@@ -177,7 +182,7 @@ angular.module( 'gme.directives.projectBrowser', [
   projectServiceTest.startTest().then( function () {
 
 
-    projectService.getAvailableProjectTags( 'multi' ).then( function ( tagList ) {
+    projectService.getAvailableProjectTags( databaseId ).then( function ( tagList ) {
 
       $scope.availableTerms = tagList;
 
@@ -185,7 +190,7 @@ angular.module( 'gme.directives.projectBrowser', [
 
     console.log( 'In here...' );
 
-    projectService.getProjects( 'multi' ).then( function ( gmeProjectDescriptors ) {
+    projectService.getProjects( databaseId ).then( function ( gmeProjectDescriptors ) {
 
       $scope.projectList.items = [];
       $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
@@ -241,6 +246,24 @@ angular.module( 'gme.directives.projectBrowser', [
               id: 'delete',
               label: 'Delete Project',
               disabled: false,
+              action: function () {
+                $simpleDialog.open( {
+                  dialogTitle: 'Are you sure?',
+                  dialogContentTemplate: '/ng-gme/templates/confirmProjectDelete.html',
+                  onOk: function () {
+                    projectService.deleteProject(databaseId, item.id ).then(function(e){
+                      console.log('deleted');
+                    });
+                    
+                  },
+                  onCancel: function () {
+                    console.log( 'This was canceled' );
+                  },
+                  size: 'lg', // can be sm or lg
+                  scope: false
+                } );
+
+              },
               iconClass: ''
             }
           ]
@@ -264,16 +287,24 @@ angular.module( 'gme.directives.projectBrowser', [
 
         $scope.createItem = function ( newItem ) {
 
+          var tags;
+
+          tags = [];
+
+          angular.forEach(newItem.tags, function(tag) {
+            tags.push(tag.name);
+          });
+
           projectService.createProject(
-          newItem.title,
+          databaseId,
           newItem.title,
           {
             visibleName: newItem.title,
-            tags: newItem.tags,
+            tags: tags,
             description: newItem.description
           }
-          ).then( function ( e ) {
-            console.log( e );
+          ).then( function () {
+            console.log( 'created');
           } );
 
           $scope.newItem = {};
