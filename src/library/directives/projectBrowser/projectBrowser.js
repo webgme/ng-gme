@@ -155,12 +155,14 @@ angular.module( 'gme.directives.projectBrowser', [
 
     angular.forEach(projectDescriptors, function(projectDescriptor) {
 
+        console.log(projectDescriptor);
+
         result.push({
 
           id: projectDescriptor.id,
-          description: projectDescriptor.description,
-          title: projectDescriptor.visibleName,
-          taxonomyTerms: projectDescriptor.tags
+          description: projectDescriptor.info.description,
+          title: projectDescriptor.info.visibleName,
+          taxonomyTerms: projectDescriptor.info.tags
 
         });
 
@@ -181,8 +183,9 @@ angular.module( 'gme.directives.projectBrowser', [
 
     });
 
+    console.log('In here...');
+
     projectService.getProjects( 'multi' ).then( function ( gmeProjectDescriptors ) {
-      $log.debug(gmeProjectDescriptors);
 
       $scope.projectList.items = [];
       $scope.projectList.items = projectDescriptorMapper(gmeProjectDescriptors);
