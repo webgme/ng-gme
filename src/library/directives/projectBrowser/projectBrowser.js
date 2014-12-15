@@ -149,24 +149,24 @@ angular.module( 'gme.directives.projectBrowser', [
 //    $scope.projectList.items.push(dummyProjectGenerator(i));
 //  }
 
-  projectDescriptorMapper = function(projectDescriptors) {
+  projectDescriptorMapper = function ( projectDescriptors ) {
 
     var result = [];
 
-    angular.forEach(projectDescriptors, function(projectDescriptor) {
+    angular.forEach( projectDescriptors, function ( projectDescriptor ) {
 
-        console.log(projectDescriptor);
+      console.log( projectDescriptor );
 
-        result.push({
+      result.push( {
 
-          id: projectDescriptor.id,
-          description: projectDescriptor.info.description,
-          title: projectDescriptor.info.visibleName,
-          taxonomyTerms: projectDescriptor.info.tags
+        id: projectDescriptor.id,
+        description: projectDescriptor.info.description,
+        title: projectDescriptor.info.visibleName,
+        taxonomyTerms: projectDescriptor.info.tags
 
-        });
+      } );
 
-      });
+    } );
 
     return result;
 
@@ -177,23 +177,23 @@ angular.module( 'gme.directives.projectBrowser', [
   projectServiceTest.startTest().then( function () {
 
 
-    projectService.getAvailableProjectTags( 'multi' ).then( function(tagList) {
+    projectService.getAvailableProjectTags( 'multi' ).then( function ( tagList ) {
 
       $scope.availableTerms = tagList;
 
-    });
+    } );
 
-    console.log('In here...');
+    console.log( 'In here...' );
 
     projectService.getProjects( 'multi' ).then( function ( gmeProjectDescriptors ) {
 
       $scope.projectList.items = [];
-      $scope.projectList.items = projectDescriptorMapper(gmeProjectDescriptors);
+      $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
 
       //$scope.projectList.items = results;
-    });
+    } );
 
-  });
+  } );
 
   $scope.config = config = {
 
@@ -224,19 +224,23 @@ angular.module( 'gme.directives.projectBrowser', [
             {
               id: 'open',
               label: 'Open Project',
-              disabled: true,
+              disabled: false,
               iconClass: ''
-            },
+            }
+          ]
+        },
+        {
+          items: [
             {
               id: 'edit',
               label: 'Edit Project Details',
-              disabled: true,
+              disabled: false,
               iconClass: ''
             },
             {
               id: 'delete',
               label: 'Delete Project',
-              disabled: true,
+              disabled: false,
               iconClass: ''
             }
           ]
@@ -260,10 +264,17 @@ angular.module( 'gme.directives.projectBrowser', [
 
         $scope.createItem = function ( newItem ) {
 
-          newItem.id = newItem.title;
-          console.log(newItem.tags);
-          projectList.items.push( newItem );
-          console.log( projectList.items );
+          projectService.createProject(
+          newItem.title,
+          newItem.title,
+          {
+            visibleName: newItem.title,
+            tags: newItem.tags,
+            description: newItem.description
+          }
+          ).then( function ( e ) {
+            console.log( e );
+          } );
 
           $scope.newItem = {};
 
