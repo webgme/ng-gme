@@ -12270,7 +12270,8 @@ angular.module( 'gme.directives.projectBrowser', [
   'isis.ui.simpleDialog',
   'gme.directives.termFilter',
   'ngTagsInput',
-  'gme.testServices'
+  'gme.testServices',
+  'isis.ui.valueWidgets'
 ] )
 .run( function () {
 
@@ -12511,7 +12512,23 @@ angular.module( 'gme.directives.projectBrowser', [
               id: 'edit',
               label: 'Edit Project Details',
               disabled: false,
-              iconClass: ''
+              iconClass: '',
+              action: function() {
+                $simpleDialog.open( {
+                  dialogTitle: 'Edit project details',
+                  dialogContentTemplate: '/ng-gme/templates/newProjectTemplate.html',
+                  onOk: function () {
+
+
+                  },
+                  onCancel: function () {
+                    console.log( 'This was canceled' );
+                  },
+                  size: 'lg', // can be sm or lg
+                  scope: false
+                } );
+
+              }
             },
             {
               id: 'delete',

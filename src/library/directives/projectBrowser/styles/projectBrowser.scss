@@ -5,7 +5,6 @@
     overflow: auto;
   }
 
-  .edit-item,
   .create-new-item {
 
     .panel-group > .panel {
@@ -42,72 +41,94 @@
 
     }
 
-    tags-input {
+  }
+}
+
+.edit-project-details {
+
+  form {
+
+    .row {
+      margin-bottom: 1ex;
+    }
+
+  }
+
+  tags-input {
+
+    .tags.focused {
+      border: none;
+      box-shadow: none;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    .host {
       &:focus {
         outline: none;
       }
+    }
 
-      .host {
-        &:focus {
-          outline: none;
-        }
+    input {
+      border-radius: 2px;
+    }
+
+  }
+
+  .tags-input-row {
+    margin-top: 2em;
+  }
+
+  .tags {
+
+    border: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+
+    > input.input {
+      width: 100% !important;
+      padding: 0 1ex;
+      border: 1px solid #ccc;
+
+      &:focus {
+        border-color: #66afe9;
+        outline: 0;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
       }
-
     }
 
-    .tags-input-row {
-      margin-top: 2em;
-    }
+    .tag-list {
 
-    .tags {
+      font-size: 70%;
+      padding-left: 0;
 
-      border: 0;
-      box-shadow: none;
-      -webkit-box-shadow: none;
+      .tag-item {
+        display: inline-block;
 
-      > input.input {
-        width: 100% !important;
         padding: 0 1ex;
-        border: 1px solid #ccc;
+        margin-right: 1ex;
 
-        &:focus {
-          border-color: #66afe9;
-          outline: 0;
-          -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-        }
+        background-color: #999;
+        border: none;
+        border-radius: 0.5ex;
+        text-transform: uppercase;
+        line-height: 140%;
       }
 
-      .tag-list {
+      .remove-button {
+        display: inline-block;
+        cursor: pointer;
+        color: #fff;
 
-        font-size: 70%;
-        padding-left: 0;
-
-        .tag-item {
-          display: inline-block;
-
-          padding: 0 1ex;
-          margin-right: 1ex;
-
-          background-color: #999;
-          border: none;
-          border-radius: 0.5ex;
-          text-transform: uppercase;
-          line-height: 140%;
-        }
-
-        .remove-button {
-          display: inline-block;
-          cursor: pointer;
-          color: #fff;
-
-          &:hover {
-            color: #ff0;
-          }
-
+        &:hover {
+          color: #ff0;
         }
 
       }
+
     }
   }
 }
