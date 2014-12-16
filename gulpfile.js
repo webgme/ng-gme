@@ -288,7 +288,7 @@ gulp.task( 'compile-all', function ( cb ) {
 gulp.task( 'prettify', function () {
   gulp.src( './src/**/*.js' )
   .pipe( prettify( {
-    'indent_size': 2,
+    'indent_size': 4,
     'indent_char': ' ',
     'space_in_paren': true,
     'indent_level': 0,
@@ -303,7 +303,7 @@ gulp.task( 'prettify', function () {
     'break_chained_methods': true,
     'eval_code': false,
     'unescape_strings': false,
-    'wrap_line_length': 100
+    'wrap_line_length': 120
   } ) )
   .pipe( gulp.dest( './src' ) ); // edit in place
 } );

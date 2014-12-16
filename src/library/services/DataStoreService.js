@@ -2,7 +2,7 @@
 
 'use strict';
 
-module.exports = function($q) {
+module.exports = function ( $q ) {
     var dataStores = {},
         connectQueue = [],
         queueProcessing = false,
@@ -72,48 +72,48 @@ module.exports = function($q) {
     // Picks up the next connectionmeta and tries to connect
     // After a(n) (un)successful connection, the defered resolve/promise is called
     // and the function picks up the next item from the queue
-    connectNextInQueue = function() {
-        if (connectQueue.length > 0) {
-            var currentItem = connectQueue[0];
+    connectNextInQueue = function () {
+        if ( connectQueue.length > 0 ) {
+            var currentItem = connectQueue[ 0 ];
 
-            if (dataStores.hasOwnProperty(currentItem.databaseId)) {
+            if ( dataStores.hasOwnProperty( currentItem.databaseId ) ) {
                 // FIXME: this may or may not ready yet...
                 currentItem.deferred.resolve();
-                connectQueue.splice(0, 1);
+                connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                var client = new WebGMEGlobal.classes.Client(currentItem.options);
+                var client = new WebGMEGlobal.classes.Client( currentItem.options );
 
                 // hold a reference to the client instance
-                dataStores[currentItem.databaseId] = {
+                dataStores[ currentItem.databaseId ] = {
                     client: client
                 };
 
                 // TODO: add event listeners to client
                 // FIXME: deferred should not be used from closure
-                client.connectToDatabaseAsync({}, function(err) {
-                    if (err) {
-                        currentItem.deferred.reject(err);
+                client.connectToDatabaseAsync( {}, function ( err ) {
+                    if ( err ) {
+                        currentItem.deferred.reject( err );
                     } else {
-                      currentItem.deferred.resolve();
+                        currentItem.deferred.resolve();
                     }
 
-                    connectQueue.splice(0, 1);
+                    connectQueue.splice( 0, 1 );
                     connectNextInQueue();
-                });
+                } );
             }
         } else {
             queueProcessing = false;
-            if (connectQueue.length > 0) {
-              processQueue();
+            if ( connectQueue.length > 0 ) {
+                processQueue();
             }
         }
     };
 
     // Check if there are any processing phase
     // No simultaneous processing
-    processQueue = function() {
-        if (!queueProcessing) {
+    processQueue = function () {
+        if ( !queueProcessing ) {
             queueProcessing = true;
             connectNextInQueue();
         }
@@ -121,37 +121,37 @@ module.exports = function($q) {
 
     // Just one connection phase at one time.
     // Multiple connection phase may cause 'unexpected results'
-    this.connectToDatabase = function(databaseId, options) {
+    this.connectToDatabase = function ( databaseId, options ) {
         var deferred = $q.defer();
 
         // Put the connection metadata into a queue
-        connectQueue.push({
+        connectQueue.push( {
             databaseId: databaseId, // Where to connect? Default: 'multi'
-            deferred: deferred,     // defered object, where the notifications are sent if the connection succesful (or not)
-            options: options        // Connection oprtions
-        });
+            deferred: deferred, // defered object, where the notifications are sent if the connection succesful (or not)
+            options: options // Connection oprtions
+        } );
 
         processQueue();
 
         return deferred.promise;
     };
 
-    this.getDatabaseConnection = function(databaseId) {
-        if (dataStores.hasOwnProperty(databaseId) && typeof dataStores[databaseId] === 'object') {
-            return dataStores[databaseId];
+    this.getDatabaseConnection = function ( databaseId ) {
+        if ( dataStores.hasOwnProperty( databaseId ) && typeof dataStores[ databaseId ] === 'object' ) {
+            return dataStores[ databaseId ];
         }
 
-        console.error(databaseId + ' does not have an active database connection.');
+        console.error( databaseId + ' does not have an active database connection.' );
     };
 
-    this.watchConnection = function( /*databaseId*/ ) {
+    this.watchConnection = function ( /*databaseId*/) {
         // TODO: handle events
         // TODO: CONNECTED
         // TODO: DISCONNECTED
 
         // TODO: NETWORKSTATUS_CHANGED
 
-        throw new Error('Not implemented yet.');
+        throw new Error( 'Not implemented yet.' );
     };
 
     // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
