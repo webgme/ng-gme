@@ -4,19 +4,19 @@
             <div class="col-md-6">
                 <input type="text" class="form-control" data-ng-model="newItem.title"
                        placeholder="New item name">
-                    <value-widget
+                    <!--<value-widget-->
 
-                        ng-model="widgetDescriptor.model"
-                        model-config="widgetDescriptor.modelConfigEdit"
+                        <!--ng-model="widgetDescriptor.model"-->
+                        <!--model-config="widgetDescriptor.modelConfigEdit"-->
 
-                        input-config="widgetDescriptor.inputConfig"
+                        <!--input-config="widgetDescriptor.inputConfig"-->
 
-                        widget-type="widgetDescriptor.widgetType"
-                        widget-mode="'edit'"
-                        widget-config="widgetDescriptor.widgetConfigEdit"
-                        widget-disabled="inputsDisabled">
+                        <!--widget-type="widgetDescriptor.widgetType"-->
+                        <!--widget-mode="'edit'"-->
+                        <!--widget-config="widgetDescriptor.widgetConfigEdit"-->
+                        <!--widget-disabled="inputsDisabled">-->
 
-                    </value-widget>
+                    <!--</value-widget>-->
 
             </div>
         </div>
@@ -29,7 +29,9 @@
         </div>
         <div class="row tags-input-row">
             <div class="col-md-12">
-                <tags-input ng-model="newItem.tags" display-property="name"></tags-input>
+                <tags-input ng-model="newItem.tags" display-property="name">
+                    <auto-complete source="loadTags($query)"></auto-complete>
+                </tags-input>
             </div>
         </div>
         <div class="row form-footer">

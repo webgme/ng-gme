@@ -5,13 +5,13 @@
 var directiveComponents, serviceComponents;
 
 directiveComponents = [ {
-  name: 'projectBrowser',
-  sources: [ 'demo.html', 'demo.js' ]
+    name: 'projectBrowser',
+    sources: [ 'demo.html', 'demo.js' ]
 } ];
 
 serviceComponents = [ {
-  name: 'projectService',
-  sources: [ 'demo.html', 'demo.js' ]
+    name: 'projectService',
+    sources: [ 'demo.html', 'demo.js' ]
 } ];
 
 window.chance = new Chance();
@@ -39,107 +39,106 @@ require( 'ui-utils' );
 
 
 var demoApp = angular.module(
-  'gme.demoApp', [
-    'gme.docs.templates',
-    'btford.markdown',
-    'ui.codemirror',
-    'ui.bootstrap'
-  ].concat( directiveComponents.map( function ( e ) {
-    return 'gme.' + e.name + '.demo';
-  } ) )
-  .concat( serviceComponents.map( function ( e ) {
-    return 'gme.' + e.name + '.demo';
-  } ) )
+    'gme.demoApp', [
+        'gme.docs.templates',
+        'btford.markdown',
+        'ui.codemirror',
+        'ui.bootstrap'
+    ].concat( directiveComponents.map( function ( e ) {
+        return 'gme.' + e.name + '.demo';
+    } ) )
+    .concat( serviceComponents.map( function ( e ) {
+        return 'gme.' + e.name + '.demo';
+    } ) )
 );
 
 demoApp.run( function () {
-  console.log( 'DemoApp run...' );
+    console.log( 'DemoApp run...' );
 
 } );
 
 demoApp.controller(
-  'UIComponentsDemoController',
-  function ( $scope, $templateCache ) {
+    'UIComponentsDemoController',
+    function ( $scope, $templateCache ) {
 
-    var fileExtensionRE,
-      codeMirrorModes;
+        var fileExtensionRE,
+            codeMirrorModes;
 
-    fileExtensionRE = /(?:\.([^.]+))?$/;
+        fileExtensionRE = /(?:\.([^.]+))?$/;
 
-    codeMirrorModes = {
-      'js': 'javascript',
-      'html': 'htmlmixed'
-    };
+        codeMirrorModes = {
+            'js': 'javascript',
+            'html': 'htmlmixed'
+        };
 
-    $scope.components = directiveComponents.map( function ( component ) {
-      var sources,
-        viewerOptions,
-        fileExtension;
+        $scope.components = directiveComponents.map( function ( component ) {
+            var sources,
+                viewerOptions,
+                fileExtension;
 
-      if ( angular.isArray( component.sources ) ) {
-        sources = component.sources.map( function ( sourceFile ) {
+            if ( angular.isArray( component.sources ) ) {
+                sources = component.sources.map( function ( sourceFile ) {
 
-          fileExtension = fileExtensionRE.exec( sourceFile );
+                    fileExtension = fileExtensionRE.exec( sourceFile );
 
-          viewerOptions = {
-            lineWrapping: true,
-            lineNumbers: true,
-            readOnly: true,
-            mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
-          };
+                    viewerOptions = {
+                        lineWrapping: true,
+                        lineNumbers: true,
+                        readOnly: true,
+                        mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
+                    };
 
-          return {
-            fileName: sourceFile,
-            code: $templateCache.get( '/library/directives/' + component.name + '/docs/' +
-              sourceFile ),
-            viewerOptions: viewerOptions
-          };
+                    return {
+                        fileName: sourceFile,
+                        code: $templateCache.get( '/library/directives/' + component.name + '/docs/' +
+                            sourceFile ),
+                        viewerOptions: viewerOptions
+                    };
+                } );
+            }
+
+            return {
+                name: component.name,
+                template: '/library/directives/' + component.name + '/docs/demo.html',
+                docs: '/library/directives/' + component.name + '/docs/readme.md',
+                sources: sources
+            };
         } );
-      }
 
-      return {
-        name: component.name,
-        template: '/library/directives/' + component.name + '/docs/demo.html',
-        docs: '/library/directives/' + component.name + '/docs/readme.md',
-        sources: sources
-      };
+        $scope.components = $scope.components.concat( serviceComponents.map( function ( component ) {
+            var sources,
+                viewerOptions,
+                fileExtension;
+
+            if ( angular.isArray( component.sources ) ) {
+                sources = component.sources.map( function ( sourceFile ) {
+
+                    fileExtension = fileExtensionRE.exec( sourceFile );
+
+                    viewerOptions = {
+                        lineWrapping: true,
+                        lineNumbers: true,
+                        readOnly: true,
+                        mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
+                    };
+
+                    return {
+                        fileName: sourceFile,
+                        code: $templateCache.get( '/library/services/' + component.name + '/docs/' +
+                            sourceFile ),
+                        viewerOptions: viewerOptions
+                    };
+                } );
+            }
+
+            return {
+                name: component.name,
+                template: '/library/services/' + component.name + '/docs/demo.html',
+                docs: '/library/services/' + component.name + '/docs/readme.md',
+                sources: sources
+            };
+        } ) );
     } );
-
-    $scope.components = $scope.components.concat(serviceComponents.map( function ( component ) {
-      var sources,
-        viewerOptions,
-        fileExtension;
-
-      if ( angular.isArray( component.sources ) ) {
-        sources = component.sources.map( function ( sourceFile ) {
-
-          fileExtension = fileExtensionRE.exec( sourceFile );
-
-          viewerOptions = {
-            lineWrapping: true,
-            lineNumbers: true,
-            readOnly: true,
-            mode: codeMirrorModes[ fileExtension[ 1 ] ] || 'xml'
-          };
-
-          return {
-            fileName: sourceFile,
-            code: $templateCache.get( '/library/services/' + component.name + '/docs/' +
-              sourceFile ),
-            viewerOptions: viewerOptions
-          };
-        } );
-      }
-
-      return {
-        name: component.name,
-        template: '/library/services/' + component.name + '/docs/demo.html',
-        docs: '/library/services/' + component.name + '/docs/readme.md',
-        sources: sources
-      };
-    } )
-    );
-  } );
 
 
 demoApp.controller( '' );
@@ -12246,8 +12245,8 @@ module.exports.byUrl = function(url) {
 require( './projectBrowser/projectBrowser.js' );
 
 angular.module( 'gme.directives', [
-  'gme.templates',
-  'gme.directives.projectBrowser'
+    'gme.templates',
+    'gme.directives.projectBrowser'
 ] );
 },{"./projectBrowser/projectBrowser.js":15}],14:[function(require,module,exports){
 /*globals angular*/
@@ -12256,7 +12255,7 @@ angular.module( 'gme.directives', [
 var demoApp = angular.module( 'gme.projectBrowser.demo', [ 'gme.directives.projectBrowser' ] );
 
 demoApp.controller( 'ProjectBrowserDemoController', function ( $scope, $log ) {
-  $log.debug( 'In ProjectBrowserDemoController' );
+    $log.debug( 'In ProjectBrowserDemoController' );
 } );
 },{}],15:[function(require,module,exports){
 /*globals angular, chance*/
@@ -12265,630 +12264,638 @@ demoApp.controller( 'ProjectBrowserDemoController', function ( $scope, $log ) {
 require( '../termFilter/termFilter.js' );
 
 angular.module( 'gme.directives.projectBrowser', [
-  'gme.templates',
-  'isis.ui.itemList',
-  'isis.ui.simpleDialog',
-  'gme.directives.termFilter',
-  'ngTagsInput',
-  'gme.testServices',
-  'isis.ui.valueWidgets'
+    'gme.templates',
+    'isis.ui.itemList',
+    'isis.ui.simpleDialog',
+    'gme.directives.termFilter',
+    'ngTagsInput',
+    'gme.testServices',
+    'isis.ui.valueWidgets'
 ] )
 .run( function () {
 
 } )
-.controller( 'ProjectBrowserController', function (
-  $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
+.controller( 'ProjectBrowserController',
+function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
 
-  var config,
-  dummyProjectGenerator,
+    var config,
+    dummyProjectGenerator,
 
-  projectDescriptorMapper,
+    projectDescriptorMapper,
 
-  filterItems,
-  projectList,
-  availableTerms,
-  databaseId,
+    filterItems,
+    projectList,
+    availableTerms,
+    databaseId,
 
-  updateProjectList;
-  
-  databaseId = 'multi';
+    updateProjectList;
 
-  availableTerms = $scope.availableTerms = [];
+    databaseId = 'multi';
 
-//  availableTerms = $scope.availableTerms = [
-//    {
-//      id: 'tag1',
-//      name: 'Tag A',
-//      url: 'http://vanderbilt.edu'
-//    },
-//    {
-//      id: 'tag2',
-//      name: 'Tag B',
-//      url: 'http://vanderbilt.edu'
-//    },
-//    {
-//      id: 'tag3',
-//      name: 'Tag C',
-//      url: 'http://vanderbilt.edu'
-//    },
-//    {
-//      id: 'tag4',
-//      name: 'Tag D',
-//      url: 'http://vanderbilt.edu'
-//    },
-//    {
-//      id: 'tag5',
-//      name: 'Tag E',
-//      url: 'http://vanderbilt.edu'
-//    },
-//    {
-//      id: 'tag6',
-//      name: 'Tag F',
-//      url: 'http://vanderbilt.edu'
-//    }
-//  ];
+    availableTerms = $scope.availableTerms = [];
 
-
-  $scope.filtering = {
-    selectedTermIds: [
-
-    ]
-  };
-
-  projectList = $scope.projectList = {
-    items: []
-  };
-
-  $scope.filteredProjectList = {
-    items: []
-  };
+    //  availableTerms = $scope.availableTerms = [
+    //    {
+    //      id: 'tag1',
+    //      name: 'Tag A',
+    //      url: 'http://vanderbilt.edu'
+    //    },
+    //    {
+    //      id: 'tag2',
+    //      name: 'Tag B',
+    //      url: 'http://vanderbilt.edu'
+    //    },
+    //    {
+    //      id: 'tag3',
+    //      name: 'Tag C',
+    //      url: 'http://vanderbilt.edu'
+    //    },
+    //    {
+    //      id: 'tag4',
+    //      name: 'Tag D',
+    //      url: 'http://vanderbilt.edu'
+    //    },
+    //    {
+    //      id: 'tag5',
+    //      name: 'Tag E',
+    //      url: 'http://vanderbilt.edu'
+    //    },
+    //    {
+    //      id: 'tag6',
+    //      name: 'Tag F',
+    //      url: 'http://vanderbilt.edu'
+    //    }
+    //  ];
 
 
-  filterItems = function () {
-    $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
-    $scope.filtering.selectedTermIds );
-  };
+    $scope.filtering = {
+        selectedTermIds: [
 
-  $scope.$watch( function () {
-
-    return $scope.filtering.selectedTermIds;
-  }, function () {
-    filterItems();
-  },
-  true );
-
-
-  $scope.$watch( 'filtering.selectedTermIds', function () {
-    filterItems();
-  } );
-
-  $scope.$watch( 'projectList.items', function () {
-    filterItems();
-  } );
-
-  dummyProjectGenerator = function ( id ) {
-
-    var projectDescriptor, i;
-
-    projectDescriptor = {
-      id: id,
-      title: chance.paragraph( {
-        sentences: 1
-      } ),
-      cssClass: 'project-item',
-      toolTip: 'Open project',
-      description: chance.paragraph( {
-        sentences: 2
-      } ),
-      lastUpdated: {
-        time: Date.now(),
-        user: 'N/A'
-
-      },
-      taxonomyTerms: [],
-      stats: [
-        {
-          value: id,
-          toolTip: 'Commits',
-          iconClass: 'fa fa-cloud-upload'
-        },
-        {
-          value: id,
-          toolTip: 'Users',
-          iconClass: 'fa fa-users'
-        }
-      ],
-      details: chance.paragraph( {
-        sentences: 3
-      } )
+        ]
     };
 
-    for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
+    projectList = $scope.projectList = {
+        items: []
+    };
 
-      if ( Math.random() > 0.5 ) {
-        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
-      }
-    }
-
-    return projectDescriptor;
-
-  };
-
-//  for (i = 0; i < 20; i++) {
-//    $scope.projectList.items.push(dummyProjectGenerator(i));
-//  }
-
-  projectDescriptorMapper = function ( projectDescriptors ) {
-
-    var result = [];
-
-    angular.forEach( projectDescriptors, function ( projectDescriptor ) {
-
-      console.log( projectDescriptor );
-
-      result.push( {
-
-        id: projectDescriptor.id,
-        description: projectDescriptor.info.description,
-        title: projectDescriptor.info.visibleName,
-        taxonomyTerms: projectDescriptor.info.tags
-
-      } );
-
-    } );
-
-    return result;
-
-  };
-
-  updateProjectList = function() {
-
-    projectService.getAvailableProjectTags( databaseId ).then( function ( tagList ) {
-
-      $scope.availableTerms = tagList;
-
-    } );
-
-    console.log( 'In here...' );
-
-    projectService.getProjects( databaseId ).then( function ( gmeProjectDescriptors ) {
-
-      $scope.projectList.items = [];
-      $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
-
-      //$scope.projectList.items = results;
-    } );
-
-  };
+    $scope.filteredProjectList = {
+        items: []
+    };
 
 
-  // Making sure we have test project in DB
+    filterItems = function () {
+        $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+        $scope.filtering.selectedTermIds );
+    };
 
-  projectServiceTest.startTest().then( function () {
-    updateProjectList();
-  } );
+    $scope.$watch( function () {
 
-  $scope.config = config = {
-
-    sortable: true,
-    secondaryItemMenu: true,
-    detailsCollapsible: true,
-    showDetailsLabel: 'Show details',
-    hideDetailsLabel: 'Hide details',
-    filter: {},
-
-    // Event handlers
-
-    itemSort: function ( jQEvent, ui ) {
-      console.log( 'Sort happened', jQEvent, ui );
+        return $scope.filtering.selectedTermIds;
+    }, function () {
+        filterItems();
     },
-
-    itemClick: function ( event, item ) {
-      console.log( 'Clicked: ' + item );
-    },
-
-    itemContextmenuRenderer: function ( e, item ) {
-      console.log( 'Contextmenu was triggered for node:', item );
-
-      return [
-        {
-          items: [
-
-            {
-              id: 'open',
-              label: 'Open Project',
-              disabled: false,
-              iconClass: '',
-              action: function() {
-                projectService.selectProject(databaseId, item.id);
-              }
-
-            }
-          ]
-        },
-        {
-          items: [
-            {
-              id: 'edit',
-              label: 'Edit Project Details',
-              disabled: false,
-              iconClass: '',
-              action: function() {
-                $simpleDialog.open( {
-                  dialogTitle: 'Edit project details',
-                  dialogContentTemplate: '/ng-gme/templates/newProjectTemplate.html',
-                  onOk: function () {
+    true );
 
 
-                  },
-                  onCancel: function () {
-                    console.log( 'This was canceled' );
-                  },
-                  size: 'lg', // can be sm or lg
-                  scope: false
-                } );
+    $scope.$watch( 'filtering.selectedTermIds', function () {
+        filterItems();
+    } );
 
-              }
+    $scope.$watch( 'projectList.items', function () {
+        filterItems();
+    } );
+
+    dummyProjectGenerator = function ( id ) {
+
+        var projectDescriptor, i;
+
+        projectDescriptor = {
+            id: id,
+            title: chance.paragraph( {
+                sentences: 1
+            } ),
+            cssClass: 'project-item',
+            toolTip: 'Open project',
+            description: chance.paragraph( {
+                sentences: 2
+            } ),
+            lastUpdated: {
+                time: Date.now(),
+                user: 'N/A'
+
             },
-            {
-              id: 'delete',
-              label: 'Delete Project',
-              disabled: false,
-              action: function () {
-                $simpleDialog.open( {
-                  dialogTitle: 'Are you sure?',
-                  dialogContentTemplate: '/ng-gme/templates/confirmProjectDelete.html',
-                  onOk: function () {
-
-                    projectService.deleteProject(databaseId, item.id ).then(function(){
-                      updateProjectList();
-                    });
-                    
-                  },
-                  onCancel: function () {
-                    console.log( 'This was canceled' );
-                  },
-                  size: 'lg', // can be sm or lg
-                  scope: false
-                } );
-
-              },
-              iconClass: ''
-            }
-          ]
-        }
-      ];
-    },
-
-    detailsRenderer: function ( item ) {
-      item.details = 'My details are here now!';
-    },
-
-    newItemForm: {
-      title: 'Create new Project',
-      itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
-      expanded: false,
-      controller: function ( $scope ) {
-
-        $scope.newItem = {};
-
-        $scope.tags = angular.copy( availableTerms );
-
-        $scope.createItem = function ( newItem ) {
-
-          var tags;
-
-          tags = [];
-
-          angular.forEach(newItem.tags, function(tag) {
-            tags.push(tag.name);
-          });
-
-          projectService.createProject(
-          databaseId,
-          newItem.title,
-          {
-            visibleName: newItem.title,
-            tags: tags,
-            description: newItem.description
-          }
-          ).then( function () {
-            updateProjectList();
-          } );
-
-          $scope.newItem = {};
-
-          config.newItemForm.expanded = false; // this is how you close the form itself
-
+            taxonomyTerms: [],
+            stats: [
+                {
+                    value: id,
+                    toolTip: 'Commits',
+                    iconClass: 'fa fa-cloud-upload'
+                },
+                {
+                    value: id,
+                    toolTip: 'Users',
+                    iconClass: 'fa fa-users'
+                }
+            ],
+            details: chance.paragraph( {
+                sentences: 3
+            } )
         };
 
-      }
-    }
+        for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-  };
+            if ( Math.random() > 0.5 ) {
+                projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
+            }
+        }
+
+        return projectDescriptor;
+
+    };
+
+    //  for (i = 0; i < 20; i++) {
+    //    $scope.projectList.items.push(dummyProjectGenerator(i));
+    //  }
+
+    projectDescriptorMapper = function ( projectDescriptors ) {
+
+        var result = [];
+
+        angular.forEach( projectDescriptors, function ( projectDescriptor ) {
+
+            //console.log( projectDescriptor );
+
+            result.push( {
+
+                id: projectDescriptor.id,
+                description: projectDescriptor.info.description,
+                title: projectDescriptor.info.visibleName,
+                taxonomyTerms: projectDescriptor.info.tags
+
+            } );
+
+        } );
+
+        return result;
+
+    };
+
+    updateProjectList = function () {
+
+        projectService.getAvailableProjectTags( databaseId )
+        .then( function ( tagList ) {
+
+            $scope.availableTerms = tagList;
+
+        } );
+
+        console.log( 'In here...' );
+
+        projectService.getProjects( databaseId )
+        .then( function ( gmeProjectDescriptors ) {
+
+            $scope.projectList.items = [];
+            $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
+
+            //$scope.projectList.items = results;
+        } );
+
+    };
+
+
+    // Making sure we have test project in DB
+
+    projectServiceTest.startTest()
+    .then( function () {
+        updateProjectList();
+    } );
+
+    $scope.config = config = {
+
+        sortable: true,
+        secondaryItemMenu: true,
+        detailsCollapsible: true,
+        showDetailsLabel: 'Show details',
+        hideDetailsLabel: 'Hide details',
+        filter: {},
+
+        // Event handlers
+
+        itemSort: function ( jQEvent, ui ) {
+            console.log( 'Sort happened', jQEvent, ui );
+        },
+
+        itemClick: function ( event, item ) {
+            console.log( 'Clicked: ' + item );
+        },
+
+        itemContextmenuRenderer: function ( e, item ) {
+            console.log( 'Contextmenu was triggered for node:', item );
+
+            return [
+                {
+                    items: [
+
+                        {
+                            id: 'open',
+                            label: 'Open Project',
+                            disabled: false,
+                            iconClass: '',
+                            action: function () {
+                                projectService.selectProject( databaseId, item.id );
+                            }
+
+                        }
+                    ]
+                },
+                {
+                    items: [
+                        {
+                            id: 'edit',
+                            label: 'Edit Project Details',
+                            disabled: false,
+                            iconClass: '',
+                            action: function () {
+                                $simpleDialog.open( {
+                                    dialogTitle: 'Edit project details',
+                                    dialogContentTemplate: '/ng-gme/templates/newProjectTemplate.html',
+                                    onOk: function () {
+
+
+                                    },
+                                    onCancel: function () {
+                                        console.log( 'This was canceled' );
+                                    },
+                                    size: 'lg', // can be sm or lg
+                                    scope: false
+                                } );
+
+                            }
+                        },
+                        {
+                            id: 'delete',
+                            label: 'Delete Project',
+                            disabled: false,
+                            action: function () {
+                                $simpleDialog.open( {
+                                    dialogTitle: 'Are you sure?',
+                                    dialogContentTemplate: '/ng-gme/templates/confirmProjectDelete.html',
+                                    onOk: function () {
+
+                                        projectService.deleteProject( databaseId, item.id )
+                                        .then( function () {
+                                            updateProjectList();
+                                        } );
+
+                                    },
+                                    onCancel: function () {
+                                        console.log( 'This was canceled' );
+                                    },
+                                    size: 'lg', // can be sm or lg
+                                    scope: false
+                                } );
+
+                            },
+                            iconClass: ''
+                        }
+                    ]
+                }
+            ];
+        },
+
+        detailsRenderer: function ( item ) {
+            item.details = 'My details are here now!';
+        },
+
+        newItemForm: {
+            title: 'Create new Project',
+            itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
+            expanded: false,
+            controller: function ( $scope, projectService ) {
+
+                $scope.newItem = {};
+
+                $scope.tags = angular.copy( availableTerms );
+
+                $scope.loadTags = function ( /*query*/ ) {
+                    return projectService.getAvailableProjectTags( databaseId );
+                };
+
+                $scope.createItem = function ( newItem ) {
+
+                    var tags;
+
+                    tags = {};
+
+                    angular.forEach( newItem.tags, function ( tag ) {
+                        tags[tag.id] = tag.name;
+                    } );
+
+                    projectService.createProject(
+                    databaseId,
+                    newItem.title, {
+                        visibleName: newItem.title,
+                        tags: tags,
+                        description: newItem.description
+                    }
+                    )
+                    .then( function () {
+                        updateProjectList();
+                    } );
+
+                    $scope.newItem = {};
+
+                    config.newItemForm.expanded = false; // this is how you close the form itself
+
+                };
+
+            }
+        }
+
+    };
 
 
 } )
 .directive( 'projectBrowser', function () {
 
-  return {
-    scope: false,
-    restrict: 'E',
-    controller: 'ProjectBrowserController',
-    replace: true,
-    templateUrl: '/ng-gme/templates/projectBrowser.html'
-  };
+    return {
+        scope: false,
+        restrict: 'E',
+        controller: 'ProjectBrowserController',
+        replace: true,
+        templateUrl: '/ng-gme/templates/projectBrowser.html'
+    };
 } );
-
 },{"../termFilter/termFilter.js":16}],16:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
 angular.module(
-  'gme.directives.termFilter', [
-    'isis.ui.taxonomyTerm'
-  ]
+    'gme.directives.termFilter', [
+        'isis.ui.taxonomyTerm'
+    ]
 
 )
-  .filter( 'isSelected', [
-    function () {
-      return function ( input, selectedTermIds, direction ) {
-        var output = [];
+    .filter( 'isSelected', [
 
-        angular.forEach( input, function ( term ) {
+        function () {
+            return function ( input, selectedTermIds, direction ) {
+                var output = [];
 
-          if ( direction === -1 ) {
+                angular.forEach( input, function ( term ) {
 
-            if ( selectedTermIds.indexOf( term.id ) === -1 ) {
-              output.push( term );
+                    if ( direction === -1 ) {
+
+                        if ( selectedTermIds.indexOf( term.id ) === -1 ) {
+                            output.push( term );
+                        }
+
+                    } else {
+
+                        if ( selectedTermIds.indexOf( term.id ) > -1 ) {
+                            output.push( term );
+                        }
+
+                    }
+                } );
+
+                return output;
+
+            };
+        }
+    ] )
+    .filter( 'termFilter', function () {
+        return function ( input, selectedTermIds ) {
+
+            var output = [],
+                countOfTermHits;
+
+            if ( angular.isArray( selectedTermIds ) && selectedTermIds.length ) {
+
+                angular.forEach( input, function ( elem ) {
+
+                    countOfTermHits = 0;
+
+                    angular.forEach( elem.taxonomyTerms, function ( aTerm ) {
+
+                        countOfTermHits = countOfTermHits && countOfTermHits;
+
+                        if ( selectedTermIds.indexOf( aTerm.id ) > -1 ) {
+                            countOfTermHits += 1;
+                        }
+
+                    } );
+
+                    if ( countOfTermHits === selectedTermIds.length ) {
+                        output.push( elem );
+                    }
+
+                } );
+
+            } else {
+                output = input;
             }
 
-          } else {
+            return output;
 
-            if ( selectedTermIds.indexOf( term.id ) > -1 ) {
-              output.push( term );
+        };
+    } )
+    .controller( 'TermFilterController', function ( $scope ) {
+
+        $scope.toggle = function ( term ) {
+
+            var index;
+
+            index = $scope.selectedTermIds.indexOf( term.id );
+
+            if ( index === -1 ) {
+                $scope.selectedTermIds.push( term.id );
+            } else {
+                $scope.selectedTermIds.splice( index, 1 );
             }
+        };
 
-          }
+    } )
+    .directive(
+        'termFilter',
+        function () {
+
+            return {
+                scope: {
+                    availableTerms: '=',
+                    selectedTermIds: '='
+                },
+                controller: 'TermFilterController',
+                restrict: 'E',
+                replace: true,
+                templateUrl: '/ng-gme/templates/termFilter.html'
+            };
         } );
-
-        return output;
-
-      };
-    }
-  ] )
-  .filter( 'termFilter', function () {
-    return function ( input, selectedTermIds ) {
-
-      var output = [], countOfTermHits;
-
-      if ( angular.isArray( selectedTermIds ) && selectedTermIds.length ) {
-
-        angular.forEach( input, function ( elem ) {
-
-          countOfTermHits = 0;
-
-          angular.forEach( elem.taxonomyTerms, function ( aTerm ) {
-
-            countOfTermHits = countOfTermHits && countOfTermHits;
-
-            if ( selectedTermIds.indexOf( aTerm.id ) > -1 ) {
-              countOfTermHits += 1;
-            }
-
-          } );
-
-          if (countOfTermHits === selectedTermIds.length) {
-            output.push( elem );
-          }
-
-        } );
-
-      } else {
-        output = input;
-      }
-
-      return output;
-
-    };
-  } )
-  .controller( 'TermFilterController', function ( $scope ) {
-
-    $scope.toggle = function ( term ) {
-
-      var index;
-
-      index = $scope.selectedTermIds.indexOf( term.id );
-
-      if ( index === -1 ) {
-        $scope.selectedTermIds.push( term.id );
-      } else {
-        $scope.selectedTermIds.splice( index, 1 );
-      }
-    };
-
-  } )
-  .directive(
-    'termFilter',
-    function () {
-
-      return {
-        scope: {
-          availableTerms: '=',
-          selectedTermIds: '='
-        },
-        controller: 'TermFilterController',
-        restrict: 'E',
-        replace: true,
-        templateUrl: '/ng-gme/templates/termFilter.html'
-      };
-    } );
 },{}],17:[function(require,module,exports){
 'use strict';
 
 require( './services/gmeServices.js' );
-require( './services/gmeTestServices.js');
+require( './services/gmeTestServices.js' );
 require( './directives/gmeDirectives.js' );
-
 },{"./directives/gmeDirectives.js":13,"./services/gmeServices.js":22,"./services/gmeTestServices.js":23}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
 
-  this.selectBranch = function ( databaseId, branchId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      deferred = new $q.defer();
+    this.selectBranch = function ( databaseId, branchId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
 
-    dbConn.branchService = dbConn.branchService || {};
+        dbConn.branchService = dbConn.branchService || {};
 
-    dbConn.client.selectBranchAsync( branchId,
-      function ( err ) {
-        if ( err ) {
-          deferred.reject( err );
-          return;
-        }
-
-        dbConn.branchService.branchId = branchId;
-
-        deferred.resolve( branchId );
-      } );
-
-    return deferred.promise;
-  };
-
-  this.getSelectedBranch = function ( /*databaseId*/) {
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.watchBranches = function ( /*databaseId*/) {
-    // TODO: register for branch events
-    // TODO: SERVER_BRANCH_CREATED
-    // TODO: SERVER_BRANCH_UPDATED
-    // TODO: SERVER_BRANCH_DELETED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.watchBranchState = function ( /*databaseId*/) {
-    // TODO: register for branch state events
-    // TODO: SYNC
-    // TODO: FORKED
-    // TODO: OFFLINE
-
-    // TODO: BRANCHSTATUS_CHANGED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.on = function ( databaseId, eventName, fn ) {
-    var dbConn,
-      i;
-
-    console.assert( typeof databaseId === 'string' );
-    console.assert( typeof eventName === 'string' );
-    console.assert( typeof fn === 'function' );
-
-    dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    dbConn.branchService = dbConn.branchService || {};
-
-    dbConn.branchService.isInitialized = dbConn.branchService.isInitialized || false;
-
-    if ( typeof dbConn.branchService.events === 'undefined' ) {
-      // register for project events
-      projectService.on( databaseId, 'initialize', function ( dbId ) {
-        var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
-          i;
-
-        if ( dbConnEvent.branchService &&
-          dbConnEvent.branchService.events &&
-          dbConnEvent.branchService.events.initialize ) {
-
-          dbConnEvent.branchService.isInitialized = true;
-
-          for ( i = 0; i < dbConnEvent.branchService.events.initialize.length; i += 1 ) {
-            dbConnEvent.branchService.events.initialize[ i ]( dbId );
-          }
-        }
-      } );
-
-      projectService.on( databaseId, 'destroy', function ( dbId ) {
-        var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
-          i;
-
-        if ( dbConnEvent.branchService &&
-          dbConnEvent.branchService.events &&
-          dbConnEvent.branchService.events.destroy ) {
-
-          dbConnEvent.branchService.isInitialized = false;
-
-          for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
-            dbConnEvent.branchService.events.destroy[ i ]( dbId );
-          }
-        }
-      } );
-
-      dbConn.client.addEventListener( dbConn.client.events.BRANCH_CHANGED,
-        function ( projectId /* FIXME */ , branchId ) {
-
-          if ( dbConn.branchService.branchId !== branchId ) {
-
-            dbConn.branchService.branchId = branchId;
-
-            console.log( 'There was a BRANCH_CHANGED event', branchId );
-            if ( branchId ) {
-              // initialize
-              if ( dbConn.branchService &&
-                dbConn.branchService.events &&
-                dbConn.branchService.events.initialize ) {
-
-                dbConn.branchService.isInitialized = true;
-
-                for ( i = 0; i < dbConn.branchService.events.initialize.length; i += 1 ) {
-                  dbConn.branchService.events.initialize[ i ]( databaseId );
+        dbConn.client.selectBranchAsync( branchId,
+            function ( err ) {
+                if ( err ) {
+                    deferred.reject( err );
+                    return;
                 }
-              }
-            } else {
-              // branchId is falsy, empty or null or undefined
-              // destroy
-              if ( dbConn.branchService &&
-                dbConn.branchService.events &&
-                dbConn.branchService.events.destroy ) {
 
-                dbConn.branchService.isInitialized = false;
-                delete dbConn.branchService.branchId;
+                dbConn.branchService.branchId = branchId;
 
-                for ( i = 0; i < dbConn.branchService.events.destroy.length; i += 1 ) {
-                  dbConn.branchService.events.destroy[ i ]( databaseId );
+                deferred.resolve( branchId );
+            } );
+
+        return deferred.promise;
+    };
+
+    this.getSelectedBranch = function ( /*databaseId*/) {
+        throw new Error( 'Not implemented yet.' );
+    };
+
+    this.watchBranches = function ( /*databaseId*/) {
+        // TODO: register for branch events
+        // TODO: SERVER_BRANCH_CREATED
+        // TODO: SERVER_BRANCH_UPDATED
+        // TODO: SERVER_BRANCH_DELETED
+
+        throw new Error( 'Not implemented yet.' );
+    };
+
+    this.watchBranchState = function ( /*databaseId*/) {
+        // TODO: register for branch state events
+        // TODO: SYNC
+        // TODO: FORKED
+        // TODO: OFFLINE
+
+        // TODO: BRANCHSTATUS_CHANGED
+
+        throw new Error( 'Not implemented yet.' );
+    };
+
+    this.on = function ( databaseId, eventName, fn ) {
+        var dbConn,
+            i;
+
+        console.assert( typeof databaseId === 'string' );
+        console.assert( typeof eventName === 'string' );
+        console.assert( typeof fn === 'function' );
+
+        dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        dbConn.branchService = dbConn.branchService || {};
+
+        dbConn.branchService.isInitialized = dbConn.branchService.isInitialized || false;
+
+        if ( typeof dbConn.branchService.events === 'undefined' ) {
+            // register for project events
+            projectService.on( databaseId, 'initialize', function ( dbId ) {
+                var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    i;
+
+                if ( dbConnEvent.branchService &&
+                    dbConnEvent.branchService.events &&
+                    dbConnEvent.branchService.events.initialize ) {
+
+                    dbConnEvent.branchService.isInitialized = true;
+
+                    for ( i = 0; i < dbConnEvent.branchService.events.initialize.length; i += 1 ) {
+                        dbConnEvent.branchService.events.initialize[ i ]( dbId );
+                    }
                 }
-              }
+            } );
+
+            projectService.on( databaseId, 'destroy', function ( dbId ) {
+                var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    i;
+
+                if ( dbConnEvent.branchService &&
+                    dbConnEvent.branchService.events &&
+                    dbConnEvent.branchService.events.destroy ) {
+
+                    dbConnEvent.branchService.isInitialized = false;
+
+                    for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
+                        dbConnEvent.branchService.events.destroy[ i ]( dbId );
+                    }
+                }
+            } );
+
+            dbConn.client.addEventListener( dbConn.client.events.BRANCH_CHANGED,
+                function ( projectId /* FIXME */ , branchId ) {
+
+                    if ( dbConn.branchService.branchId !== branchId ) {
+
+                        dbConn.branchService.branchId = branchId;
+
+                        console.log( 'There was a BRANCH_CHANGED event', branchId );
+                        if ( branchId ) {
+                            // initialize
+                            if ( dbConn.branchService &&
+                                dbConn.branchService.events &&
+                                dbConn.branchService.events.initialize ) {
+
+                                dbConn.branchService.isInitialized = true;
+
+                                for ( i = 0; i < dbConn.branchService.events.initialize.length; i += 1 ) {
+                                    dbConn.branchService.events.initialize[ i ]( databaseId );
+                                }
+                            }
+                        } else {
+                            // branchId is falsy, empty or null or undefined
+                            // destroy
+                            if ( dbConn.branchService &&
+                                dbConn.branchService.events &&
+                                dbConn.branchService.events.destroy ) {
+
+                                dbConn.branchService.isInitialized = false;
+                                delete dbConn.branchService.branchId;
+
+                                for ( i = 0; i < dbConn.branchService.events.destroy.length; i += 1 ) {
+                                    dbConn.branchService.events.destroy[ i ]( databaseId );
+                                }
+                            }
+                        }
+                    }
+                } );
+        }
+
+        dbConn.branchService.events = dbConn.branchService.events || {};
+        dbConn.branchService.events[ eventName ] = dbConn.branchService.events[ eventName ] || [];
+        dbConn.branchService.events[ eventName ].push( fn );
+
+        if ( dbConn.branchService.isInitialized ) {
+            if ( eventName === 'initialize' ) {
+                fn( databaseId );
             }
-          }
-        } );
-    }
+        } else {
+            if ( eventName === 'destroy' ) {
+                fn( databaseId );
+            }
+        }
 
-    dbConn.branchService.events = dbConn.branchService.events || {};
-    dbConn.branchService.events[ eventName ] = dbConn.branchService.events[ eventName ] || [];
-    dbConn.branchService.events[ eventName ].push( fn );
-
-    if ( dbConn.branchService.isInitialized ) {
-      if ( eventName === 'initialize' ) {
-        fn( databaseId );
-      }
-    } else {
-      if ( eventName === 'destroy' ) {
-        fn( databaseId );
-      }
-    }
-
-    // TODO: register for branch change event OR BranchService onInitialize
-  };
+        // TODO: register for branch change event OR BranchService onInitialize
+    };
 };
 },{}],19:[function(require,module,exports){
 /*globals WebGMEGlobal*/
 
 'use strict';
 
-module.exports = function($q) {
+module.exports = function ( $q ) {
     var dataStores = {},
         connectQueue = [],
         queueProcessing = false,
@@ -12958,48 +12965,48 @@ module.exports = function($q) {
     // Picks up the next connectionmeta and tries to connect
     // After a(n) (un)successful connection, the defered resolve/promise is called
     // and the function picks up the next item from the queue
-    connectNextInQueue = function() {
-        if (connectQueue.length > 0) {
-            var currentItem = connectQueue[0];
+    connectNextInQueue = function () {
+        if ( connectQueue.length > 0 ) {
+            var currentItem = connectQueue[ 0 ];
 
-            if (dataStores.hasOwnProperty(currentItem.databaseId)) {
+            if ( dataStores.hasOwnProperty( currentItem.databaseId ) ) {
                 // FIXME: this may or may not ready yet...
                 currentItem.deferred.resolve();
-                connectQueue.splice(0, 1);
+                connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                var client = new WebGMEGlobal.classes.Client(currentItem.options);
+                var client = new WebGMEGlobal.classes.Client( currentItem.options );
 
                 // hold a reference to the client instance
-                dataStores[currentItem.databaseId] = {
+                dataStores[ currentItem.databaseId ] = {
                     client: client
                 };
 
                 // TODO: add event listeners to client
                 // FIXME: deferred should not be used from closure
-                client.connectToDatabaseAsync({}, function(err) {
-                    if (err) {
-                        currentItem.deferred.reject(err);
+                client.connectToDatabaseAsync( {}, function ( err ) {
+                    if ( err ) {
+                        currentItem.deferred.reject( err );
                     } else {
-                      currentItem.deferred.resolve();
+                        currentItem.deferred.resolve();
                     }
 
-                    connectQueue.splice(0, 1);
+                    connectQueue.splice( 0, 1 );
                     connectNextInQueue();
-                });
+                } );
             }
         } else {
             queueProcessing = false;
-            if (connectQueue.length > 0) {
-              processQueue();
+            if ( connectQueue.length > 0 ) {
+                processQueue();
             }
         }
     };
 
     // Check if there are any processing phase
     // No simultaneous processing
-    processQueue = function() {
-        if (!queueProcessing) {
+    processQueue = function () {
+        if ( !queueProcessing ) {
             queueProcessing = true;
             connectNextInQueue();
         }
@@ -13007,564 +13014,563 @@ module.exports = function($q) {
 
     // Just one connection phase at one time.
     // Multiple connection phase may cause 'unexpected results'
-    this.connectToDatabase = function(databaseId, options) {
+    this.connectToDatabase = function ( databaseId, options ) {
         var deferred = $q.defer();
 
         // Put the connection metadata into a queue
-        connectQueue.push({
+        connectQueue.push( {
             databaseId: databaseId, // Where to connect? Default: 'multi'
-            deferred: deferred,     // defered object, where the notifications are sent if the connection succesful (or not)
-            options: options        // Connection oprtions
-        });
+            deferred: deferred, // defered object, where the notifications are sent if the connection succesful (or not)
+            options: options // Connection oprtions
+        } );
 
         processQueue();
 
         return deferred.promise;
     };
 
-    this.getDatabaseConnection = function(databaseId) {
-        if (dataStores.hasOwnProperty(databaseId) && typeof dataStores[databaseId] === 'object') {
-            return dataStores[databaseId];
+    this.getDatabaseConnection = function ( databaseId ) {
+        if ( dataStores.hasOwnProperty( databaseId ) && typeof dataStores[ databaseId ] === 'object' ) {
+            return dataStores[ databaseId ];
         }
 
-        console.error(databaseId + ' does not have an active database connection.');
+        console.error( databaseId + ' does not have an active database connection.' );
     };
 
-    this.watchConnection = function( /*databaseId*/ ) {
+    this.watchConnection = function ( /*databaseId*/) {
         // TODO: handle events
         // TODO: CONNECTED
         // TODO: DISCONNECTED
 
         // TODO: NETWORKSTATUS_CHANGED
 
-        throw new Error('Not implemented yet.');
+        throw new Error( 'Not implemented yet.' );
     };
 
     // TODO: on selected project changed, on initialize and on destroy (socket.io connected/disconnected)
 };
-
 },{}],20:[function(require,module,exports){
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
 
-  var self = this,
-    NodeObj,
-    getIdFromNodeOrString;
+    var self = this,
+        NodeObj,
+        getIdFromNodeOrString;
 
-  /**
-   * Loads the meta nodes from the context (will create a node-service on the dbConn with regions if not present when invoked).
-   * @param {object} context - From where to load the nodes.
-   * @param {string} context.db - Database where the nodes will be loaded from.
-   * @param {string} context.regionId - Region where the NodeObjs will be stored.
-   * @returns {Promise} - Returns an array of NodeObjs when resolved.
-   */
-  this.getMetaNodes = function ( context ) {
-    var deferred = $q.defer();
-    self.loadNode( context, '' )
-      .then( function ( rootNode ) {
-        var metaNodeIds = rootNode.getMemberIds( 'MetaAspectSet' ),
-          queueList = [],
-          i;
-        //console.log(metaNodeIds);
-        for ( i = 0; i < metaNodeIds.length; i += 1 ) {
-          queueList.push( self.loadNode( context, metaNodeIds[ i ] ) );
-        }
-        $q.all( queueList )
-          .then( function ( metaNodes ) {
-            var key,
-              metaNode,
-              meta = {};
-            for ( key in metaNodes ) {
-              if ( metaNodes.hasOwnProperty( key ) ) {
-                metaNode = metaNodes[ key ];
-                meta[ metaNode.getAttribute( 'name' ) ] = metaNode;
-              }
-            }
-            deferred.resolve( meta );
-          } );
-      } );
+    /**
+     * Loads the meta nodes from the context (will create a node-service on the dbConn with regions if not present when invoked).
+     * @param {object} context - From where to load the nodes.
+     * @param {string} context.db - Database where the nodes will be loaded from.
+     * @param {string} context.regionId - Region where the NodeObjs will be stored.
+     * @returns {Promise} - Returns an array of NodeObjs when resolved.
+     */
+    this.getMetaNodes = function ( context ) {
+        var deferred = $q.defer();
+        self.loadNode( context, '' )
+            .then( function ( rootNode ) {
+                var metaNodeIds = rootNode.getMemberIds( 'MetaAspectSet' ),
+                    queueList = [],
+                    i;
+                //console.log(metaNodeIds);
+                for ( i = 0; i < metaNodeIds.length; i += 1 ) {
+                    queueList.push( self.loadNode( context, metaNodeIds[ i ] ) );
+                }
+                $q.all( queueList )
+                    .then( function ( metaNodes ) {
+                        var key,
+                            metaNode,
+                            meta = {};
+                        for ( key in metaNodes ) {
+                            if ( metaNodes.hasOwnProperty( key ) ) {
+                                metaNode = metaNodes[ key ];
+                                meta[ metaNode.getAttribute( 'name' ) ] = metaNode;
+                            }
+                        }
+                        deferred.resolve( meta );
+                    } );
+            } );
 
-    return deferred.promise;
-  };
-
-  /**
-   * Loads a node from context (will create a node-service on the dbConn with regions if not present when invoked).
-   * @param {object} context - From where to look for the node.
-   * @param {string} context.db - Database where the node will be looked for.
-   * @param {string} context.regionId - Region where the NodeObj will be stored.
-   * @param {string} id - Path to the node.
-   * @returns {Promise} - Returns a NodeObj when resolved.
-   */
-  this.loadNode = function ( context, id ) {
-    var deferred = $q.defer(),
-      dbConn = dataStoreService.getDatabaseConnection( context.db ),
-      territoryId,
-      territoryPattern = {},
-      nodes;
-
-    console.assert( typeof context.regionId === 'string' );
-
-    territoryId = context.regionId + '_' + id;
-    dbConn.nodeService = dbConn.nodeService || {};
-    dbConn.nodeService.regions = dbConn.nodeService.regions || {};
-    dbConn.nodeService.regions[ context.regionId ] = dbConn.nodeService.regions[ context.regionId ] || {
-      regionId: context.regionId,
-      nodes: {}
+        return deferred.promise;
     };
 
-    nodes = dbConn.nodeService.regions[ context.regionId ].nodes;
-    //console.log('territoryId', territoryId);
-    if ( nodes.hasOwnProperty( id ) ) {
-      console.log( 'Node already loaded..', id );
-      deferred.resolve( nodes[ id ] );
-    } else {
-      dbConn.client.addUI( {}, function ( events ) {
-        var i,
-          event;
+    /**
+     * Loads a node from context (will create a node-service on the dbConn with regions if not present when invoked).
+     * @param {object} context - From where to look for the node.
+     * @param {string} context.db - Database where the node will be looked for.
+     * @param {string} context.regionId - Region where the NodeObj will be stored.
+     * @param {string} id - Path to the node.
+     * @returns {Promise} - Returns a NodeObj when resolved.
+     */
+    this.loadNode = function ( context, id ) {
+        var deferred = $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( context.db ),
+            territoryId,
+            territoryPattern = {},
+            nodes;
 
-        for ( i = 0; i < events.length; i += 1 ) {
-          event = events[ i ];
-          if ( id !== event.eid ) {
-            continue;
-          }
-          if ( event.etype === 'load' ) {
-            nodes[ id ] = new NodeObj( context, id );
-            nodes[ id ].territories.push( territoryId );
+        console.assert( typeof context.regionId === 'string' );
+
+        territoryId = context.regionId + '_' + id;
+        dbConn.nodeService = dbConn.nodeService || {};
+        dbConn.nodeService.regions = dbConn.nodeService.regions || {};
+        dbConn.nodeService.regions[ context.regionId ] = dbConn.nodeService.regions[ context.regionId ] || {
+            regionId: context.regionId,
+            nodes: {}
+        };
+
+        nodes = dbConn.nodeService.regions[ context.regionId ].nodes;
+        //console.log('territoryId', territoryId);
+        if ( nodes.hasOwnProperty( id ) ) {
+            console.log( 'Node already loaded..', id );
             deferred.resolve( nodes[ id ] );
-          } else if ( event.etype === 'update' ) {
-            nodes[ id ]._onUpdate( event.eid );
-          } else if ( event.etype === 'unload' ) {
-            nodes[ id ]._onUnload( event.eid );
-            nodes[ id ].__onUnload();
-          } else {
-            throw 'Unexpected event type' + events[ i ].etype;
-          }
+        } else {
+            dbConn.client.addUI( {}, function ( events ) {
+                var i,
+                    event;
+
+                for ( i = 0; i < events.length; i += 1 ) {
+                    event = events[ i ];
+                    if ( id !== event.eid ) {
+                        continue;
+                    }
+                    if ( event.etype === 'load' ) {
+                        nodes[ id ] = new NodeObj( context, id );
+                        nodes[ id ].territories.push( territoryId );
+                        deferred.resolve( nodes[ id ] );
+                    } else if ( event.etype === 'update' ) {
+                        nodes[ id ]._onUpdate( event.eid );
+                    } else if ( event.etype === 'unload' ) {
+                        nodes[ id ]._onUnload( event.eid );
+                        nodes[ id ].__onUnload();
+                    } else {
+                        throw 'Unexpected event type' + events[ i ].etype;
+                    }
+                }
+            }, territoryId );
+
+            territoryPattern[ id ] = {
+                children: 0
+            };
+            dbConn.client.updateTerritory( territoryId, territoryPattern );
         }
-      }, territoryId );
 
-      territoryPattern[ id ] = {
-        children: 0
-      };
-      dbConn.client.updateTerritory( territoryId, territoryPattern );
-    }
-
-    return deferred.promise;
-  };
-
-  /**
-   * Creates a new node in the database and returns with the NodeObj.
-   * @param {object} context - Where to create the node.
-   * @param {string} context.db - Database where the node will be created.
-   * @param {string} context.regionId - Region where the NodeObj will be stored.
-   * @param {NodeObj|string} parent - model where the node should be created.
-   * @param {NodeObj|string} base - base, e.g. meta-type, of the new node.
-   * @param {string} [msg] - optional commit message.
-   * @returns {Promise} - Evaluates to the newly created node (inside context).
-   */
-  this.createNode = function ( context, parent, base, msg ) {
-    var deferred = $q.defer(),
-      dbConn = dataStoreService.getDatabaseConnection( context.db ),
-      parentId = getIdFromNodeOrString( parent ),
-      baseId = getIdFromNodeOrString( base ),
-      id;
-
-    id = dbConn.client.createChild( {
-      parentId: parentId,
-      baseId: baseId
-    }, msg );
-
-    self.loadNode( context, id )
-      .then( function ( node ) {
-        deferred.resolve( node );
-      } );
-
-    return deferred.promise;
-  };
-
-  /**
-   * Creates a new node in the database and returns with its assigned id (path).
-   * @param {object} context - Where to create the node.
-   * @param {string} context.db - Database where the node will be created.
-   * @param {object} parameters - as in client.createChild (see this.createNode for example).
-   * @param {string} [msg] - optional commit message.
-   * @returns {string} - id (path) of new node.
-   */
-  this.createChild = function ( context, parameters, msg ) {
-    var dbConn = dataStoreService.getDatabaseConnection( context.db );
-    return dbConn.client.createChild( parameters, msg );
-  };
-
-  /**
-   * Updates the attribute of the given node
-   * @param {object} context - Where to create the node.
-   * @param {string} context.db - Database where the node will be created.
-   * @param {string} id - Path to node to update.
-   * @param {string} name - Name of Attribute.
-   * @param {string} value - New value for Attribute.
-   * @param {string} [msg] - optional commit message.
-   * @returns {string} - id (path) of new node.
-   */
-  this.setAttributes = function ( context, id, name, value, msg ) {
-    var dbConn = dataStoreService.getDatabaseConnection( context.db );
-    return dbConn.client.setAttributes( id, name, value, msg );
-  };
-
-  /**
-   * Removes the node from the data-base connection.
-   * @param {object} context - From where to delete the node.
-   * @param {string} context.db - Database from where the node will be deleted.
-   * @param {NodeObj|string} nodeOrId - node that should be deleted (the NodeObj(s) will be removed from all regions through __OnUnload()).
-   * @param {string} [msg] - optional commit message.
-   */
-  this.destroyNode = function ( context, nodeOrId, msg ) {
-    var dbConn = dataStoreService.getDatabaseConnection( context.db ),
-      id = getIdFromNodeOrString( nodeOrId ),
-      nodeToDelete = dbConn.client.getNode( id );
-    if ( nodeToDelete ) {
-      dbConn.client.delMoreNodes( [ id ], msg );
-    } else {
-      console.warn( 'Requested deletion of node that does not exist in context! (id, context) ',
-        id,
-        context );
-    }
-  };
-
-  /**
-   * Removes all references and listeners attached to any NodeObj in the region.
-   * N.B. This function must be invoked for all regions that a "user" created.
-   * This is typically done in the "$scope.on($destroy)"-function of a controller.
-   * @param {string} databaseId - data-base connection from where the region will be removed.
-   * @param {string} regionId - Region to clean-up.
-   */
-  this.cleanUpRegion = function ( databaseId, regionId ) {
-    var key,
-      dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      nodes = dbConn.nodeService.regions[ regionId ].nodes;
-    // Go through all nodes and remove the territories associated with each node.
-    for ( key in nodes ) {
-      if ( nodes.hasOwnProperty( key ) ) {
-        nodes[ key ].cleanUpNode();
-      }
-    }
-    // Remove the reference to the region (includes) nodes.
-    delete dbConn.nodeService.regions[ regionId ];
-  };
-
-
-  this.cleanUpAllRegions = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-      regionId;
-
-    if ( dbConn.nodeService ) {
-      //                console.log(dbConn.nodeService.regions);
-      for ( regionId in dbConn.nodeService.regions ) {
-        if ( dbConn.nodeService.regions.hasOwnProperty( regionId ) ) {
-          self.cleanUpRegion( databaseId, regionId );
-        }
-      }
-      //                console.log(dbConn.nodeService.regions);
-    }
-  };
-
-  /**
-   * Logs the regions of the database connection.
-   * @param {string} databaseId - Id of database to log.
-   */
-  this.logContext = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    console.log( 'logContext: ', dbConn );
-  };
-
-  NodeObj = function ( context, id ) {
-    var thisNode = this;
-    this.id = id;
-    this.territories = [];
-    this.context = context;
-    this.databaseConnection = dataStoreService.getDatabaseConnection( context.db );
-    // TODO: Should these be arrays of functions? The controller may want to add more methods.
-    this._onUpdate = function ( /*id*/) {};
-    this._onUnload = function ( /*id*/) {};
-    // This will always be called on unload.
-    this.__onUnload = function () {
-      thisNode.cleanUpNode();
-      delete thisNode.databaseConnection.nodeService.regions[ context.regionId ].nodes[ thisNode.id ];
-    };
-  };
-
-  NodeObj.prototype.cleanUpNode = function () {
-    var i;
-    // This ought to remove all references to event handlers in the client.
-    for ( i = 0; i < this.territories.length; i += 1 ) {
-      this.databaseConnection.client.removeUI( this.territories[ i ] );
-    }
-  };
-
-  NodeObj.prototype.getAttribute = function ( name ) {
-    return this.databaseConnection.client.getNode( this.id )
-      .getAttribute( name );
-  };
-
-  NodeObj.prototype.setAttribute = function ( name, value, msg ) {
-    this.databaseConnection.client.setAttributes( this.id, name, value, msg );
-  };
-
-  NodeObj.prototype.getRegistry = function ( /*name*/) {
-
-  };
-
-  NodeObj.prototype.setRegistry = function ( /*name, value*/) {
-
-  };
-
-  /** Gets nodeIds of nodes this node points 'to' and is pointed to 'from'.
-   * @param {string} name - name of pointer, e.g. 'src', 'dst'.
-   * @returns {object} pointers - object with ids.
-   * @returns {string} pointers.to - node id the pointer of this NodeObj points to.
-   * @returns {[string]} pointers.from - node ids of nodes that points to this NodeObj through the pointer.
-   */
-  NodeObj.prototype.getPointer = function ( name ) {
-    return this.databaseConnection.client.getNode( this.id )
-      .getPointer( name );
-  };
-
-  /**
-   * Sets pointer named pointer from this node to given node.
-   * @param {string} name - name of pointer, e.g. 'src', 'dst'.
-   * @param {string} toId - id of node to point to
-   * @param {string} [msg] - optional commit message.
-   */
-  NodeObj.prototype.makePointer = function ( name, toId, msg ) {
-    this.databaseConnection.client.makePointer( this.id, name, toId, msg );
-  };
-
-  // TODO: add sets
-
-  NodeObj.prototype.getCollectionPaths = function ( name ) {
-    return this.databaseConnection.client.getNode( this.id )
-      .getCollectionPaths( name );
-  };
-
-  NodeObj.prototype.getBaseNode = function () {
-    // TODO: add proper error handling
-    return self.loadNode( this.context, this.getBaseId() );
-  };
-
-  NodeObj.prototype.getParentId = function () {
-    return this.databaseConnection.client.getNode( this.id )
-      .getParentId();
-  };
-
-  NodeObj.prototype.getParentNode = function () {
-    // TODO: add proper error handling
-    return self.loadNode( this.context, this.getParentId() );
-  };
-
-  NodeObj.prototype.getId = function () {
-    return this.id;
-  };
-
-  NodeObj.prototype.getBaseId = function () {
-    return this.databaseConnection.client.getNode( this.id )
-      .getBaseId();
-  };
-
-  NodeObj.prototype.getGuid = function () {
-    return this.databaseConnection.client.getNode( this.id )
-      .getGuid();
-  };
-
-  NodeObj.prototype.getChildrenIds = function () {
-    return this.databaseConnection.client.getNode( this.id )
-      .getChildrenIds();
-  };
-
-  NodeObj.prototype.loadChildren = function () {
-    var childrenIds = this.getChildrenIds(),
-      queueList = [],
-      i;
-
-    for ( i = 0; i < childrenIds.length; i += 1 ) {
-      queueList.push( self.loadNode( this.context, childrenIds[ i ] ) );
-    }
-
-    return $q.all( queueList );
-  };
-
-  NodeObj.prototype.createChild = function ( /*baseNodeOrId, name*/) {
-
-  };
-
-  /**
-   * Removes the node from the data-base. (All regions within the same context should get onUnload events).
-   * @param [msg] - Optional commit message.
-   */
-  NodeObj.prototype.destroy = function ( msg ) {
-    // TODO: Perhaps remove the node from its context/region at this point? Now it waits for the unload event
-    self.destroyNode( this.context, this.id, msg );
-  };
-
-  NodeObj.prototype.getMemberIds = function ( name ) {
-    return this.databaseConnection.client.getNode( this.id )
-      .getMemberIds( name );
-  };
-
-  NodeObj.prototype.getMetaType = function () {
-
-  };
-
-  NodeObj.prototype.isMetaTypeOf = function ( metaNode ) {
-    var /*idWasGiven = false,*/
-    node = this.databaseConnection.client.getNode( this.id );
-
-    while ( node ) {
-      if ( node.getId() === metaNode.getId() ) {
-        return true;
-      }
-      node = this.databaseConnection.client.getNode( node.getBaseId() );
-    }
-    return false;
-  };
-
-  NodeObj.prototype.onUpdate = function ( fn ) {
-    console.assert( typeof fn === 'function' );
-    this._onUpdate = fn;
-  };
-
-  NodeObj.prototype.onUnload = function ( fn ) {
-    console.assert( typeof fn === 'function' );
-    this._onUnload = fn;
-  };
-
-  NodeObj.prototype.onNewChildLoaded = function ( fn ) {
-    var dbConn = this.databaseConnection,
-      context = this.context,
-      territoryPattern = {},
-      id = this.id,
-      terrId = context.regionId + '_' + id + '_new_children_watch',
-      initializeNewNode;
-
-    initializeNewNode = function ( newNode ) {
-      fn( newNode );
-      //console.log('Added new territory through onNewChildLoaded ', event.eid);
+        return deferred.promise;
     };
 
-    //console.log(dbConn);
-    if ( this.territories.indexOf( terrId ) > -1 ) {
-      console.warn( 'Children are already being watched for ', terrId );
-    } else {
-      this.territories.push( terrId );
-      dbConn.client.addUI( {}, function ( events ) {
-        var i,
-          event;
-        for ( i = 0; i < events.length; i += 1 ) {
-          event = events[ i ];
-          if ( event.etype === 'load' ) {
-            if ( dbConn.nodeService.regions[ context.regionId ].nodes.hasOwnProperty( event.eid ) ===
-              false ) {
-              self.loadNode( context, event.eid )
-                .then( initializeNewNode );
+    /**
+     * Creates a new node in the database and returns with the NodeObj.
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {string} context.regionId - Region where the NodeObj will be stored.
+     * @param {NodeObj|string} parent - model where the node should be created.
+     * @param {NodeObj|string} base - base, e.g. meta-type, of the new node.
+     * @param {string} [msg] - optional commit message.
+     * @returns {Promise} - Evaluates to the newly created node (inside context).
+     */
+    this.createNode = function ( context, parent, base, msg ) {
+        var deferred = $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( context.db ),
+            parentId = getIdFromNodeOrString( parent ),
+            baseId = getIdFromNodeOrString( base ),
+            id;
+
+        id = dbConn.client.createChild( {
+            parentId: parentId,
+            baseId: baseId
+        }, msg );
+
+        self.loadNode( context, id )
+            .then( function ( node ) {
+                deferred.resolve( node );
+            } );
+
+        return deferred.promise;
+    };
+
+    /**
+     * Creates a new node in the database and returns with its assigned id (path).
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {object} parameters - as in client.createChild (see this.createNode for example).
+     * @param {string} [msg] - optional commit message.
+     * @returns {string} - id (path) of new node.
+     */
+    this.createChild = function ( context, parameters, msg ) {
+        var dbConn = dataStoreService.getDatabaseConnection( context.db );
+        return dbConn.client.createChild( parameters, msg );
+    };
+
+    /**
+     * Updates the attribute of the given node
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {string} id - Path to node to update.
+     * @param {string} name - Name of Attribute.
+     * @param {string} value - New value for Attribute.
+     * @param {string} [msg] - optional commit message.
+     * @returns {string} - id (path) of new node.
+     */
+    this.setAttributes = function ( context, id, name, value, msg ) {
+        var dbConn = dataStoreService.getDatabaseConnection( context.db );
+        return dbConn.client.setAttributes( id, name, value, msg );
+    };
+
+    /**
+     * Removes the node from the data-base connection.
+     * @param {object} context - From where to delete the node.
+     * @param {string} context.db - Database from where the node will be deleted.
+     * @param {NodeObj|string} nodeOrId - node that should be deleted (the NodeObj(s) will be removed from all regions through __OnUnload()).
+     * @param {string} [msg] - optional commit message.
+     */
+    this.destroyNode = function ( context, nodeOrId, msg ) {
+        var dbConn = dataStoreService.getDatabaseConnection( context.db ),
+            id = getIdFromNodeOrString( nodeOrId ),
+            nodeToDelete = dbConn.client.getNode( id );
+        if ( nodeToDelete ) {
+            dbConn.client.delMoreNodes( [ id ], msg );
+        } else {
+            console.warn( 'Requested deletion of node that does not exist in context! (id, context) ',
+                id,
+                context );
+        }
+    };
+
+    /**
+     * Removes all references and listeners attached to any NodeObj in the region.
+     * N.B. This function must be invoked for all regions that a "user" created.
+     * This is typically done in the "$scope.on($destroy)"-function of a controller.
+     * @param {string} databaseId - data-base connection from where the region will be removed.
+     * @param {string} regionId - Region to clean-up.
+     */
+    this.cleanUpRegion = function ( databaseId, regionId ) {
+        var key,
+            dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            nodes = dbConn.nodeService.regions[ regionId ].nodes;
+        // Go through all nodes and remove the territories associated with each node.
+        for ( key in nodes ) {
+            if ( nodes.hasOwnProperty( key ) ) {
+                nodes[ key ].cleanUpNode();
+            }
+        }
+        // Remove the reference to the region (includes) nodes.
+        delete dbConn.nodeService.regions[ regionId ];
+    };
+
+
+    this.cleanUpAllRegions = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            regionId;
+
+        if ( dbConn.nodeService ) {
+            //                console.log(dbConn.nodeService.regions);
+            for ( regionId in dbConn.nodeService.regions ) {
+                if ( dbConn.nodeService.regions.hasOwnProperty( regionId ) ) {
+                    self.cleanUpRegion( databaseId, regionId );
+                }
+            }
+            //                console.log(dbConn.nodeService.regions);
+        }
+    };
+
+    /**
+     * Logs the regions of the database connection.
+     * @param {string} databaseId - Id of database to log.
+     */
+    this.logContext = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        console.log( 'logContext: ', dbConn );
+    };
+
+    NodeObj = function ( context, id ) {
+        var thisNode = this;
+        this.id = id;
+        this.territories = [];
+        this.context = context;
+        this.databaseConnection = dataStoreService.getDatabaseConnection( context.db );
+        // TODO: Should these be arrays of functions? The controller may want to add more methods.
+        this._onUpdate = function ( /*id*/) {};
+        this._onUnload = function ( /*id*/) {};
+        // This will always be called on unload.
+        this.__onUnload = function () {
+            thisNode.cleanUpNode();
+            delete thisNode.databaseConnection.nodeService.regions[ context.regionId ].nodes[ thisNode.id ];
+        };
+    };
+
+    NodeObj.prototype.cleanUpNode = function () {
+        var i;
+        // This ought to remove all references to event handlers in the client.
+        for ( i = 0; i < this.territories.length; i += 1 ) {
+            this.databaseConnection.client.removeUI( this.territories[ i ] );
+        }
+    };
+
+    NodeObj.prototype.getAttribute = function ( name ) {
+        return this.databaseConnection.client.getNode( this.id )
+            .getAttribute( name );
+    };
+
+    NodeObj.prototype.setAttribute = function ( name, value, msg ) {
+        this.databaseConnection.client.setAttributes( this.id, name, value, msg );
+    };
+
+    NodeObj.prototype.getRegistry = function ( /*name*/) {
+
+    };
+
+    NodeObj.prototype.setRegistry = function ( /*name, value*/) {
+
+    };
+
+    /** Gets nodeIds of nodes this node points 'to' and is pointed to 'from'.
+     * @param {string} name - name of pointer, e.g. 'src', 'dst'.
+     * @returns {object} pointers - object with ids.
+     * @returns {string} pointers.to - node id the pointer of this NodeObj points to.
+     * @returns {[string]} pointers.from - node ids of nodes that points to this NodeObj through the pointer.
+     */
+    NodeObj.prototype.getPointer = function ( name ) {
+        return this.databaseConnection.client.getNode( this.id )
+            .getPointer( name );
+    };
+
+    /**
+     * Sets pointer named pointer from this node to given node.
+     * @param {string} name - name of pointer, e.g. 'src', 'dst'.
+     * @param {string} toId - id of node to point to
+     * @param {string} [msg] - optional commit message.
+     */
+    NodeObj.prototype.makePointer = function ( name, toId, msg ) {
+        this.databaseConnection.client.makePointer( this.id, name, toId, msg );
+    };
+
+    // TODO: add sets
+
+    NodeObj.prototype.getCollectionPaths = function ( name ) {
+        return this.databaseConnection.client.getNode( this.id )
+            .getCollectionPaths( name );
+    };
+
+    NodeObj.prototype.getBaseNode = function () {
+        // TODO: add proper error handling
+        return self.loadNode( this.context, this.getBaseId() );
+    };
+
+    NodeObj.prototype.getParentId = function () {
+        return this.databaseConnection.client.getNode( this.id )
+            .getParentId();
+    };
+
+    NodeObj.prototype.getParentNode = function () {
+        // TODO: add proper error handling
+        return self.loadNode( this.context, this.getParentId() );
+    };
+
+    NodeObj.prototype.getId = function () {
+        return this.id;
+    };
+
+    NodeObj.prototype.getBaseId = function () {
+        return this.databaseConnection.client.getNode( this.id )
+            .getBaseId();
+    };
+
+    NodeObj.prototype.getGuid = function () {
+        return this.databaseConnection.client.getNode( this.id )
+            .getGuid();
+    };
+
+    NodeObj.prototype.getChildrenIds = function () {
+        return this.databaseConnection.client.getNode( this.id )
+            .getChildrenIds();
+    };
+
+    NodeObj.prototype.loadChildren = function () {
+        var childrenIds = this.getChildrenIds(),
+            queueList = [],
+            i;
+
+        for ( i = 0; i < childrenIds.length; i += 1 ) {
+            queueList.push( self.loadNode( this.context, childrenIds[ i ] ) );
+        }
+
+        return $q.all( queueList );
+    };
+
+    NodeObj.prototype.createChild = function ( /*baseNodeOrId, name*/) {
+
+    };
+
+    /**
+     * Removes the node from the data-base. (All regions within the same context should get onUnload events).
+     * @param [msg] - Optional commit message.
+     */
+    NodeObj.prototype.destroy = function ( msg ) {
+        // TODO: Perhaps remove the node from its context/region at this point? Now it waits for the unload event
+        self.destroyNode( this.context, this.id, msg );
+    };
+
+    NodeObj.prototype.getMemberIds = function ( name ) {
+        return this.databaseConnection.client.getNode( this.id )
+            .getMemberIds( name );
+    };
+
+    NodeObj.prototype.getMetaType = function () {
+
+    };
+
+    NodeObj.prototype.isMetaTypeOf = function ( metaNode ) {
+        var /*idWasGiven = false,*/
+        node = this.databaseConnection.client.getNode( this.id );
+
+        while ( node ) {
+            if ( node.getId() === metaNode.getId() ) {
+                return true;
+            }
+            node = this.databaseConnection.client.getNode( node.getBaseId() );
+        }
+        return false;
+    };
+
+    NodeObj.prototype.onUpdate = function ( fn ) {
+        console.assert( typeof fn === 'function' );
+        this._onUpdate = fn;
+    };
+
+    NodeObj.prototype.onUnload = function ( fn ) {
+        console.assert( typeof fn === 'function' );
+        this._onUnload = fn;
+    };
+
+    NodeObj.prototype.onNewChildLoaded = function ( fn ) {
+        var dbConn = this.databaseConnection,
+            context = this.context,
+            territoryPattern = {},
+            id = this.id,
+            terrId = context.regionId + '_' + id + '_new_children_watch',
+            initializeNewNode;
+
+        initializeNewNode = function ( newNode ) {
+            fn( newNode );
+            //console.log('Added new territory through onNewChildLoaded ', event.eid);
+        };
+
+        //console.log(dbConn);
+        if ( this.territories.indexOf( terrId ) > -1 ) {
+            console.warn( 'Children are already being watched for ', terrId );
+        } else {
+            this.territories.push( terrId );
+            dbConn.client.addUI( {}, function ( events ) {
+                var i,
+                    event;
+                for ( i = 0; i < events.length; i += 1 ) {
+                    event = events[ i ];
+                    if ( event.etype === 'load' ) {
+                        if ( dbConn.nodeService.regions[ context.regionId ].nodes.hasOwnProperty( event.eid ) ===
+                            false ) {
+                            self.loadNode( context, event.eid )
+                                .then( initializeNewNode );
+                        } else {
+                            //console.info('Node ' + event.eid + ' was loaded in ' + terrId + ' but it already' +
+                            //    ' existed in the nodes of the region: ' + context.regionId);
+                        }
+                    } else {
+                        // These node are just watched for loading..
+                    }
+                }
+            }, terrId );
+
+            territoryPattern[ id ] = {
+                children: 1
+            };
+            dbConn.client.updateTerritory( terrId, territoryPattern );
+        }
+    };
+
+    getIdFromNodeOrString = function ( nodeOrId ) {
+        if ( typeof nodeOrId === 'string' ) {
+            return nodeOrId;
+        }
+
+        if ( typeof nodeOrId === 'object' ) {
+            if ( typeof nodeOrId.getId === 'function' ) {
+                return nodeOrId.getId();
             } else {
-              //console.info('Node ' + event.eid + ' was loaded in ' + terrId + ' but it already' +
-              //    ' existed in the nodes of the region: ' + context.regionId);
+                console.error( nodeOrId, ' does not have a getId function' );
             }
-          } else {
-            // These node are just watched for loading..
-          }
+        } else {
+            console.error( nodeOrId, ' is not a string nor an object.' );
         }
-      }, terrId );
+    };
 
-      territoryPattern[ id ] = {
-        children: 1
-      };
-      dbConn.client.updateTerritory( terrId, territoryPattern );
-    }
-  };
+    this.on = function ( databaseId, eventName, fn ) {
+        var dbConn;
 
-  getIdFromNodeOrString = function ( nodeOrId ) {
-    if ( typeof nodeOrId === 'string' ) {
-      return nodeOrId;
-    }
+        console.assert( typeof databaseId === 'string' );
+        console.assert( typeof eventName === 'string' );
+        console.assert( typeof fn === 'function' );
 
-    if ( typeof nodeOrId === 'object' ) {
-      if ( typeof nodeOrId.getId === 'function' ) {
-        return nodeOrId.getId();
-      } else {
-        console.error( nodeOrId, ' does not have a getId function' );
-      }
-    } else {
-      console.error( nodeOrId, ' is not a string nor an object.' );
-    }
-  };
+        dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        dbConn.nodeService = dbConn.nodeService || {};
 
-  this.on = function ( databaseId, eventName, fn ) {
-    var dbConn;
+        dbConn.nodeService.isInitialized = dbConn.nodeService.isInitialized || false;
 
-    console.assert( typeof databaseId === 'string' );
-    console.assert( typeof eventName === 'string' );
-    console.assert( typeof fn === 'function' );
+        if ( typeof dbConn.nodeService.events === 'undefined' ) {
+            branchService.on( databaseId, 'initialize', function ( dbId ) {
+                var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    i;
 
-    dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    dbConn.nodeService = dbConn.nodeService || {};
+                self.cleanUpAllRegions( dbId );
 
-    dbConn.nodeService.isInitialized = dbConn.nodeService.isInitialized || false;
+                if ( dbConnEvent.nodeService &&
+                    dbConnEvent.nodeService.events &&
+                    dbConnEvent.nodeService.events.initialize ) {
+                    // NodeService requires a selected branch.
+                    if ( dbConn.branchService.branchId ) {
+                        dbConnEvent.nodeService.isInitialized = true;
 
-    if ( typeof dbConn.nodeService.events === 'undefined' ) {
-      branchService.on( databaseId, 'initialize', function ( dbId ) {
-        var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
-          i;
+                        for ( i = 0; i < dbConnEvent.nodeService.events.initialize.length; i += 1 ) {
+                            dbConnEvent.nodeService.events.initialize[ i ]( dbId );
+                        }
+                    }
+                }
+            } );
 
-        self.cleanUpAllRegions( dbId );
+            branchService.on( databaseId, 'destroy', function ( dbId ) {
+                var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    i;
 
-        if ( dbConnEvent.nodeService &&
-          dbConnEvent.nodeService.events &&
-          dbConnEvent.nodeService.events.initialize ) {
-          // NodeService requires a selected branch.
-          if ( dbConn.branchService.branchId ) {
-            dbConnEvent.nodeService.isInitialized = true;
+                self.cleanUpAllRegions( dbId );
 
-            for ( i = 0; i < dbConnEvent.nodeService.events.initialize.length; i += 1 ) {
-              dbConnEvent.nodeService.events.initialize[ i ]( dbId );
+                if ( dbConnEvent.nodeService &&
+                    dbConnEvent.nodeService.events &&
+                    dbConnEvent.nodeService.events.destroy ) {
+
+                    dbConnEvent.nodeService.isInitialized = false;
+
+                    for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
+                        dbConnEvent.nodeService.events.destroy[ i ]( dbId );
+                    }
+                }
+            } );
+        }
+
+        dbConn.nodeService.events = dbConn.nodeService.events || {};
+        dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
+        dbConn.nodeService.events[ eventName ].push( fn );
+
+        if ( dbConn.nodeService.isInitialized ) {
+            if ( eventName === 'initialize' ) {
+                dbConn.nodeService.isInitialized = true;
+                fn( databaseId );
             }
-          }
+        } else {
+            if ( eventName === 'destroy' ) {
+                dbConn.nodeService.isInitialized = false;
+                fn( databaseId );
+            }
         }
-      } );
-
-      branchService.on( databaseId, 'destroy', function ( dbId ) {
-        var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
-          i;
-
-        self.cleanUpAllRegions( dbId );
-
-        if ( dbConnEvent.nodeService &&
-          dbConnEvent.nodeService.events &&
-          dbConnEvent.nodeService.events.destroy ) {
-
-          dbConnEvent.nodeService.isInitialized = false;
-
-          for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
-            dbConnEvent.nodeService.events.destroy[ i ]( dbId );
-          }
-        }
-      } );
-    }
-
-    dbConn.nodeService.events = dbConn.nodeService.events || {};
-    dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
-    dbConn.nodeService.events[ eventName ].push( fn );
-
-    if ( dbConn.nodeService.isInitialized ) {
-      if ( eventName === 'initialize' ) {
-        dbConn.nodeService.isInitialized = true;
-        fn( databaseId );
-      }
-    } else {
-      if ( eventName === 'destroy' ) {
-        dbConn.nodeService.isInitialized = false;
-        fn( databaseId );
-      }
-    }
-  };
+    };
 };
 },{}],21:[function(require,module,exports){
 /*globals angular*/
@@ -13573,331 +13579,330 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
 module.exports = function ( $q, dataStoreService ) {
 
-  this.getAvailableProjectTags = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
-      var tagKeys,
-      tags = [];
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
+    this.getAvailableProjectTags = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
+            var tagKeys,
+                tags = [];
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            }
 
-      tagKeys = Object.keys( results );
-      for ( var i = tagKeys.length - 1; i >= 0; i-- ) {
-        tags.push( {
-          id: tagKeys[i],
-          name: results[tagKeys[i]]
+            tagKeys = Object.keys( results );
+            for ( var i = tagKeys.length - 1; i >= 0; i-- ) {
+                tags.push( {
+                    id: tagKeys[ i ],
+                    name: results[ tagKeys[ i ] ]
+                } );
+            }
+
+            deferred.resolve( tags );
         } );
-      }
 
-      deferred.resolve( tags );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.applyTagsOnProject = function ( databaseId, projectId, newTags ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer(),
-    mappedTags = {},
-    tagMapper = function ( tag ) {
-      mappedTags[tag.id] = tag.name;
+        return deferred.promise;
     };
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getProjectInfoAsync( projectId, function ( err, existingInfo ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-      // Transform the tags to key-value format
-      angular.forEach( newTags, tagMapper );
-      existingInfo.tags = mappedTags;
-      dbConn.client.setProjectInfoAsync( projectId, existingInfo, function ( errInfo ) {
-        if ( errInfo ) {
-          deferred.reject( errInfo );
-          return;
-        }
-        deferred.resolve();
-      } );
-    } );
 
-    return deferred.promise;
-  };
-
-  this.getAvailableProjects = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = $q.defer();
-    dbConn.projectService = dbConn.projectService || {};
-    dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projects );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.getProjects = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
-      var projectTags,
-      branches,
-      projects = [],
-      projectMapper,
-      projectTagsMapper,
-      branchMapper;
-
-      projectTagsMapper = function ( tagName, tagId ) {
-        projectTags.push( {
-          id: tagId,
-          name: tagName
-        } );
-      };
-
-      branchMapper = function ( commitId, branchId ) {
-        branches.push( {
-          branchId: branchId,
-          commitId: commitId
-        } );
-      };
-
-      projectMapper = function ( project, projectId ) {
-        projectTags = [];
-        branches = [];
-
-        // Transform tags
-        angular.forEach( project.info.tags, projectTagsMapper );
-        project.info.tags = projectTags;
-
-        // Transform branches
-        angular.forEach( project.branches, branchMapper );
-
-        // Transform project
-        projects.push( {
-          id: projectId,
-          branches: branches,
-          info: project.info,
-          rights: project.rights
-        } );
-      };
-
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      angular.forEach( result, projectMapper );
-      deferred.resolve( projects );
-    } );
-    return deferred.promise;
-  };
-
-  this.getProjectsIds = function ( databaseId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.client.getAvailableProjectsAsync( function ( err, projectIds ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      }
-
-      deferred.resolve( projectIds );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.createProject = function ( databaseId, projectname, projectInfo ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = new $q.defer();
-
-    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      } else {
-        deferred.resolve();
-      }
-    } );
-
-    return deferred.promise;
-  };
-
-  this.deleteProject = function ( databaseId, projectId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = new $q.defer();
-
-    console.log(projectId);
-
-    dbConn.client.deleteProjectAsync( projectId, function ( err ) {
-      if ( err ) {
-        deferred.reject( err );
-        return;
-      } else {
-        deferred.resolve();
-      }
-    } );
-
-    return deferred.promise;
-  };
-
-  this.selectProject = function ( databaseId, projectId ) {
-    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    deferred = new $q.defer();
-
-    dbConn.projectService = dbConn.projectService || {};
-
-    this.getProjectsIds( databaseId )
-    .then( function ( projectIds ) {
-      if ( projectIds.indexOf( projectId ) > -1 ) {
-        dbConn.client.selectProjectAsync( projectId, function ( err ) {
-          if ( err ) {
-            deferred.reject( err );
-            return;
-          }
-
-          dbConn.projectService.projectId = projectId;
-
-          deferred.resolve( projectId );
-        } );
-      } else {
-        deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
-        databaseId ) );
-      }
-    } )
-    .
-    catch( function ( reason ) {
-      deferred.reject( reason );
-    } );
-
-    return deferred.promise;
-  };
-
-  this.watchProjects = function ( /*databaseId*/ ) {
-    // TODO: register for project events
-    // TODO: SERVER_PROJECT_CREATED
-    // TODO: SERVER_PROJECT_DELETED
-
-    throw new Error( 'Not implemented yet.' );
-  };
-
-  this.on = function ( databaseId, eventName, fn ) {
-    var dbConn,
-    i;
-
-    console.assert( typeof databaseId === 'string' );
-    console.assert( typeof eventName === 'string' );
-    console.assert( typeof fn === 'function' );
-
-    dbConn = dataStoreService.getDatabaseConnection( databaseId );
-    dbConn.projectService = dbConn.projectService || {};
-
-    dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
-
-    if ( typeof dbConn.projectService.events === 'undefined' ) {
-      // this should not be an inline function
-
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
-      function ( dummy /* FIXME */, projectId ) {
-
-        if ( dbConn.projectService.projectId !== projectId ) {
-          dbConn.projectService.projectId = projectId;
-
-          console.log( 'There was a PROJECT_OPENED event', projectId );
-          if ( projectId ) {
-            // initialize
-            if ( dbConn.projectService &&
-            dbConn.projectService.events &&
-            dbConn.projectService.events.initialize ) {
-
-              dbConn.projectService.isInitialized = true;
-
-              for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
-                dbConn.projectService.events.initialize[i]( databaseId );
-              }
+    this.applyTagsOnProject = function ( databaseId, projectId, newTags ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = $q.defer(),
+            mappedTags = {},
+            tagMapper = function ( tag ) {
+                mappedTags[ tag.id ] = tag.name;
+            };
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getProjectInfoAsync( projectId, function ( err, existingInfo ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
             }
-          } else {
-            // branchId is falsy, empty or null or undefined
-            // destroy
-            if ( dbConn.projectService &&
-            dbConn.projectService.events &&
-            dbConn.projectService.events.destroy ) {
+            // Transform the tags to key-value format
+            angular.forEach( newTags, tagMapper );
+            existingInfo.tags = mappedTags;
+            dbConn.client.setProjectInfoAsync( projectId, existingInfo, function ( errInfo ) {
+                if ( errInfo ) {
+                    deferred.reject( errInfo );
+                    return;
+                }
+                deferred.resolve();
+            } );
+        } );
 
-              dbConn.projectService.isInitialized = false;
+        return deferred.promise;
+    };
 
-              for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-                dbConn.projectService.events.destroy[i]( databaseId );
-              }
+    this.getAvailableProjects = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = $q.defer();
+        dbConn.projectService = dbConn.projectService || {};
+        dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
             }
-          }
+
+            deferred.resolve( projects );
+        } );
+
+        return deferred.promise;
+    };
+
+    this.getProjects = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
+            var projectTags,
+                branches,
+                projects = [],
+                projectMapper,
+                projectTagsMapper,
+                branchMapper;
+
+            projectTagsMapper = function ( tagName, tagId ) {
+                projectTags.push( {
+                    id: tagId,
+                    name: tagName
+                } );
+            };
+
+            branchMapper = function ( commitId, branchId ) {
+                branches.push( {
+                    branchId: branchId,
+                    commitId: commitId
+                } );
+            };
+
+            projectMapper = function ( project, projectId ) {
+                projectTags = [];
+                branches = [];
+
+                // Transform tags
+                angular.forEach( project.info.tags, projectTagsMapper );
+                project.info.tags = projectTags;
+
+                // Transform branches
+                angular.forEach( project.branches, branchMapper );
+
+                // Transform project
+                projects.push( {
+                    id: projectId,
+                    branches: branches,
+                    info: project.info,
+                    rights: project.rights
+                } );
+            };
+
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            }
+
+            angular.forEach( result, projectMapper );
+            deferred.resolve( projects );
+        } );
+        return deferred.promise;
+    };
+
+    this.getProjectsIds = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.client.getAvailableProjectsAsync( function ( err, projectIds ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            }
+
+            deferred.resolve( projectIds );
+        } );
+
+        return deferred.promise;
+    };
+
+    this.createProject = function ( databaseId, projectname, projectInfo ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            } else {
+                deferred.resolve();
+            }
+        } );
+
+        return deferred.promise;
+    };
+
+    this.deleteProject = function ( databaseId, projectId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        console.log( projectId );
+
+        dbConn.client.deleteProjectAsync( projectId, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            } else {
+                deferred.resolve();
+            }
+        } );
+
+        return deferred.promise;
+    };
+
+    this.selectProject = function ( databaseId, projectId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        dbConn.projectService = dbConn.projectService || {};
+
+        this.getProjectsIds( databaseId )
+            .then( function ( projectIds ) {
+                if ( projectIds.indexOf( projectId ) > -1 ) {
+                    dbConn.client.selectProjectAsync( projectId, function ( err ) {
+                        if ( err ) {
+                            deferred.reject( err );
+                            return;
+                        }
+
+                        dbConn.projectService.projectId = projectId;
+
+                        deferred.resolve( projectId );
+                    } );
+                } else {
+                    deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
+                        databaseId ) );
+                }
+            } )
+            .
+        catch ( function ( reason ) {
+            deferred.reject( reason );
+        } );
+
+        return deferred.promise;
+    };
+
+    this.watchProjects = function ( /*databaseId*/) {
+        // TODO: register for project events
+        // TODO: SERVER_PROJECT_CREATED
+        // TODO: SERVER_PROJECT_DELETED
+
+        throw new Error( 'Not implemented yet.' );
+    };
+
+    this.on = function ( databaseId, eventName, fn ) {
+        var dbConn,
+            i;
+
+        console.assert( typeof databaseId === 'string' );
+        console.assert( typeof eventName === 'string' );
+        console.assert( typeof fn === 'function' );
+
+        dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        dbConn.projectService = dbConn.projectService || {};
+
+        dbConn.projectService.isInitialized = dbConn.projectService.isInitialized || false;
+
+        if ( typeof dbConn.projectService.events === 'undefined' ) {
+            // this should not be an inline function
+
+            dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
+                function ( dummy /* FIXME */ , projectId ) {
+
+                    if ( dbConn.projectService.projectId !== projectId ) {
+                        dbConn.projectService.projectId = projectId;
+
+                        console.log( 'There was a PROJECT_OPENED event', projectId );
+                        if ( projectId ) {
+                            // initialize
+                            if ( dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.initialize ) {
+
+                                dbConn.projectService.isInitialized = true;
+
+                                for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
+                                    dbConn.projectService.events.initialize[ i ]( databaseId );
+                                }
+                            }
+                        } else {
+                            // branchId is falsy, empty or null or undefined
+                            // destroy
+                            if ( dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.destroy ) {
+
+                                dbConn.projectService.isInitialized = false;
+
+                                for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
+                                    dbConn.projectService.events.destroy[ i ]( databaseId );
+                                }
+                            }
+                        }
+                    }
+                } );
+
+            dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
+                function ( /*dummy*/ /* FIXME */) {
+                    console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
+
+                    delete dbConn.projectService.projectId;
+
+                    // destroy
+                    if ( dbConn.projectService &&
+                        dbConn.projectService.events &&
+                        dbConn.projectService.events.destroy ) {
+
+                        dbConn.projectService.isInitialized = false;
+
+                        for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
+                            dbConn.projectService.events.destroy[ i ]( databaseId );
+                        }
+                    }
+
+                } );
         }
-      } );
 
-      dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
-      function ( /*dummy*/ /* FIXME */ ) {
-        console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
+        dbConn.projectService.events = dbConn.projectService.events || {};
+        dbConn.projectService.events[ eventName ] = dbConn.projectService.events[ eventName ] || [];
+        dbConn.projectService.events[ eventName ].push( fn );
 
-        delete dbConn.projectService.projectId;
-
-        // destroy
-        if ( dbConn.projectService &&
-        dbConn.projectService.events &&
-        dbConn.projectService.events.destroy ) {
-
-          dbConn.projectService.isInitialized = false;
-
-          for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-            dbConn.projectService.events.destroy[i]( databaseId );
-          }
+        if ( dbConn.projectService.isInitialized ) {
+            if ( eventName === 'initialize' ) {
+                fn( databaseId );
+            }
+        } else {
+            if ( eventName === 'destroy' ) {
+                fn( databaseId );
+            }
         }
-
-      } );
-    }
-
-    dbConn.projectService.events = dbConn.projectService.events || {};
-    dbConn.projectService.events[eventName] = dbConn.projectService.events[eventName] || [];
-    dbConn.projectService.events[eventName].push( fn );
-
-    if ( dbConn.projectService.isInitialized ) {
-      if ( eventName === 'initialize' ) {
-        fn( databaseId );
-      }
-    } else {
-      if ( eventName === 'destroy' ) {
-        fn( databaseId );
-      }
-    }
-  };
+    };
 };
-
 },{}],22:[function(require,module,exports){
 /*globals angular, require*/
 
 'use strict';
 
 var DataStoreServiceClass = require( './DataStoreService.js' ),
-  ProjectServiceClass = require( './ProjectService/ProjectService.js' ),
-  BranchServiceClass = require( './BranchService.js' ),
-  NodeServiceClass = require( './NodeService.js' );
+    ProjectServiceClass = require( './ProjectService/ProjectService.js' ),
+    BranchServiceClass = require( './BranchService.js' ),
+    NodeServiceClass = require( './NodeService.js' );
 
 angular.module( 'gme.services', [] )
-  .service( 'dataStoreService', DataStoreServiceClass )
-  .service( 'projectService', ProjectServiceClass )
-  .service( 'branchService', BranchServiceClass )
-  .service( 'nodeService', NodeServiceClass );
+    .service( 'dataStoreService', DataStoreServiceClass )
+    .service( 'projectService', ProjectServiceClass )
+    .service( 'branchService', BranchServiceClass )
+    .service( 'nodeService', NodeServiceClass );
 },{"./BranchService.js":18,"./DataStoreService.js":19,"./NodeService.js":20,"./ProjectService/ProjectService.js":21}],23:[function(require,module,exports){
 /*globals angular, require*/
 
@@ -13906,38 +13911,41 @@ angular.module( 'gme.services', [] )
 var ProjectServiceTestClass = require( './tests/ProjectServiceTest.js' );
 
 angular.module( 'gme.testServices', [] )
-  .service( 'projectServiceTest', ProjectServiceTestClass );
-
+    .service( 'projectServiceTest', ProjectServiceTestClass );
 },{"./tests/ProjectServiceTest.js":25}],24:[function(require,module,exports){
 /*globals angular*/
 'use strict';
 
 var demoApp = angular.module( 'gme.projectService.demo', [
-  'gme.services',
-  'gme.testServices'
+    'gme.services',
+    'gme.testServices'
 ] );
 
-demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
-  $scope.projects = [];
-  $scope.tags = [];
-  projectServiceTest.startTest().then( function () {
-    projectService.getProjects( 'multi' ).then( function ( results ) {
-      $scope.projects = results;
-    }, function ( err ) {
-      console.log( 'Cannot get projects: ' + err );
-    } );
+demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService,
+    projectServiceTest ) {
+    $scope.projects = [];
+    $scope.tags = [];
+    projectServiceTest.startTest()
+        .then( function () {
+            projectService.getProjects( 'multi' )
+                .then( function ( results ) {
+                    $scope.projects = results;
+                }, function ( err ) {
+                    console.log( 'Cannot get projects: ' + err );
+                } );
 
-    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
-      $scope.tags = results;
-    }, function ( err ) {
-      console.log( 'Cannot get tags: ' + err );
-    } );
+            projectService.getAvailableProjectTags( 'multi' )
+                .then( function ( results ) {
+                    $scope.tags = results;
+                }, function ( err ) {
+                    console.log( 'Cannot get tags: ' + err );
+                } );
 
 
-  } );
+        } );
 
 
-  /*var a = projectServiceTest.startTest();
+    /*var a = projectServiceTest.startTest();
    a.then(function(){
    console.log('start: ' + 1);
    projectService.getProjects('multi').then(function(results){
@@ -13962,14 +13970,13 @@ demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q,
    }, function(){console.log('cannot start: ' + 3);});*/
 
 } );
-
 },{}],25:[function(require,module,exports){
 'use strict';
 
-require('../gmeServices.js');
+require( '../gmeServices.js' );
 
-module.exports = function($q, dataStoreService, projectService) {
-    var testProjects = [{
+module.exports = function ( $q, dataStoreService, projectService ) {
+    var testProjects = [ {
         projectName: 'ProjectServiceTest1',
         projectInfo: {
             visibleName: 'ProjectServiceTest1',
@@ -13987,47 +13994,49 @@ module.exports = function($q, dataStoreService, projectService) {
                 tag1: 'Master'
             }
         }
-    }];
+    } ];
 
-    this.startTest = function() {
+    this.startTest = function () {
         var deferred = new $q.defer(),
             index = 0;
 
-        dataStoreService.connectToDatabase('multi', {
-                host: window.location.basename
-            })
-            .then(function() {
-              //projectService.applyTagsOnProject('multi','ProjectServiceTest2',[{id:'t1', name:'alma1'},{id:'t2', name:'korte2'}]);
+        dataStoreService.connectToDatabase( 'multi', {
+            host: window.location.basename
+        } )
+            .then( function () {
+                //projectService.applyTagsOnProject('multi','ProjectServiceTest2',[{id:'t1', name:'alma1'},{id:'t2', name:'korte2'}]);
                 //projectService.deleteProject('multi', 'ProjectServiceTest1').then(function() {
-                    projectService.getAvailableProjects('multi').then(function(names) {
-                        if (names) {
+                projectService.getAvailableProjects( 'multi' )
+                    .then( function ( names ) {
+                        if ( names ) {
                             var createProjectPromises = [];
 
-                            for (index = 0; index < testProjects.length; index++) {
+                            for ( index = 0; index < testProjects.length; index++ ) {
                                 // If testProject doesn't exist
-                                if (names.indexOf(testProjects[index].projectName) === -1) {
-                                    createProjectPromises.push(projectService.createProject('multi', testProjects[index].projectName,
-                                        testProjects[index].projectInfo));
+                                if ( names.indexOf( testProjects[ index ].projectName ) === -1 ) {
+                                    createProjectPromises.push( projectService.createProject( 'multi',
+                                        testProjects[ index ].projectName,
+                                        testProjects[ index ].projectInfo ) );
                                 }
                             }
 
                             // Waiting for the createProject promise
-                            if (createProjectPromises.length > 0) {
-                                $q.all(createProjectPromises).then(function() {
-                                    deferred.resolve();
-                                });
+                            if ( createProjectPromises.length > 0 ) {
+                                $q.all( createProjectPromises )
+                                    .then( function () {
+                                        deferred.resolve();
+                                    } );
                             } else {
                                 deferred.resolve();
                             }
                         }
-                    });
+                    } );
                 //});
-            });
+            } );
 
         return deferred.promise;
     };
 };
-
 },{"../gmeServices.js":22}],26:[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
