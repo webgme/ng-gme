@@ -823,6 +823,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                 var metaNodeIds = rootNode.getMemberIds( 'MetaAspectSet' ),
                     queueList = [],
                     i;
+
                 //console.log(metaNodeIds);
                 for ( i = 0; i < metaNodeIds.length; i += 1 ) {
                     queueList.push( self.loadNode( context, metaNodeIds[ i ] ) );
@@ -1066,12 +1067,12 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         this.databaseConnection.client.setAttributes( this.id, name, value, msg );
     };
 
-    NodeObj.prototype.getRegistry = function ( /*name*/) {
-
+    NodeObj.prototype.getRegistry = function ( name ) {
+        return this.databaseConnection.client.getRegistry( this.id, name );
     };
 
-    NodeObj.prototype.setRegistry = function ( /*name, value*/) {
-
+    NodeObj.prototype.setRegistry = function ( name, value, msg) {
+        this.databaseConnection.client.setRegistry( this.id, name, value, msg );
     };
 
     /** Gets nodeIds of nodes this node points 'to' and is pointed to 'from'.
