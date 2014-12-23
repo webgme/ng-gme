@@ -13317,7 +13317,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     };
 
     NodeObj.prototype.getRegistry = function ( name ) {
-        return this.databaseConnection.client.getRegistry( this.id, name );
+        return this.databaseConnection.client.getNode( this.id ).getRegistry( name );
     };
 
     NodeObj.prototype.setRegistry = function ( name, value, msg) {
