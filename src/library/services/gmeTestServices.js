@@ -5,4 +5,4 @@
 var ProjectServiceTestClass = require( './tests/ProjectServiceTest.js' );
 
 angular.module( 'gme.testServices', [] )
-  .service( 'projectServiceTest', ProjectServiceTestClass );
+    .service( 'projectServiceTest', ProjectServiceTestClass );

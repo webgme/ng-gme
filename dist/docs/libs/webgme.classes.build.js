@@ -9748,7 +9748,7 @@ define('storage/cache',[ "util/assert" ], function (ASSERT) {
 				cacheSize = 0;
 			}
 
-			/*function getBranchHash (name, oldhash, callback) {
+			function getBranchHash (name, oldhash, callback) {
 				ASSERT(typeof name === "string" && typeof callback === "function");
 				ASSERT(typeof oldhash === "string" || oldhash === null);
 
@@ -9771,9 +9771,9 @@ define('storage/cache',[ "util/assert" ], function (ASSERT) {
 				} else {
 					branch.push(callback);
 				}
-			}*/
+			}
 
-			/*function setBranchHash (name, oldhash, newhash, callback) {
+			function setBranchHash (name, oldhash, newhash, callback) {
 				ASSERT(typeof name === "string" && typeof oldhash === "string");
 				ASSERT(typeof newhash === "string" && typeof callback === "function");
 
@@ -9794,7 +9794,7 @@ define('storage/cache',[ "util/assert" ], function (ASSERT) {
 
 					callback(err);
 				});
-			}*/
+			}
 
 			function reopenProject (callback) {
 				ASSERT(project !== null && refcount >= 0 && typeof callback === "function");
@@ -9811,10 +9811,10 @@ define('storage/cache',[ "util/assert" ], function (ASSERT) {
 					findHash: project.findHash,
 					dumpObjects: project.dumpObjects,
 					getBranchNames: project.getBranchNames,
-					//getBranchHash: getBranchHash,
-					//setBranchHash: setBranchHash,
-          getBranchHash: project.getBranchHash,
-          setBranchHash: project.setBranchHash,
+					getBranchHash: getBranchHash,
+					setBranchHash: setBranchHash,
+          //getBranchHash: project.getBranchHash,
+          //setBranchHash: project.setBranchHash,
 					getCommits: project.getCommits,
 					makeCommit: project.makeCommit,
 					ID_NAME: project.ID_NAME
@@ -10572,7 +10572,7 @@ define('coreclient/meta',[], function () {
             var node = _nodes[path] || null;
             if(node){
                 var metaNode = _core.getChild(node,"_meta");
-                _core.deleteNode(metaNode);
+                _core.deleteNode(metaNode,true);
                 metaNode = _core.getChild(node,"_meta");
                 if(meta.children){
                     var childrenNode = _core.getChild(metaNode,"children");
@@ -10598,7 +10598,7 @@ define('coreclient/meta',[], function () {
                         }
 
                     } else {
-                        _core.deleteNode(childrenNode);
+                        _core.deleteNode(childrenNode,true);
                     }
                 }
 
@@ -13359,6 +13359,29 @@ define('coreclient/serialization',['util/assert'],function(ASSERT){
         return null;*/
         return _extraBasePaths[path];
     }
+
+    var sortMultipleArrays = function () {
+        var index = getSortedIndex(arguments[0]);
+        for (var j = 0; j < arguments.length; j++) {
+            var _arr = arguments[j].slice();
+            for(var i = 0; i < _arr.length; i++) {
+                arguments[j][i] = _arr[index[i]];
+            }
+        }
+    };
+
+    var getSortedIndex = function (arr) {
+        var index = [];
+        for (var i = 0; i < arr.length; i++) {
+            index.push(i);
+        }
+        index = index.sort((function(arr){
+            return function (a, b) {return ((arr[a] > arr[b]) ? 1 : ((arr[a] < arr[b]) ? -1 : 0));
+            };
+        })(arr));
+        return index;
+    };
+
     function pathsToGuids(jsonObject){
         if(jsonObject && typeof jsonObject === 'object'){
             var keys = Object.keys(jsonObject),
@@ -13387,6 +13410,7 @@ define('coreclient/serialization',['util/assert'],function(ASSERT){
                             jsonObject.maxItems.splice(toDelete[j], 1);
                         }
                     }
+                    sortMultipleArrays(jsonObject.items, jsonObject.minItems, jsonObject.maxItems);
                 } else if(keys[i] === 'aspects'){
                     //aspects are a bunch of named path list, so we have to handle them separately
                     tArray = Object.keys(jsonObject[keys[i]]);
@@ -13921,6 +13945,7 @@ define('client',[
         currentModification = null,
         canDoUndo = false,
         canDoRedo = false,
+        currentTarget = null,
         addModification = function (commitHash, info) {
           var newElement = {
             previous: currentModification,
@@ -13940,6 +13965,7 @@ define('client',[
             from = currentModification.commit;
             to = currentModification.previous.commit;
             currentModification = currentModification.previous;
+            currentTarget = to;
             project.setBranchHash(branch, from, to, callback);
           } else {
             callback(new Error('unable to execute undo'));
@@ -13952,6 +13978,7 @@ define('client',[
             from = currentModification.commit;
             to = currentModification.next.commit;
             currentModification = currentModification.next;
+            currentTarget = to;
             project.setBranchHash(branch, from, to, callback);
           } else {
             callback(new Error('unable to execute redo'));
@@ -13967,6 +13994,13 @@ define('client',[
             undo: currentModification ? currentModification.previous !== null && currentModification.previous !== undefined : false,
             redo: currentModification ? currentModification.next !== null && currentModification.next !== undefined : false
           };
+        },
+        isCurrentTarget = function(commitHash){
+          if(currentTarget === commitHash){
+            currentTarget = null;
+            return true;
+          }
+          return false;
         };
 
       _client.addEventListener(_client.events.UNDO_AVAILABLE,function(client,parameters){
@@ -13980,7 +14014,8 @@ define('client',[
         redo: redo,
         addModification: addModification,
         clean: clean,
-        checkStatus: checkStatus
+        checkStatus: checkStatus,
+        isCurrentTarget: isCurrentTarget
       };
 
     }
@@ -14028,8 +14063,8 @@ define('client',[
         }
       }
       require([_configuration.host + '/listAllDecorators', _configuration.host + '/listAllPlugins'], function (d, p) {
-        AllDecorators = d;
-        AllPlugins = p;
+        AllDecorators = WebGMEGlobal.allDecorators;
+        AllPlugins = WebGMEGlobal.allPlugins;
       });
 
       function print_nodes(pretext) {
@@ -14387,6 +14422,7 @@ define('client',[
         var myCallback = null;
         var redoerNeedsClean = true;
         var branchHashUpdated = function (err, newhash, forked) {
+          var doUpdate = false;
           if (branch === _branch && !_offline) {
             if (!err && typeof newhash === 'string') {
               if (newhash === '') {
@@ -14399,7 +14435,69 @@ define('client',[
                   }
                 });
               } else {
-                if(redoerNeedsClean || !_selfCommits[newhash]){
+                if(_redoer.isCurrentTarget(newhash)){
+                  addCommit(newhash);
+                  doUpdate = true;
+                } else if(!_selfCommits[newhash] || redoerNeedsClean){
+                  redoerNeedsClean = false;
+                  _redoer.clean();
+                  _redoer.addModification(newhash,"branch initial");
+                  _selfCommits={};
+                  _selfCommits[newhash] = true;
+                  doUpdate = true;
+                  addCommit(newhash);
+                }
+                var redoInfo = _redoer.checkStatus(),
+                  canUndo = false,
+                  canRedo = false;
+
+                if(_selfCommits[newhash]){
+                  if(redoInfo.undo) {
+                    canUndo = true;
+                  }
+                  if(redoInfo.redo) {
+                    canRedo = true;
+                  }
+                }
+                _self.dispatchEvent(_self.events.UNDO_AVAILABLE, canUndo);
+                _self.dispatchEvent(_self.events.REDO_AVAILABLE, canRedo);
+
+                if(doUpdate){
+                  _project.loadObject(newhash, function (err, commitObj) {
+                    if (!err && commitObj) {
+                      loading(commitObj.root);
+                    } else {
+                      setTimeout(function () {
+                        _project.loadObject(newhash, function (err, commitObj) {
+                          if (!err && commitObj) {
+                            loading(commitObj.root);
+                          } else {
+                            console.log("second load try failed on commit!!!", err);
+                          }
+                        });
+                      }, 1000);
+                    }
+                  });
+                }
+
+                if (callback) {
+                  myCallback = callback;
+                  callback = null;
+                  myCallback();
+                }
+
+                //branch status update
+                if (_offline) {
+                  changeBranchState(_self.branchStates.OFFLINE);
+                } else {
+                  if (forked) {
+                    changeBranchState(_self.branchStates.FORKED);
+                  }
+                }
+
+                return _project.getBranchHash(branch, _recentCommits[0], branchHashUpdated);
+
+                /*if(redoerNeedsClean || !_selfCommits[newhash]){
                   redoerNeedsClean = false;
                   _redoer.clean();
                   _redoer.addModification(newhash,"branch initial");
@@ -14421,7 +14519,7 @@ define('client',[
                 _self.dispatchEvent(_self.events.REDO_AVAILABLE, canRedo);
 
 
-                if (/*_recentCommits.indexOf(newhash) === -1*/_recentCommits.indexOf(newhash) !== 0) {
+                if (/*_recentCommits.indexOf(newhash) === -1/_recentCommits.indexOf(newhash) !== 0) {
 
                   addCommit(newhash);
 
@@ -14458,10 +14556,10 @@ define('client',[
                   }
                   /* else {
                    changeBranchState(_self.branchStates.SYNC);
-                   }*/
+                   }/
                 }
 
-                return _project.getBranchHash(branch, _recentCommits[0], branchHashUpdated);
+                return _project.getBranchHash(branch, _recentCommits[0], branchHashUpdated);*/
               }
             } else {
               if (callback) {
@@ -15343,7 +15441,7 @@ define('client',[
         }
       }
 
-      function createProjectAsync(projectname, callback) {
+      function createProjectAsync(projectname, projectInfo, callback) {
         if (_database) {
           getAvailableProjectsAsync(function (err, names) {
             if (!err && names) {
@@ -15353,13 +15451,10 @@ define('client',[
                     createEmptyProject(p, function (err, commit) {
                       if (!err && commit) {
                         //TODO currently this is just a hack
-                        p.setInfo({
+                        p.setInfo(projectInfo || {
                           visibleName:projectname,
                           description:"project in webGME",
-                          tags:{
-                            "1":"sample",
-                            "2":"other"
-                          }
+                          tags:{}
                         },function(err){
                           callback(err);
                         });
@@ -16539,17 +16634,25 @@ define('client',[
         //});
         switch (testnumber) {
           case 1:
-            queryAddOn("HistoryAddOn", {}, function (err, result) {
-              console.log("addon result", err, result);
+            getFullProjectsInfoAsync(function(err,info){
+              console.log('TESTMETHOD - list',err,info);
             });
             break;
           case 2:
-            queryAddOn("ConstraintAddOn", {querytype: 'checkProject'}, function (err, result) {
-              console.log("addon result", err, result);
+            setProjectInfoAsync(getActiveProject(),{
+              visibleName:"TESTMETHOD_"+getActiveProject(),
+              description:"changed by TESTMETHOD",
+              tags:{
+              "1":"sample",
+                "2":"other"
+              }},function(err){
+              console.log('TESTMETHOD - set',err);
             });
             break;
           case 3:
-            console.log(_core.getBaseType(_nodes[WebGMEGlobal.State.getActiveObject()].node));
+            getAllInfoTagsAsync(function(err,tags){
+              console.log('tags',err,tags);
+            });
             break;
         }
 
@@ -16684,7 +16787,8 @@ define('client',[
 
       function createProjectFromFileAsync(projectname, jProject, callback) {
         //if called on an existing project, it will ruin it!!! - although the old commits will be untouched
-        createProjectAsync(projectname, function (err) {
+        //TODO somehow the export / import should contain the INFO field so the tags and description could come from it
+        createProjectAsync(projectname, {}, function (err) {
           selectProjectAsync(projectname, function (err) {
             Serialization.import(_core, _root, jProject, function (err) {
               if (err) {
@@ -16778,6 +16882,32 @@ define('client',[
         });
       }
 
+      function setProjectInfoAsync(projectId,info,callback){
+        _database.simpleRequest({command:'setProjectInfo',projectId:projectId,info:info},function(err,rId){
+          if(err){
+            return callback(err);
+          }
+          _database.simpleResult(rId,callback);
+        })
+      }
+
+      function getProjectInfoAsync(projectId,callback){
+        _database.simpleRequest({command:'getProjectInfo',projectId:projectId},function(err,rId){
+          if(err){
+            return callback(err);
+          }
+          _database.simpleResult(rId,callback);
+        })
+      }
+
+      function getAllInfoTagsAsync(callback){
+        _database.simpleRequest({command:'getAllInfoTags'},function(err,rId){
+          if(err){
+            return callback(err);
+          }
+          _database.simpleResult(rId,callback);
+        })
+      }
 
       function createGenericBranchAsync(project, branch, commit, callback) {
         _database.simpleRequest({command: 'setBranch', project: project, branch: branch, old: '', new: commit}, function (err, id) {
@@ -16983,6 +17113,9 @@ define('client',[
         getFullProjectsInfoAsync: getFullProjectsInfoAsync,
         createGenericBranchAsync: createGenericBranchAsync,
         deleteGenericBranchAsync: deleteGenericBranchAsync,
+        setProjectInfoAsync: setProjectInfoAsync,
+        getProjectInfoAsync: getProjectInfoAsync,
+        getAllInfoTagsAsync: getAllInfoTagsAsync,
 
         //constraint
         setConstraint: setConstraint,
@@ -18871,16 +19004,20 @@ define('blob/BlobClient',['./Artifact', 'blob/BlobMetadata', 'superagent'], func
         }
     };
 
-    BlobClient.prototype.getViewURL = function (hash, subpath) {
+    BlobClient.prototype._getURL = function (base, hash, subpath) {
         var subpathURL = '';
         if (subpath) {
             subpathURL = subpath;
         }
-        return this.blobUrl + 'view/' + hash + '/' + encodeURIComponent(subpathURL);
+        return this.blobUrl + base + '/' + hash + '/' + encodeURIComponent(subpathURL);
     };
 
-    BlobClient.prototype.getDownloadURL = function (hash) {
-        return this.blobUrl + 'download/' + hash;
+    BlobClient.prototype.getViewURL = function (hash, subpath) {
+        return this._getURL('view', hash, subpath);
+    };
+
+    BlobClient.prototype.getDownloadURL = function (hash, subpath) {
+        return this._getURL('download', hash, subpath);
     };
 
     BlobClient.prototype.getCreateURL = function (filename, isMetadata) {
@@ -18983,7 +19120,11 @@ define('blob/BlobClient',['./Artifact', 'blob/BlobMetadata', 'superagent'], func
         }
     };
 
-    BlobClient.prototype.getObject = function (hash, callback) {
+    BlobClient.prototype.getSubObject = function (hash, subpath, callback) {
+        return this.getObject(hash, callback, subpath);
+    }
+
+    BlobClient.prototype.getObject = function (hash, callback, subpath) {
         superagent.parse['application/zip'] = function (obj, parseCallback) {
             if (parseCallback) {
                 // Running on node; this should be unreachable due to req.pipe() below
@@ -18993,7 +19134,7 @@ define('blob/BlobClient',['./Artifact', 'blob/BlobMetadata', 'superagent'], func
         }
         //superagent.parse['application/json'] = superagent.parse['application/zip'];
 
-        var req = superagent.get(this.getViewURL(hash));
+        var req = superagent.get(this.getViewURL(hash, subpath));
         if (req.pipe) {
             // running on node
             var Writable = require('stream').Writable;
@@ -19633,7 +19774,7 @@ define('plugin/PluginBase',['plugin/PluginConfig',
         PluginBase.prototype.isMetaTypeOf = function (node, metaNode) {
             var self = this;
             while (node) {
-                if (node === metaNode) {
+                if (self.core.getGuid(node) === self.core.getGuid(metaNode)) {
                     return true;
                 }
                 node = self.core.getBase(node);
@@ -19651,7 +19792,7 @@ define('plugin/PluginBase',['plugin/PluginConfig',
                 name;
             while (node) {
                 name = self.core.getAttribute(node, 'name');
-                if (self.META.hasOwnProperty(name) && self.META[name] === node) {
+                if (self.META.hasOwnProperty(name) && self.core.getGuid(node) === self.core.getGuid(self.META[name])) {
                     break;
                 }
                 node = self.core.getBase(node);
@@ -19673,7 +19814,7 @@ define('plugin/PluginBase',['plugin/PluginConfig',
                 return true;
             }
             baseName = self.core.getAttribute(baseNode, 'name');
-            return self.META.hasOwnProperty(baseName) && self.META[baseName] === baseNode;
+            return self.META.hasOwnProperty(baseName) && self.core.getGuid(self.META[baseName]) === self.core.getGuid(baseNode);
         };
 
         /**
@@ -19723,34 +19864,21 @@ define('plugin/PluginBase',['plugin/PluginConfig',
 
             this.logger.debug('Saving project');
 
-            // Commit changes.
-            this.core.persist(this.rootNode, function (err) {
-                // TODO: any error here?
-                if (err) {
-                    self.logger.error(err);
-                }
-            });
+            this.core.persist(this.rootNode,function(err){if (err) {self.logger.error(err);}});
+            var newRootHash = self.core.getHash(self.rootNode);
 
-            var newRootHash = this.core.getHash(this.rootNode);
-
-            var commitMessage = '[Plugin] ' + this.getName() + ' (v' + this.getVersion() + ') updated the model.';
+            var commitMessage = '[Plugin] ' + self.getName() + ' (v' + self.getVersion() + ') updated the model.';
             if (message) {
                 commitMessage += ' - ' + message;
             }
+            self.currentHash = self.project.makeCommit([self.currentHash], newRootHash, commitMessage, function (err) {if (err) {self.logger.error(err);}});
 
-            this.currentHash = this.project.makeCommit([this.currentHash], newRootHash, commitMessage, function (err) {
-                // TODO: any error handling here?
-                if (err) {
-                    self.logger.error(err);
-                }
-            });
-
-            if (this.branchName) {
+            if (self.branchName) {
                 // try to fast forward branch if there was a branch name defined
 
                 // FIXME: what if master branch is already in a different state?
 
-                this.project.getBranchNames(function (err, branchNames) {
+                self.project.getBranchNames(function (err, branchNames) {
                     if (branchNames.hasOwnProperty(self.branchName)) {
                         var branchHash = branchNames[self.branchName];
                         if (branchHash === self.branchHash) {
@@ -19788,9 +19916,79 @@ define('plugin/PluginBase',['plugin/PluginConfig',
 
             } else {
                 // making commits, we have not started from a branch
-                this.logger.info('Project was saved to ' + this.currentHash + ' commit.');
+                self.logger.info('Project was saved to ' + self.currentHash + ' commit.');
                 callback(null);
             }
+
+            // Commit changes.
+/*            this.core.persist(this.rootNode, function (err) {
+                // TODO: any error here?
+                if (err) {
+                    self.logger.error(err);
+                }
+
+                var newRootHash = self.core.getHash(self.rootNode);
+
+                var commitMessage = '[Plugin] ' + self.getName() + ' (v' + self.getVersion() + ') updated the model.';
+                if (message) {
+                    commitMessage += ' - ' + message;
+                }
+
+                self.currentHash = self.project.makeCommit([self.currentHash], newRootHash, commitMessage, function (err) {
+                    // TODO: any error handling here?
+                    if (err) {
+                        self.logger.error(err);
+                    }
+
+                    if (self.branchName) {
+                        // try to fast forward branch if there was a branch name defined
+
+                        // FIXME: what if master branch is already in a different state?
+
+                        self.project.getBranchNames(function (err, branchNames) {
+                            if (branchNames.hasOwnProperty(self.branchName)) {
+                                var branchHash = branchNames[self.branchName];
+                                if (branchHash === self.branchHash) {
+                                    // the branch does not have any new commits
+                                    // try to fast forward branch to the current commit
+                                    self.project.setBranchHash(self.branchName, self.branchHash, self.currentHash, function (err) {
+                                        if (err) {
+                                            // fast forward failed
+                                            self.logger.error(err);
+                                            self.logger.info('"' + self.branchName + '" was NOT updated');
+                                            self.logger.info('Project was saved to ' + self.currentHash + ' commit.');
+                                        } else {
+                                            // successful fast forward of branch to the new commit
+                                            self.logger.info('"' + self.branchName + '" was updated to the new commit.');
+                                            // roll starting point on success
+                                            self.branchHash = self.currentHash;
+                                        }
+                                        callback(err);
+                                    });
+                                } else {
+                                    // branch has changes a merge is required
+                                    // TODO: try auto-merge, if fails ...
+                                    self.logger.warn('Cannot fast forward "' + self.branchName + '" branch. Merge is required but not supported yet.');
+                                    self.logger.info('Project was saved to ' + self.currentHash + ' commit.');
+                                    callback(null);
+                                }
+                            } else {
+                                // branch was deleted or not found, do nothing
+                                self.logger.info('Project was saved to ' + self.currentHash + ' commit.');
+                                callback(null);
+                            }
+                        });
+                        // FIXME: is this call async??
+                        // FIXME: we are not tracking all commits that we make
+
+                    } else {
+                        // making commits, we have not started from a branch
+                        self.logger.info('Project was saved to ' + self.currentHash + ' commit.');
+                        callback(null);
+                    }
+                });
+
+            });*/
         };
 
         //--------------------------------------------------------------------------------------------------------------

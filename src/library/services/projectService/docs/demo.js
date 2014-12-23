@@ -2,31 +2,35 @@
 'use strict';
 
 var demoApp = angular.module( 'gme.projectService.demo', [
-  'gme.services',
-  'gme.testServices'
+    'gme.services',
+    'gme.testServices'
 ] );
 
-demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService, projectServiceTest ) {
-  $scope.projects = [];
-  $scope.tags = [];
-  projectServiceTest.startTest().then( function () {
-    projectService.getProjects( 'multi' ).then( function ( results ) {
-      $scope.projects = results;
-    }, function ( err ) {
-      console.log( 'Cannot get projects: ' + err );
-    } );
+demoApp.controller( 'ProjectServiceDemoController', function ( $scope, $log, $q, dataStoreService, projectService,
+    projectServiceTest ) {
+    $scope.projects = [];
+    $scope.tags = [];
+    projectServiceTest.startTest()
+        .then( function () {
+            projectService.getProjects( 'multi' )
+                .then( function ( results ) {
+                    $scope.projects = results;
+                }, function ( err ) {
+                    console.log( 'Cannot get projects: ' + err );
+                } );
 
-    projectService.getAvailableProjectTags( 'multi' ).then( function ( results ) {
-      $scope.tags = results;
-    }, function ( err ) {
-      console.log( 'Cannot get tags: ' + err );
-    } );
+            projectService.getAvailableProjectTags( 'multi' )
+                .then( function ( results ) {
+                    $scope.tags = results;
+                }, function ( err ) {
+                    console.log( 'Cannot get tags: ' + err );
+                } );
 
 
-  } );
+        } );
 
 
-  /*var a = projectServiceTest.startTest();
+    /*var a = projectServiceTest.startTest();
    a.then(function(){
    console.log('start: ' + 1);
    projectService.getProjects('multi').then(function(results){
