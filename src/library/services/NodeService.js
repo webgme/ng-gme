@@ -508,7 +508,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
         dbConn.nodeService.events[ eventName ].push( fn );
 
-        if ( dbConn.nodeService.isInitialized ) {
+        if ( dbConn.nodeService.isInitialized || dbConn.projectService.isInitialized) {
             if ( eventName === 'initialize' ) {
                 dbConn.nodeService.isInitialized = true;
                 fn( databaseId );

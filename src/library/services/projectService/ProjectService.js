@@ -3,6 +3,7 @@
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
+    var self = this;
 
     this.getAvailableProjectTags = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -196,6 +197,8 @@ module.exports = function ( $q, dataStoreService ) {
         this.getProjectsIds( databaseId )
         .then( function ( projectIds ) {
             if ( projectIds.indexOf( projectId ) > -1 ) {
+                // Make sure that PROJECT_OPENED is registerd.
+                self.on(databaseId, 'RegisterEventListener', function () {});
                 dbConn.client.selectProjectAsync( projectId, function ( err ) {
                     if ( err ) {
                         deferred.reject( err );
@@ -203,7 +206,6 @@ module.exports = function ( $q, dataStoreService ) {
                     }
 
                     dbConn.projectService.projectId = projectId;
-
                     deferred.resolve( projectId );
                 } );
             } else {
