@@ -12877,7 +12877,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         dbConn.branchService.events[ eventName ] = dbConn.branchService.events[ eventName ] || [];
         dbConn.branchService.events[ eventName ].push( fn );
 
-        if ( dbConn.branchService.isInitialized ) {
+        if ( dbConn.branchService.isInitialized || dbConn.projectService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 fn( databaseId );
             }
@@ -13560,7 +13560,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
         dbConn.nodeService.events[ eventName ].push( fn );
 
-        if ( dbConn.nodeService.isInitialized ) {
+        if ( dbConn.nodeService.isInitialized || dbConn.projectService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 dbConn.nodeService.isInitialized = true;
                 fn( databaseId );
@@ -13579,6 +13579,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 'use strict';
 
 module.exports = function ( $q, dataStoreService ) {
+    var self = this;
 
     this.getAvailableProjectTags = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -13772,6 +13773,8 @@ module.exports = function ( $q, dataStoreService ) {
         this.getProjectsIds( databaseId )
         .then( function ( projectIds ) {
             if ( projectIds.indexOf( projectId ) > -1 ) {
+                // Make sure that PROJECT_OPENED is registered.
+                self.on( databaseId, 'RegisterEventListener', function () {} );
                 dbConn.client.selectProjectAsync( projectId, function ( err ) {
                     if ( err ) {
                         deferred.reject( err );
@@ -13779,7 +13782,6 @@ module.exports = function ( $q, dataStoreService ) {
                     }
 
                     dbConn.projectService.projectId = projectId;
-
                     deferred.resolve( projectId );
                 } );
             } else {
