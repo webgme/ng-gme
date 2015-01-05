@@ -1728,4 +1728,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         return deferred.promise;
     };
 };
-},{"../gmeServices.js":9}]},{},[1]);
+},{"../gmeServices.js":9}]},{},[1])
+
+
+//# sourceMappingURL=ng-gme.js.map
