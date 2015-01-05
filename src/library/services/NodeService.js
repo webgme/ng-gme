@@ -265,10 +265,11 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     };
 
     NodeObj.prototype.getRegistry = function ( name ) {
-        return this.databaseConnection.client.getNode( this.id ).getRegistry( name );
+        return this.databaseConnection.client.getNode( this.id )
+            .getRegistry( name );
     };
 
-    NodeObj.prototype.setRegistry = function ( name, value, msg) {
+    NodeObj.prototype.setRegistry = function ( name, value, msg ) {
         this.databaseConnection.client.setRegistry( this.id, name, value, msg );
     };
 
@@ -508,7 +509,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
         dbConn.nodeService.events[ eventName ].push( fn );
 
-        if ( dbConn.nodeService.isInitialized || dbConn.projectService.isInitialized ) {
+        if ( dbConn.nodeService.isInitialized || dbConn.branchService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 dbConn.nodeService.isInitialized = true;
                 fn( databaseId );

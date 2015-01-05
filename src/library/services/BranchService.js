@@ -16,6 +16,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
                 }
 
                 dbConn.branchService.branchId = branchId;
+                dbConn.branchService.isInitialized = true;
 
                 deferred.resolve( branchId );
             } );
@@ -137,7 +138,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         dbConn.branchService.events[ eventName ] = dbConn.branchService.events[ eventName ] || [];
         dbConn.branchService.events[ eventName ].push( fn );
 
-        if ( dbConn.branchService.isInitialized || dbConn.projectService.isInitialized ) {
+        if ( dbConn.branchService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 fn( databaseId );
             }

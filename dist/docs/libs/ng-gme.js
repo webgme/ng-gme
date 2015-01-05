@@ -29,245 +29,239 @@ angular.module( 'gme.directives.projectBrowser', [
     'gme.testServices',
     'isis.ui.valueWidgets'
 ] )
-.run( function () {
+    .run( function () {
 
-} )
-.controller( 'ProjectBrowserController',
-function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
+    } )
+    .controller( 'ProjectBrowserController',
+        function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
 
-    var config,
-    dummyProjectGenerator,
+            var config,
+                dummyProjectGenerator,
 
-    projectDescriptorMapper,
+                projectDescriptorMapper,
 
-    filterItems,
-    projectList,
-    availableTerms,
-    databaseId,
+                filterItems,
+                projectList,
+                availableTerms,
+                databaseId,
 
-    updateProjectList;
+                updateProjectList;
 
-    databaseId = 'multi';
+            databaseId = 'multi';
 
-    availableTerms = $scope.availableTerms = [];
+            availableTerms = $scope.availableTerms = [];
 
-    //  availableTerms = $scope.availableTerms = [
-    //    {
-    //      id: 'tag1',
-    //      name: 'Tag A',
-    //      url: 'http://vanderbilt.edu'
-    //    },
-    //    {
-    //      id: 'tag2',
-    //      name: 'Tag B',
-    //      url: 'http://vanderbilt.edu'
-    //    },
-    //    {
-    //      id: 'tag3',
-    //      name: 'Tag C',
-    //      url: 'http://vanderbilt.edu'
-    //    },
-    //    {
-    //      id: 'tag4',
-    //      name: 'Tag D',
-    //      url: 'http://vanderbilt.edu'
-    //    },
-    //    {
-    //      id: 'tag5',
-    //      name: 'Tag E',
-    //      url: 'http://vanderbilt.edu'
-    //    },
-    //    {
-    //      id: 'tag6',
-    //      name: 'Tag F',
-    //      url: 'http://vanderbilt.edu'
-    //    }
-    //  ];
-
-
-    $scope.filtering = {
-        selectedTermIds: [
-
-        ]
-    };
-
-    projectList = $scope.projectList = {
-        items: []
-    };
-
-    $scope.filteredProjectList = {
-        items: []
-    };
+            //  availableTerms = $scope.availableTerms = [
+            //    {
+            //      id: 'tag1',
+            //      name: 'Tag A',
+            //      url: 'http://vanderbilt.edu'
+            //    },
+            //    {
+            //      id: 'tag2',
+            //      name: 'Tag B',
+            //      url: 'http://vanderbilt.edu'
+            //    },
+            //    {
+            //      id: 'tag3',
+            //      name: 'Tag C',
+            //      url: 'http://vanderbilt.edu'
+            //    },
+            //    {
+            //      id: 'tag4',
+            //      name: 'Tag D',
+            //      url: 'http://vanderbilt.edu'
+            //    },
+            //    {
+            //      id: 'tag5',
+            //      name: 'Tag E',
+            //      url: 'http://vanderbilt.edu'
+            //    },
+            //    {
+            //      id: 'tag6',
+            //      name: 'Tag F',
+            //      url: 'http://vanderbilt.edu'
+            //    }
+            //  ];
 
 
-    filterItems = function () {
-        $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
-        $scope.filtering.selectedTermIds );
-    };
+            $scope.filtering = {
+                selectedTermIds: [
 
-    $scope.$watch( function () {
+                ]
+            };
 
-        return $scope.filtering.selectedTermIds;
-    }, function () {
-        filterItems();
-    },
-    true );
+            projectList = $scope.projectList = {
+                items: []
+            };
+
+            $scope.filteredProjectList = {
+                items: []
+            };
 
 
-    $scope.$watch( 'filtering.selectedTermIds', function () {
-        filterItems();
-    } );
+            filterItems = function () {
+                $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
+                    $scope.filtering.selectedTermIds );
+            };
 
-    $scope.$watch( 'projectList.items', function () {
-        filterItems();
-    } );
+            $scope.$watch( function () {
 
-    dummyProjectGenerator = function ( id ) {
-
-        var projectDescriptor, i;
-
-        projectDescriptor = {
-            id: id,
-            title: chance.paragraph( {
-                sentences: 1
-            } ),
-            cssClass: 'project-item',
-            toolTip: 'Open project',
-            description: chance.paragraph( {
-                sentences: 2
-            } ),
-            lastUpdated: {
-                time: Date.now(),
-                user: 'N/A'
-
-            },
-            taxonomyTerms: [],
-            stats: [
-                {
-                    value: id,
-                    toolTip: 'Commits',
-                    iconClass: 'fa fa-cloud-upload'
+                    return $scope.filtering.selectedTermIds;
+                }, function () {
+                    filterItems();
                 },
-                {
-                    value: id,
-                    toolTip: 'Users',
-                    iconClass: 'fa fa-users'
-                }
-            ],
-            details: chance.paragraph( {
-                sentences: 3
-            } )
-        };
+                true );
 
-        for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-            if ( Math.random() > 0.5 ) {
-                projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
-            }
-        }
-
-        return projectDescriptor;
-
-    };
-
-    //  for (i = 0; i < 20; i++) {
-    //    $scope.projectList.items.push(dummyProjectGenerator(i));
-    //  }
-
-    projectDescriptorMapper = function ( projectDescriptors ) {
-
-        var result = [];
-
-        angular.forEach( projectDescriptors, function ( projectDescriptor ) {
-
-            //console.log( projectDescriptor );
-
-            result.push( {
-
-                id: projectDescriptor.id,
-                description: projectDescriptor.info.description,
-                title: projectDescriptor.info.visibleName,
-                taxonomyTerms: projectDescriptor.info.tags
-
+            $scope.$watch( 'filtering.selectedTermIds', function () {
+                filterItems();
             } );
 
-        } );
+            $scope.$watch( 'projectList.items', function () {
+                filterItems();
+            } );
 
-        return result;
+            dummyProjectGenerator = function ( id ) {
 
-    };
+                var projectDescriptor, i;
 
-    updateProjectList = function () {
+                projectDescriptor = {
+                    id: id,
+                    title: chance.paragraph( {
+                        sentences: 1
+                    } ),
+                    cssClass: 'project-item',
+                    toolTip: 'Open project',
+                    description: chance.paragraph( {
+                        sentences: 2
+                    } ),
+                    lastUpdated: {
+                        time: Date.now(),
+                        user: 'N/A'
 
-        projectService.getAvailableProjectTags( databaseId )
-        .then( function ( tagList ) {
+                    },
+                    taxonomyTerms: [],
+                    stats: [ {
+                        value: id,
+                        toolTip: 'Commits',
+                        iconClass: 'fa fa-cloud-upload'
+                    }, {
+                        value: id,
+                        toolTip: 'Users',
+                        iconClass: 'fa fa-users'
+                    } ],
+                    details: chance.paragraph( {
+                        sentences: 3
+                    } )
+                };
 
-            $scope.availableTerms = tagList;
+                for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
 
-        } );
+                    if ( Math.random() > 0.5 ) {
+                        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
+                    }
+                }
 
-        console.log( 'In here...' );
+                return projectDescriptor;
 
-        projectService.getProjects( databaseId )
-        .then( function ( gmeProjectDescriptors ) {
+            };
 
-            $scope.projectList.items = [];
-            $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
+            //  for (i = 0; i < 20; i++) {
+            //    $scope.projectList.items.push(dummyProjectGenerator(i));
+            //  }
 
-            //$scope.projectList.items = results;
-        } );
+            projectDescriptorMapper = function ( projectDescriptors ) {
 
-    };
+                var result = [];
+
+                angular.forEach( projectDescriptors, function ( projectDescriptor ) {
+
+                    //console.log( projectDescriptor );
+
+                    result.push( {
+
+                        id: projectDescriptor.id,
+                        description: projectDescriptor.info.description,
+                        title: projectDescriptor.info.visibleName,
+                        taxonomyTerms: projectDescriptor.info.tags
+
+                    } );
+
+                } );
+
+                return result;
+
+            };
+
+            updateProjectList = function () {
+
+                projectService.getAvailableProjectTags( databaseId )
+                    .then( function ( tagList ) {
+
+                        $scope.availableTerms = tagList;
+
+                    } );
+
+                console.log( 'In here...' );
+
+                projectService.getProjects( databaseId )
+                    .then( function ( gmeProjectDescriptors ) {
+
+                        $scope.projectList.items = [];
+                        $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
+
+                        //$scope.projectList.items = results;
+                    } );
+
+            };
 
 
-    // Making sure we have test project in DB
+            // Making sure we have test project in DB
 
-    projectServiceTest.startTest()
-    .then( function () {
-        updateProjectList();
-    } );
+            projectServiceTest.startTest()
+                .then( function () {
+                    updateProjectList();
+                } );
 
-    $scope.config = config = {
+            $scope.config = config = {
 
-        sortable: true,
-        secondaryItemMenu: true,
-        detailsCollapsible: true,
-        showDetailsLabel: 'Show details',
-        hideDetailsLabel: 'Hide details',
-        filter: {},
+                sortable: true,
+                secondaryItemMenu: true,
+                detailsCollapsible: true,
+                showDetailsLabel: 'Show details',
+                hideDetailsLabel: 'Hide details',
+                filter: {},
 
-        // Event handlers
+                // Event handlers
 
-        itemSort: function ( jQEvent, ui ) {
-            console.log( 'Sort happened', jQEvent, ui );
-        },
-
-        itemClick: function ( event, item ) {
-            console.log( 'Clicked: ' + item );
-        },
-
-        itemContextmenuRenderer: function ( e, item ) {
-            console.log( 'Contextmenu was triggered for node:', item );
-
-            return [
-                {
-                    items: [
-
-                        {
-                            id: 'open',
-                            label: 'Open Project',
-                            disabled: false,
-                            iconClass: '',
-                            action: function () {
-                                projectService.selectProject( databaseId, item.id );
-                            }
-
-                        }
-                    ]
+                itemSort: function ( jQEvent, ui ) {
+                    console.log( 'Sort happened', jQEvent, ui );
                 },
-                {
-                    items: [
-                        {
+
+                itemClick: function ( event, item ) {
+                    console.log( 'Clicked: ' + item );
+                },
+
+                itemContextmenuRenderer: function ( e, item ) {
+                    console.log( 'Contextmenu was triggered for node:', item );
+
+                    return [ {
+                        items: [
+
+                            {
+                                id: 'open',
+                                label: 'Open Project',
+                                disabled: false,
+                                iconClass: '',
+                                action: function () {
+                                    projectService.selectProject( databaseId, item.id );
+                                }
+
+                            }
+                        ]
+                    }, {
+                        items: [ {
                             id: 'edit',
                             label: 'Edit Project Details',
                             disabled: false,
@@ -288,8 +282,7 @@ function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDia
                                 } );
 
                             }
-                        },
-                        {
+                        }, {
                             id: 'delete',
                             label: 'Delete Project',
                             disabled: false,
@@ -300,9 +293,9 @@ function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDia
                                     onOk: function () {
 
                                         projectService.deleteProject( databaseId, item.id )
-                                        .then( function () {
-                                            updateProjectList();
-                                        } );
+                                            .then( function () {
+                                                updateProjectList();
+                                            } );
 
                                     },
                                     onCancel: function () {
@@ -314,75 +307,73 @@ function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDia
 
                             },
                             iconClass: ''
-                        }
-                    ]
-                }
-            ];
-        },
+                        } ]
+                    } ];
+                },
 
-        detailsRenderer: function ( item ) {
-            item.details = 'My details are here now!';
-        },
+                detailsRenderer: function ( item ) {
+                    item.details = 'My details are here now!';
+                },
 
-        newItemForm: {
-            title: 'Create new Project',
-            itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
-            expanded: false,
-            controller: function ( $scope, projectService ) {
+                newItemForm: {
+                    title: 'Create new Project',
+                    itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
+                    expanded: false,
+                    controller: function ( $scope, projectService ) {
 
-                $scope.newItem = {};
+                        $scope.newItem = {};
 
-                $scope.tags = angular.copy( availableTerms );
+                        $scope.tags = angular.copy( availableTerms );
 
-                $scope.loadTags = function ( /*query*/ ) {
-                    return projectService.getAvailableProjectTags( databaseId );
-                };
+                        $scope.loadTags = function ( /*query*/) {
+                            return projectService.getAvailableProjectTags( databaseId );
+                        };
 
-                $scope.createItem = function ( newItem ) {
+                        $scope.createItem = function ( newItem ) {
 
-                    var tags;
+                            var tags;
 
-                    tags = {};
+                            tags = {};
 
-                    angular.forEach( newItem.tags, function ( tag ) {
-                        tags[tag.id] = tag.name;
-                    } );
+                            angular.forEach( newItem.tags, function ( tag ) {
+                                tags[ tag.id ] = tag.name;
+                            } );
 
-                    projectService.createProject(
-                    databaseId,
-                    newItem.title, {
-                        visibleName: newItem.title,
-                        tags: tags,
-                        description: newItem.description
+                            projectService.createProject(
+                                databaseId,
+                                newItem.title, {
+                                    visibleName: newItem.title,
+                                    tags: tags,
+                                    description: newItem.description
+                                }
+                            )
+                                .then( function () {
+                                    updateProjectList();
+                                } );
+
+                            $scope.newItem = {};
+
+                            config.newItemForm.expanded = false; // this is how you close the form itself
+
+                        };
+
                     }
-                    )
-                    .then( function () {
-                        updateProjectList();
-                    } );
+                }
 
-                    $scope.newItem = {};
-
-                    config.newItemForm.expanded = false; // this is how you close the form itself
-
-                };
-
-            }
-        }
-
-    };
+            };
 
 
-} )
-.directive( 'projectBrowser', function () {
+        } )
+    .directive( 'projectBrowser', function () {
 
-    return {
-        scope: false,
-        restrict: 'E',
-        controller: 'ProjectBrowserController',
-        replace: true,
-        templateUrl: '/ng-gme/templates/projectBrowser.html'
-    };
-} );
+        return {
+            scope: false,
+            restrict: 'E',
+            controller: 'ProjectBrowserController',
+            replace: true,
+            templateUrl: '/ng-gme/templates/projectBrowser.html'
+        };
+    } );
 },{"../termFilter/termFilter.js":4}],4:[function(require,module,exports){
 /*globals angular*/
 'use strict';
@@ -507,6 +498,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
                 }
 
                 dbConn.branchService.branchId = branchId;
+                dbConn.branchService.isInitialized = true;
 
                 deferred.resolve( branchId );
             } );
@@ -628,7 +620,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         dbConn.branchService.events[ eventName ] = dbConn.branchService.events[ eventName ] || [];
         dbConn.branchService.events[ eventName ].push( fn );
 
-        if ( dbConn.branchService.isInitialized || dbConn.projectService.isInitialized ) {
+        if ( dbConn.branchService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 fn( databaseId );
             }
@@ -1068,10 +1060,11 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     };
 
     NodeObj.prototype.getRegistry = function ( name ) {
-        return this.databaseConnection.client.getNode( this.id ).getRegistry( name );
+        return this.databaseConnection.client.getNode( this.id )
+            .getRegistry( name );
     };
 
-    NodeObj.prototype.setRegistry = function ( name, value, msg) {
+    NodeObj.prototype.setRegistry = function ( name, value, msg ) {
         this.databaseConnection.client.setRegistry( this.id, name, value, msg );
     };
 
@@ -1311,7 +1304,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
         dbConn.nodeService.events[ eventName ].push( fn );
 
-        if ( dbConn.nodeService.isInitialized || dbConn.projectService.isInitialized ) {
+        if ( dbConn.nodeService.isInitialized || dbConn.branchService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 dbConn.nodeService.isInitialized = true;
                 fn( databaseId );
@@ -1327,18 +1320,17 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 },{}],8:[function(require,module,exports){
 /*globals angular*/
 
-'use strict';
-
 module.exports = function ( $q, dataStoreService ) {
-    var self = this;
+    'use strict';
+    //var self = this;
 
     this.getAvailableProjectTags = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = $q.defer();
+            deferred = $q.defer();
         dbConn.projectService = dbConn.projectService || {};
         dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
             var tagKeys,
-            tags = [];
+                tags = [];
             if ( err ) {
                 deferred.reject( err );
                 return;
@@ -1360,11 +1352,11 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.applyTagsOnProject = function ( databaseId, projectId, newTags ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = $q.defer(),
-        mappedTags = {},
-        tagMapper = function ( tag ) {
-            mappedTags[ tag.id ] = tag.name;
-        };
+            deferred = $q.defer(),
+            mappedTags = {},
+            tagMapper = function ( tag ) {
+                mappedTags[ tag.id ] = tag.name;
+            };
         dbConn.projectService = dbConn.projectService || {};
         dbConn.client.getProjectInfoAsync( projectId, function ( err, existingInfo ) {
             if ( err ) {
@@ -1388,7 +1380,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.getAvailableProjects = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = $q.defer();
+            deferred = $q.defer();
         dbConn.projectService = dbConn.projectService || {};
         dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
             if ( err ) {
@@ -1404,17 +1396,17 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.getProjects = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+            deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
         dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
             var projectTags,
-            branches,
-            projects = [],
-            projectMapper,
-            projectTagsMapper,
-            branchMapper;
+                branches,
+                projects = [],
+                projectMapper,
+                projectTagsMapper,
+                branchMapper;
 
             projectTagsMapper = function ( tagName, tagId ) {
                 projectTags.push( {
@@ -1465,7 +1457,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.getProjectsIds = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+            deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
@@ -1483,7 +1475,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.createProject = function ( databaseId, projectname, projectInfo ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+            deferred = new $q.defer();
 
         dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
             if ( err ) {
@@ -1499,7 +1491,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.deleteProject = function ( databaseId, projectId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+            deferred = new $q.defer();
 
         console.log( projectId );
 
@@ -1517,38 +1509,39 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.selectProject = function ( databaseId, projectId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-        deferred = new $q.defer();
+            deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
         this.getProjectsIds( databaseId )
-        .then( function ( projectIds ) {
-            if ( projectIds.indexOf( projectId ) > -1 ) {
-                // Make sure that PROJECT_OPENED is registered.
-                self.on( databaseId, 'RegisterEventListener', function () {} );
-                dbConn.client.selectProjectAsync( projectId, function ( err ) {
-                    if ( err ) {
-                        deferred.reject( err );
-                        return;
-                    }
+            .then( function ( projectIds ) {
+                if ( projectIds.indexOf( projectId ) > -1 ) {
+                    // Make sure that PROJECT_OPENED is registered.
+                    // self.on( databaseId, 'RegisterEventListener', function () {} );
+                    dbConn.client.selectProjectAsync( projectId, function ( err ) {
+                        if ( err ) {
+                            deferred.reject( err );
+                            return;
+                        }
 
-                    dbConn.projectService.projectId = projectId;
-                    deferred.resolve( projectId );
-                } );
-            } else {
-                deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
-                databaseId ) );
-            }
-        } )
-        .
-        catch( function ( reason ) {
+                        dbConn.projectService.projectId = projectId;
+                        dbConn.projectService.isInitialized = true;
+                        deferred.resolve( projectId );
+                    } );
+                } else {
+                    deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
+                        databaseId ) );
+                }
+            } )
+            .
+        catch ( function ( reason ) {
             deferred.reject( reason );
         } );
 
         return deferred.promise;
     };
 
-    this.watchProjects = function ( /*databaseId*/ ) {
+    this.watchProjects = function ( /*databaseId*/) {
         // TODO: register for project events
         // TODO: SERVER_PROJECT_CREATED
         // TODO: SERVER_PROJECT_DELETED
@@ -1558,7 +1551,7 @@ module.exports = function ( $q, dataStoreService ) {
 
     this.on = function ( databaseId, eventName, fn ) {
         var dbConn,
-        i;
+            i;
 
         console.assert( typeof databaseId === 'string' );
         console.assert( typeof eventName === 'string' );
@@ -1573,60 +1566,60 @@ module.exports = function ( $q, dataStoreService ) {
             // this should not be an inline function
 
             dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
-            function ( dummy /* FIXME */, projectId ) {
+                function ( dummy /* FIXME */ , projectId ) {
 
-                if ( dbConn.projectService.projectId !== projectId ) {
-                    dbConn.projectService.projectId = projectId;
+                    if ( dbConn.projectService.projectId !== projectId ) {
+                        dbConn.projectService.projectId = projectId;
 
-                    console.log( 'There was a PROJECT_OPENED event', projectId );
-                    if ( projectId ) {
-                        // initialize
-                        if ( dbConn.projectService &&
-                        dbConn.projectService.events &&
-                        dbConn.projectService.events.initialize ) {
+                        console.log( 'There was a PROJECT_OPENED event', projectId );
+                        if ( projectId ) {
+                            // initialize
+                            if ( dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.initialize ) {
 
-                            dbConn.projectService.isInitialized = true;
+                                dbConn.projectService.isInitialized = true;
 
-                            for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
-                                dbConn.projectService.events.initialize[ i ]( databaseId );
+                                for ( i = 0; i < dbConn.projectService.events.initialize.length; i += 1 ) {
+                                    dbConn.projectService.events.initialize[ i ]( databaseId );
+                                }
+                            }
+                        } else {
+                            // branchId is falsy, empty or null or undefined
+                            // destroy
+                            if ( dbConn.projectService &&
+                                dbConn.projectService.events &&
+                                dbConn.projectService.events.destroy ) {
+
+                                dbConn.projectService.isInitialized = false;
+
+                                for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
+                                    dbConn.projectService.events.destroy[ i ]( databaseId );
+                                }
                             }
                         }
-                    } else {
-                        // branchId is falsy, empty or null or undefined
-                        // destroy
-                        if ( dbConn.projectService &&
+                    }
+                } );
+
+            dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
+                function ( /*dummy*/ /* FIXME */) {
+                    console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
+
+                    delete dbConn.projectService.projectId;
+
+                    // destroy
+                    if ( dbConn.projectService &&
                         dbConn.projectService.events &&
                         dbConn.projectService.events.destroy ) {
 
-                            dbConn.projectService.isInitialized = false;
+                        dbConn.projectService.isInitialized = false;
 
-                            for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-                                dbConn.projectService.events.destroy[ i ]( databaseId );
-                            }
+                        for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
+                            dbConn.projectService.events.destroy[ i ]( databaseId );
                         }
                     }
-                }
-            } );
 
-            dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
-            function ( /*dummy*/ /* FIXME */ ) {
-                console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
-
-                delete dbConn.projectService.projectId;
-
-                // destroy
-                if ( dbConn.projectService &&
-                dbConn.projectService.events &&
-                dbConn.projectService.events.destroy ) {
-
-                    dbConn.projectService.isInitialized = false;
-
-                    for ( i = 0; i < dbConn.projectService.events.destroy.length; i += 1 ) {
-                        dbConn.projectService.events.destroy[ i ]( databaseId );
-                    }
-                }
-
-            } );
+                } );
         }
 
         dbConn.projectService.events = dbConn.projectService.events || {};
@@ -1644,7 +1637,6 @@ module.exports = function ( $q, dataStoreService ) {
         }
     };
 };
-
 },{}],9:[function(require,module,exports){
 /*globals angular, require*/
 
