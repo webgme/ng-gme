@@ -86,6 +86,8 @@ jshint = require( 'gulp-jshint' ),
 browserify = require( 'browserify' ),
 source = require( 'vinyl-source-stream' ),
 concat = require( 'gulp-concat' ),
+buffer = require( 'gulp-buffer' ),
+sourcemaps = require( 'gulp-sourcemaps' ),
 rename = require( 'gulp-rename' ),
 sass = require( 'gulp-sass' ),
 runSequence = require( 'run-sequence' ),
@@ -131,20 +133,30 @@ gulp.task( 'lint-docs', function () {
 } );
 
 gulp.task( 'browserify-docs', function () {
+  var bundler, bundle;
+  console.log('Browserifying docs...');
 
-  console.log( 'Browserifying docs...' );
-
-  if ( debugShim ) {
+  if (debugShim) {
     process.env.BROWSERIFYSHIM_DIAGNOSTICS = 1;
   }
+  bundler = browserify({
+    entries: [ sourcePaths.docsApp ],
+    debug: true
+  });
 
-  return browserify( {
-    entries: [ sourcePaths.docsApp ]
-  } )
-  .bundle()
-  .on('error', swallowError)  .pipe( source( libraryName + '-docs.js' ) )
-  .pipe( gulp.dest( buildPaths.docsRoot ) );
-
+  bundle = function() {
+    return bundler
+      .bundle()
+      .on('error', swallowError)
+      .pipe(source(libraryName + '-docs.js'))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+      // Add transformation tasks to the pipeline here.
+      //.pipe(uglify())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(buildPaths.docsRoot));
+  };
+  return bundle();
 } );
 
 gulp.task( 'compile-docs-templates', function () {
@@ -208,20 +220,31 @@ gulp.task( 'lint-library', function () {
 } );
 
 gulp.task( 'browserify-library', function () {
+  var bundler, bundle;
+  console.log('Browserifying library...');
 
-  console.log( 'Browserifying library...' );
-
-  if ( debugShim ) {
+  if (debugShim) {
     process.env.BROWSERIFYSHIM_DIAGNOSTICS = 1;
   }
+  bundler = browserify({
+    entries: [sourcePaths.libraryModuleScript],
+    debug: true
+  });
 
-  return browserify( {
-    entries: [sourcePaths.libraryModuleScript]
-  } )
-  .bundle()
-  .on('error', swallowError)  .pipe( source( libraryName + '.js' ) )
-  .pipe( gulp.dest( buildPaths.scripts ) );
+  bundle = function() {
+    return bundler
+      .bundle()
+      .on('error', swallowError)
+      .pipe(source(libraryName + '.js'))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+      // Add transformation tasks to the pipeline here.
+      //.pipe(uglify())
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(buildPaths.scripts));
+  };
 
+  return bundle();
 } );
 
 gulp.task( 'compile-library-templates', function () {
