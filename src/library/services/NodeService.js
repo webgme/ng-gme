@@ -186,6 +186,28 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     };
 
     /**
+     * Copies the nodes from nodeIds into parentId. N.B. all participating nodes need to be loaded in some region.
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {string} parentId - Path to parent node (must be loaded and needs to watch for new children to get events).
+     * @param {string[]} nodeIds - Ids of nodes to be copied, these need to be loaded in the client.
+     */
+    this.copyMoreNodes = function ( context, parentId, nodeIds ) {
+        var i,
+            parameters = {
+                parentId: parentId
+            },
+            dbConn = dataStoreService.getDatabaseConnection( context.db );
+
+        for ( i = 0; i < nodeIds.length; i += 1 ) {
+            parameters[ nodeIds[ i ] ] = true;
+        }
+        // There is no callback/promise here, instead wait for events in the parent
+        // granted it watches for new children.
+        dbConn.client.copyMoreNodes( parameters );
+    };
+
+    /**
      * Removes all references and listeners attached to any NodeObj in the region.
      * N.B. This function must be invoked for all regions that a "user" created.
      * This is typically done in the "$scope.on($destroy)"-function of a controller.
@@ -223,6 +245,57 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     };
 
     /**
+     * Starts a new transaction meaning where changes are bundled into a single commit upon
+     * completion (see this.completeTransaction).
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {string} [msg] - Optional commit message.
+     * @returns {boolean} - True if no other transaction was open.
+     */
+    this.startTransaction = function ( context, msg ) {
+        var result = false,
+            dbConn = dataStoreService.getDatabaseConnection( context.db );
+
+        if ( dbConn.isInTransaction ) {
+            // TODO: Remove error logging here and let user log.
+            console.error( 'Already in transaction - refused to start additional.' );
+        } else {
+            dbConn.isInTransaction = true;
+            dbConn.client.startTransaction( msg );
+            result = true;
+        }
+
+        return result;
+    };
+
+    /**
+     * Closes an open transaction and updates the branch hash.
+     * @param {object} context - Where to create the node.
+     * @param {string} context.db - Database where the node will be created.
+     * @param {string} [msg] - Optional commit message.
+     * @returns {Promise} - Resolved when branch updated successfully.
+     */
+    this.completeTransaction = function ( context, msg ) {
+        var deferred = $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( context.db );
+
+        if ( dbConn.isInTransaction ) {
+            dbConn.client.completeTransaction( msg, function ( err ) {
+                dbConn.isInTransaction = false;
+                if ( err ) {
+                    deferred.reject( err );
+                } else {
+                    deferred.resolve();
+                }
+            } );
+        } else {
+            deferred.reject( 'No transaction open!' );
+        }
+
+        return deferred.promise;
+    };
+
+    /**
      * Logs the regions of the database connection.
      * @param {string} databaseId - Id of database to log.
      */
@@ -250,6 +323,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     NodeObj.prototype.cleanUpNode = function () {
         var i;
         // This ought to remove all references to event handlers in the client.
+        // In current implementation a NodeObj can own two territories - its own and its 'newchild' terr
         for ( i = 0; i < this.territories.length; i += 1 ) {
             this.databaseConnection.client.removeUI( this.territories[ i ] );
         }
@@ -293,8 +367,6 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     NodeObj.prototype.makePointer = function ( name, toId, msg ) {
         this.databaseConnection.client.makePointer( this.id, name, toId, msg );
     };
-
-    // TODO: add sets
 
     NodeObj.prototype.getCollectionPaths = function ( name ) {
         return this.databaseConnection.client.getNode( this.id )

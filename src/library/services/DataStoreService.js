@@ -86,7 +86,8 @@ module.exports = function ( $q ) {
 
                 // hold a reference to the client instance
                 dataStores[ currentItem.databaseId ] = {
-                    client: client
+                    client: client,
+                    isInTransaction: false
                 };
 
                 // TODO: add event listeners to client
