@@ -42,17 +42,16 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                 }
                 $q.all( queueList )
                     .then( function ( metaNodes ) {
-                        var key,
+                        var i,
                             metaNode,
                             meta = {
-                                byId: metaNodes,
+                                byId: {},
                                 byName: {}
                             };
-                        for ( key in metaNodes ) {
-                            if ( metaNodes.hasOwnProperty( key ) ) {
-                                metaNode = metaNodes[ key ];
-                                meta.byName[ metaNode.getAttribute( 'name' ) ] = metaNode;
-                            }
+                        for ( i = 0; i < metaNodes.length; i += 1 ) {
+                            metaNode = metaNodes[ i ];
+                            meta.byId[ metaNode.getId() ] = metaNode;
+                            meta.byName[ metaNode.getAttribute( 'name' ) ] = metaNode;
                         }
                         deferred.resolve( meta );
                     } );
