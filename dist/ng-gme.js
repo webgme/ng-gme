@@ -804,10 +804,25 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
     /**
      * Loads the meta nodes from the context (will create a node-service on the dbConn with regions if not present when invoked).
+     * The meta-nodes will be returned in the following format:
+     * {
+     *     byId: {
+     *         '1/2': NodeObj1,
+     *         '1/3': NodeObj2,
+     *         ...
+     *         'x/x/': NodeObjN
+     *     },
+     *     byName: {
+     *         'Name1': NodeObj1,
+     *         'Name2': NodeObj2,
+     *         ...
+     *         'NameN': NodeObjN
+     *     }
+     * }
      * @param {object} context - From where to load the nodes.
      * @param {string} context.db - Database where the nodes will be loaded from.
      * @param {string} context.regionId - Region where the NodeObjs will be stored.
-     * @returns {Promise} - Returns an array of NodeObjs when resolved.
+     * @returns {Promise<object>} - Returns an object of NodeObjs grouped by "byId" and "byName" when resolved.
      */
     this.getMetaNodes = function ( context ) {
         var deferred = $q.defer();
@@ -825,11 +840,14 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                     .then( function ( metaNodes ) {
                         var key,
                             metaNode,
-                            meta = {};
+                            meta = {
+                                byId: metaNodes,
+                                byName: {}
+                            };
                         for ( key in metaNodes ) {
                             if ( metaNodes.hasOwnProperty( key ) ) {
                                 metaNode = metaNodes[ key ];
-                                meta[ metaNode.getAttribute( 'name' ) ] = metaNode;
+                                meta.byName[ metaNode.getAttribute( 'name' ) ] = metaNode;
                             }
                         }
                         deferred.resolve( meta );
@@ -845,7 +863,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
      * @param {string} context.db - Database where the node will be looked for.
      * @param {string} context.regionId - Region where the NodeObj will be stored.
      * @param {string} id - Path to the node.
-     * @returns {Promise} - Returns a NodeObj when resolved.
+     * @returns {Promise<NodeObj>} - Returns the NodeObj when resolved.
      */
     this.loadNode = function ( context, id ) {
         var deferred = $q.defer(),
@@ -911,7 +929,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
      * @param {NodeObj|string} parent - model where the node should be created.
      * @param {NodeObj|string} base - base, e.g. meta-type, of the new node.
      * @param {string} [msg] - optional commit message.
-     * @returns {Promise} - Evaluates to the newly created node (inside context).
+     * @returns {Promise<NodeObj>} - Evaluates to the newly created node (inside context).
      */
     this.createNode = function ( context, parent, base, msg ) {
         var deferred = $q.defer(),
@@ -1233,13 +1251,49 @@ module.exports = function ( $q, dataStoreService, branchService ) {
             .getMemberIds( name );
     };
 
-    NodeObj.prototype.getMetaType = function () {
+    /**
+     * Finds the (most specific) meta-node this node inherits from and returns it.
+     * @param {Object} metaNodes - MetaNodes given as returned in this.getMetaType
+     * @param {Object} metaNodes.byId - Dictionary where keys are the ids of the metaNodes.
+     * @returns {NodeObj} - The (most specific) meta-node this node inherits from.
+     */
+    NodeObj.prototype.getMetaTypeNode = function ( metaNodes ) {
+        var node = this.databaseConnection.client.getNode( this.id ),
+            metaNode;
+        console.assert( typeof metaNodes.byId === 'object' );
+        while ( node ) {
+            metaNode = metaNodes.byId[ node.getId() ];
+            if ( metaNode ) {
+                return metaNode;
+            }
+            node = this.databaseConnection.client.getNode( node.getBaseId() );
+        }
 
+        console.error( 'Could not getMetaTypeNode of ', this.getAttribute( 'name' ), this.id );
+        return null;
     };
 
+    /**
+     * Finds the name of the (most specific) meta-node this node inherits from and returns it.
+     * @param {Object} metaNodes - MetaNodes given as returned in this.getMetaType
+     * @param {Object} metaNodes.byId - Dictionary where keys are the ids of the metaNodes.
+     * @returns {string} - The name of the (most specific) meta-node this node inherits from.
+     */
+    NodeObj.prototype.getMetaTypeName = function ( metaNodes ) {
+        var metaNode = this.getMetaTypeNode( metaNodes );
+        if ( metaNode ) {
+            return metaNode.getAttribute( 'name' );
+        }
+        return null;
+    };
+
+    /**
+     * Checks if this node inherits from the given metaNode.
+     * @param {NodeObj} metaNode
+     * @returns {boolean} - True if it inherits from the metaNode.
+     */
     NodeObj.prototype.isMetaTypeOf = function ( metaNode ) {
-        var /*idWasGiven = false,*/
-        node = this.databaseConnection.client.getNode( this.id );
+        var node = this.databaseConnection.client.getNode( this.id );
 
         while ( node ) {
             if ( node.getId() === metaNode.getId() ) {
