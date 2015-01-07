@@ -1,4 +1,4 @@
-/*globals WebGMEGlobal*/
+/*globals GME*/
 
 'use strict';
 
@@ -82,7 +82,7 @@ module.exports = function ( $q ) {
                 connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                var client = new WebGMEGlobal.classes.Client( currentItem.options );
+                var client = new GME.classes.Client( currentItem.options );
 
                 // hold a reference to the client instance
                 dataStores[ currentItem.databaseId ] = {
