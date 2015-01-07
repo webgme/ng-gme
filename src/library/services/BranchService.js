@@ -109,7 +109,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
                     dbConnEvent.branchService.isInitialized = false;
 
-                    for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
+                    for ( i = 0; i < dbConnEvent.branchService.events.destroy.length; i += 1 ) {
                         dbConnEvent.branchService.events.destroy[ i ]( dbId );
                     }
                 }
