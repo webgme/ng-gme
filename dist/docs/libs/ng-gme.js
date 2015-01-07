@@ -506,6 +506,26 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         return deferred.promise;
     };
 
+    this.getBranches = function ( databaseId ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            deferred = new $q.defer();
+
+        dbConn.branchService = dbConn.branchService || {};
+
+        dbConn.client.getBranchesAsync( function ( err, branches ) {
+                if ( err ) {
+                    deferred.reject( err );
+                    return;
+                }
+
+                dbConn.branchService.isInitialized = true;
+
+                deferred.resolve( branches );
+            } );
+
+        return deferred.promise;
+    };
+
     this.getSelectedBranch = function ( /*databaseId*/) {
         throw new Error( 'Not implemented yet.' );
     };
