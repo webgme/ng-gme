@@ -31,15 +31,15 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         dbConn.branchService = dbConn.branchService || {};
 
         dbConn.client.getBranchesAsync( function ( err, branches ) {
-                if ( err ) {
-                    deferred.reject( err );
-                    return;
-                }
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            }
 
-                dbConn.branchService.isInitialized = true;
+            dbConn.branchService.isInitialized = true;
 
-                deferred.resolve( branches );
-            } );
+            deferred.resolve( branches );
+        } );
 
         return deferred.promise;
     };

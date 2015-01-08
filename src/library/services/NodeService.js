@@ -204,24 +204,33 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
     /**
      * Copies the nodes from nodeIds into parentId. N.B. all participating nodes need to be loaded in some region.
+     * nodesToCopy:
+     *  {
+     *      '/1/2/3': {
+     *          registry: {
+     *              position: {
+     *                  x: 100,
+     *                  y: 100
+     *              }
+     *          },
+     *          attributes: {
+     *              name: 'Copy'
+     *          }
+     *      },
+     *      '/1/2/4': { }
+     *  }
      * @param {object} context - Where to create the node.
      * @param {string} context.db - Database where the node will be created.
      * @param {string} parentId - Path to parent node (must be loaded and needs to watch for new children to get events).
-     * @param {string[]} nodeIds - Ids of nodes to be copied, these need to be loaded in the client.
+     * @param {Object} nodesToCopy - Ids of nodes to be copied, these need to be loaded in the client.
      */
-    this.copyMoreNodes = function ( context, parentId, nodeIds ) {
-        var i,
-            parameters = {
-                parentId: parentId
-            },
-            dbConn = dataStoreService.getDatabaseConnection( context.db );
+    this.copyMoreNodes = function ( context, parentId, nodesToCopy ) {
+        var dbConn = dataStoreService.getDatabaseConnection( context.db );
+        nodesToCopy.parentId = parentId;
 
-        for ( i = 0; i < nodeIds.length; i += 1 ) {
-            parameters[ nodeIds[ i ] ] = true;
-        }
         // There is no callback/promise here, instead wait for events in the parent
         // granted it watches for new children.
-        dbConn.client.copyMoreNodes( parameters );
+        dbConn.client.copyMoreNodes( nodesToCopy );
     };
 
     /**
