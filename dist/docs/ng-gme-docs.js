@@ -13410,12 +13410,17 @@ module.exports = function ( $q, dataStoreService, branchService ) {
      *              name: 'Copy'
      *          }
      *      },
-     *      '/1/2/4': { }
+     *      '/1/2/4': {
+     *          attributes: {
+     *              name: 'Copy'
+     *          }
+     *      },
+     *      '/1/2/5': null
      *  }
      * @param {object} context - Where to create the node.
      * @param {string} context.db - Database where the node will be created.
      * @param {string} parentId - Path to parent node (must be loaded and needs to watch for new children to get events).
-     * @param {Object} nodesToCopy - Ids of nodes to be copied, these need to be loaded in the client.
+     * @param {Object} nodesToCopy - Object where keys are ids of nodes to be copied, these need to be loaded in the client.
      */
     this.copyMoreNodes = function ( context, parentId, nodesToCopy ) {
         var dbConn = dataStoreService.getDatabaseConnection( context.db );
