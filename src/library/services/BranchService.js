@@ -76,15 +76,39 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         throw new Error( 'Not implemented yet.' );
     };
 
-    this.watchBranchState = function ( /*databaseId*/) {
-        // TODO: register for branch state events
-        // TODO: SYNC
-        // TODO: FORKED
-        // TODO: OFFLINE
-
-        // TODO: BRANCHSTATUS_CHANGED
-
-        throw new Error( 'Not implemented yet.' );
+    /**
+     * Registered functions are fired when the BRANCHSTATUS_CHANGED event was raised.
+     * TODO: Currently the eventTypes are passed to fn as the values in branchStates.
+     *  branchStates = {
+     *    'SYNC':    'inSync',
+     *    'FORKED':  'forked',
+     *    'OFFLINE': 'offline'
+     *  };
+     * @param {string} databaseId
+     * @param {function} fn
+     */
+    this.watchBranchState = function ( databaseId, fn ) {
+        var dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        if ( !( dbConn && dbConn.branchService && dbConn.branchService.branchId ) ) {
+            console.error( databaseId + ' does not have an active database connection or branch-service.' );
+        }
+        if ( typeof dbConn.branchService.events === 'undefined' ||
+            typeof dbConn.branchService.events.branchState === 'undefined' ) {
+            dbConn.branchService.events = dbConn.branchService.events || {};
+            dbConn.branchService.events.branchState = dbConn.branchService.events.branchState || [];
+            dbConn.branchService.events.branchState.push( fn );
+            dbConn.client.addEventListener( dbConn.client.events.BRANCHSTATUS_CHANGED,
+                function ( dummy, eventType ) {
+                    var i;
+                    //console.log(eventType);
+                    for ( i = 0; i < dbConn.branchService.events.branchState.length; i += 1 ) {
+                        dbConn.branchService.events.branchState[ i ]( eventType );
+                    }
+                } );
+        } else {
+            dbConn.branchService.events.branchState.push( fn );
+        }
+        // FIXME: When should these be cleaned up? On demand? On destroy? Never?
     };
 
     this.on = function ( databaseId, eventName, fn ) {
