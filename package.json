@@ -38,7 +38,7 @@
     "run-sequence": "^0.3.6",
     "tiny-lr": "^0.1.1",
     "vinyl-source-stream": "^1.0.0",
-    "webgme": "https://github.com/webgme/webgme/tarball/master",
+    "webgme": "0.6.6",
     "yargs": "^1.3.1"
   },
   "browserify": {
