@@ -592,21 +592,23 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         }
     };
 
-    this.on = function ( databaseId, eventName, fn ) {
+    this.on = function ( context, eventName, fn ) {
         var dbConn;
 
-        console.assert( typeof databaseId === 'string' );
+        console.assert( typeof context.db === 'string' );
+        console.assert( typeof context.regionId === 'string' );
         console.assert( typeof eventName === 'string' );
         console.assert( typeof fn === 'function' );
 
-        dbConn = dataStoreService.getDatabaseConnection( databaseId );
+        dbConn = dataStoreService.getDatabaseConnection( context.db );
         dbConn.nodeService = dbConn.nodeService || {};
 
         dbConn.nodeService.isInitialized = dbConn.nodeService.isInitialized || false;
 
         if ( typeof dbConn.nodeService.events === 'undefined' ) {
-            branchService.on( databaseId, 'initialize', function ( dbId ) {
+            branchService.on( context.db, 'initialize', function ( dbId ) {
                 var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    keys,
                     i;
 
                 self.cleanUpAllRegions( dbId );
@@ -617,16 +619,17 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                     // NodeService requires a selected branch.
                     if ( dbConn.branchService.branchId ) {
                         dbConnEvent.nodeService.isInitialized = true;
-
-                        for ( i = 0; i < dbConnEvent.nodeService.events.initialize.length; i += 1 ) {
-                            dbConnEvent.nodeService.events.initialize[ i ]( dbId );
+                        keys = Object.keys(dbConnEvent.nodeService.events.initialize);
+                        for ( i = 0; i < keys.length; i += 1 ) {
+                            dbConnEvent.nodeService.events.initialize[ keys[ i ] ]( dbId );
                         }
                     }
                 }
             } );
 
-            branchService.on( databaseId, 'destroy', function ( dbId ) {
+            branchService.on( context.db, 'destroy', function ( dbId ) {
                 var dbConnEvent = dataStoreService.getDatabaseConnection( dbId ),
+                    keys,
                     i;
 
                 self.cleanUpAllRegions( dbId );
@@ -636,28 +639,58 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                     dbConnEvent.nodeService.events.destroy ) {
 
                     dbConnEvent.nodeService.isInitialized = false;
-
-                    for ( i = 0; i < dbConnEvent.nodeService.events.destroy.length; i += 1 ) {
-                        dbConnEvent.nodeService.events.destroy[ i ]( dbId );
+                    keys = Object.keys(dbConnEvent.nodeService.events.destroy);
+                    for ( i = 0; i < keys.length; i += 1 ) {
+                        dbConnEvent.nodeService.events.destroy[ keys[ i ] ]( dbId );
                     }
                 }
             } );
         }
 
         dbConn.nodeService.events = dbConn.nodeService.events || {};
-        dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || [];
-        dbConn.nodeService.events[ eventName ].push( fn );
+        dbConn.nodeService.events[ eventName ] = dbConn.nodeService.events[ eventName ] || {};
+        dbConn.nodeService.events[ eventName ][ context.regionId ] = fn;
 
         if ( dbConn.nodeService.isInitialized || dbConn.branchService.isInitialized ) {
             if ( eventName === 'initialize' ) {
                 dbConn.nodeService.isInitialized = true;
-                fn( databaseId );
+                fn( context.db );
             }
         } else {
             if ( eventName === 'destroy' ) {
                 dbConn.nodeService.isInitialized = false;
-                fn( databaseId );
+                fn( context.db );
             }
         }
+    };
+
+    this.off = function ( context, eventName ) {
+        var dbConn;
+
+        console.assert( typeof context.db === 'string' );
+        console.assert( typeof context.regionId === 'string' );
+        console.assert( typeof eventName === 'string' );
+
+        dbConn = dataStoreService.getDatabaseConnection( context.db );
+        if ( !dbConn ) {
+            return new Error(context.db + ' does not exist.');
+        }
+        if ( !dbConn.nodeService ) {
+            return new Error(context.db + ' does not have any registered nodeService.');
+        }
+        if ( !dbConn.nodeService.events ) {
+            return new Error(context.db + ' does not have any events for the registered nodeService.');
+        }
+        if ( !dbConn.nodeService.events[ eventName ] ) {
+            return new Error(context.db + ', ' +  eventName + ' event never registered.' );
+        }
+        if ( !dbConn.nodeService.events[ eventName ][ context.regionId ] ) {
+            return new Error(context.db + ', ' + eventName + ', ' + context.regionId +
+            ' never registered for given event.' );
+        }
+
+        delete dbConn.nodeService.events[ eventName ][ context.regionId ];
+
+        return true;
     };
 };
