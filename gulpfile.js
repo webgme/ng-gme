@@ -91,7 +91,6 @@ sourcemaps = require( 'gulp-sourcemaps' ),
 rename = require( 'gulp-rename' ),
 sass = require( 'gulp-sass' ),
 runSequence = require( 'run-sequence' ),
-clean = require( 'gulp-clean' ),
 templateCache = require( 'gulp-angular-templatecache' ),
 
 express = require( 'express' ),
@@ -115,8 +114,12 @@ function swallowError( error ) {
   this.emit( 'end' );
 }
 
-gulp.task( 'clean-build', function () {
-  return gulp.src( buildPaths.root ).pipe( clean() );
+gulp.task( 'clean-build', function (cb) {
+  require('del')([
+    'dist/**/*',
+    '!dist/.npmignore',
+    '!dist/.gitignore'
+  ], cb);
 } );
 
 
