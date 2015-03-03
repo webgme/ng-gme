@@ -88,7 +88,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         nodes = dbConn.nodeService.regions[ context.regionId ].nodes;
         //console.log('territoryId', territoryId);
         if ( nodes.hasOwnProperty( id ) ) {
-            console.log( 'Node already loaded..', id );
+            //console.log( 'Node already loaded..', id );
             deferred.resolve( nodes[ id ] );
         } else {
             dbConn.client.addUI( {}, function ( events ) {
@@ -248,13 +248,22 @@ module.exports = function ( $q, dataStoreService, branchService ) {
     this.cleanUpRegion = function ( databaseId, regionId ) {
         var key,
             dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            nodes = dbConn.nodeService.regions[ regionId ].nodes;
+            region = dbConn.nodeService.regions[ regionId],
+            nodes;
         // Go through all nodes and remove the territories associated with each node.
-        for ( key in nodes ) {
-            if ( nodes.hasOwnProperty( key ) ) {
-                nodes[ key ].cleanUpNode();
+
+        if (region) {
+
+            nodes = region.nodes;
+
+            for (key in nodes) {
+                if (nodes.hasOwnProperty(key)) {
+                    nodes[key].cleanUpNode();
+                }
             }
+
         }
+
         // Remove the reference to the region (includes) nodes.
         delete dbConn.nodeService.regions[ regionId ];
     };
