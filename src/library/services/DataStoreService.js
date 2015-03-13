@@ -2,71 +2,12 @@
 
 'use strict';
 
-module.exports = function ( $q ) {
+module.exports = function ( $q, $http ) {
     var dataStores = {},
         connectQueue = [],
         queueProcessing = false,
         connectNextInQueue,
         processQueue;
-
-    /*isAnotherThreadConnecting = function(databaseId) {
-        if (connectingProgress.indexOf(databaseId) !== -1) {
-            return true;
-        }
-        return false;
-    };
-
-    connect = function(databaseId, options, deferred) {
-        var client;
-
-        connectingProgress.push(databaseId);
-
-        if (dataStores.hasOwnProperty(databaseId)) {
-            console.log('connection already exists, remove from connecting phase');
-            connectingProgress.splice(connectingProgress.indexOf(databaseId), 1);
-
-            // FIXME: this may or may not ready yet...
-            deferred.resolve();
-        } else {
-
-
-            client = new WebGMEGlobal.classes.Client(options);
-
-            // hold a reference to the client instance
-            dataStores[databaseId] = {
-                client: client
-            };
-
-            // TODO: add event listeners to client
-
-            // FIXME: deferred should not be used from closure
-            client.connectToDatabaseAsync({}, function(err) {
-                console.log('connected, remove from connecting phase');
-                connectingProgress.splice(connectingProgress.indexOf(databaseId), 1);
-                if (err) {
-                    deferred.reject(err);
-                    return;
-                }
-
-                deferred.resolve();
-            });
-        }
-    };
-
-    waitForAnotherThread = function(databaseId, options, deferred, maxTry) {
-        if (isAnotherThreadConnecting(databaseId)) {
-            console.log('another thread is connecting: ' + maxTry);
-            timer = setTimeout(function() {
-                clearTimeout(timer);
-                if (maxTry-- > 0) {
-                    waitForAnotherThread(databaseId, options, deferred, maxTry);
-                }
-            }, 100);
-        } else {
-            console.log('connecting, remaining tries' + maxTry);
-            connect(databaseId, options, deferred);
-        }
-    };*/
 
 
     // Picks up the next connectionmeta and tries to connect
@@ -82,26 +23,32 @@ module.exports = function ( $q ) {
                 connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                var client = new GME.classes.Client( currentItem.options );
+                $http.get( currentItem.options.host + '/gmeConfig.json' )
+                    .success( function ( gmeConfig ) {
+                        var client = new GME.classes.Client( gmeConfig );
 
-                // hold a reference to the client instance
-                dataStores[ currentItem.databaseId ] = {
-                    client: client,
-                    isInTransaction: false
-                };
+                        // hold a reference to the client instance
+                        dataStores[ currentItem.databaseId ] = {
+                            client: client,
+                            gmeConfig: gmeConfig,
+                            isInTransaction: false
+                        };
 
-                // TODO: add event listeners to client
-                // FIXME: deferred should not be used from closure
-                client.connectToDatabaseAsync( {}, function ( err ) {
-                    if ( err ) {
+                        // TODO: add event listeners to client
+                        // FIXME: deferred should not be used from closure
+                        client.connectToDatabaseAsync( {}, function ( err ) {
+                            if ( err ) {
+                                currentItem.deferred.reject( err );
+                            } else {
+                                currentItem.deferred.resolve();
+                            }
+
+                            connectQueue.splice( 0, 1 );
+                            connectNextInQueue();
+                        } );
+                    } ).error( function ( err ) {
                         currentItem.deferred.reject( err );
-                    } else {
-                        currentItem.deferred.resolve();
-                    }
-
-                    connectQueue.splice( 0, 1 );
-                    connectNextInQueue();
-                } );
+                    } );
             }
         } else {
             queueProcessing = false;
