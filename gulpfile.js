@@ -103,7 +103,6 @@ gutil = require( 'gutil' );
 
 // Utility tasks
 
-require( 'process' );
 require( 'path' );
 
 function swallowError( error ) {

@@ -34,7 +34,6 @@
     "istanbul": ">=0.2.6",
     "jslint": ">=0.3.0",
     "mocha": ">=1.17.1",
-    "process": "^0.7.0",
     "run-sequence": "^0.3.6",
     "tiny-lr": "^0.1.1",
     "vinyl-source-stream": "^1.0.0",
