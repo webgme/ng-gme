@@ -2,7 +2,7 @@
 
 'use strict';
 
-module.exports = function ( $q, $http ) {
+module.exports = function ( $q ) {
     var dataStores = {},
         connectQueue = [],
         queueProcessing = false,
@@ -10,8 +10,8 @@ module.exports = function ( $q, $http ) {
         processQueue;
 
 
-    // Picks up the next connectionmeta and tries to connect
-    // After a(n) (un)successful connection, the defered resolve/promise is called
+    // Picks up the next connection-meta and tries to connect
+    // After a(n) (un)successful connection, the deferred resolve/promise is called
     // and the function picks up the next item from the queue
     connectNextInQueue = function () {
         if ( connectQueue.length > 0 ) {
@@ -23,32 +23,26 @@ module.exports = function ( $q, $http ) {
                 connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                $http.get( currentItem.options.host + '/gmeConfig.json' )
-                    .success( function ( gmeConfig ) {
-                        var client = new GME.classes.Client( gmeConfig );
+                var client = new GME.classes.Client( currentItem.options );
 
-                        // hold a reference to the client instance
-                        dataStores[ currentItem.databaseId ] = {
-                            client: client,
-                            gmeConfig: gmeConfig,
-                            isInTransaction: false
-                        };
+                // hold a reference to the client instance
+                dataStores[ currentItem.databaseId ] = {
+                    client: client,
+                    isInTransaction: false
+                };
 
-                        // TODO: add event listeners to client
-                        // FIXME: deferred should not be used from closure
-                        client.connectToDatabaseAsync( {}, function ( err ) {
-                            if ( err ) {
-                                currentItem.deferred.reject( err );
-                            } else {
-                                currentItem.deferred.resolve();
-                            }
-
-                            connectQueue.splice( 0, 1 );
-                            connectNextInQueue();
-                        } );
-                    } ).error( function ( err ) {
+                // TODO: add event listeners to client
+                // FIXME: deferred should not be used from closure
+                client.connectToDatabaseAsync( {}, function ( err ) {
+                    if ( err ) {
                         currentItem.deferred.reject( err );
-                    } );
+                    } else {
+                        currentItem.deferred.resolve();
+                    }
+
+                    connectQueue.splice( 0, 1 );
+                    connectNextInQueue();
+                } );
             }
         } else {
             queueProcessing = false;
@@ -74,9 +68,9 @@ module.exports = function ( $q, $http ) {
 
         // Put the connection metadata into a queue
         connectQueue.push( {
-            databaseId: databaseId, // Where to connect? Default: 'multi'
-            deferred: deferred, // defered object, where the notifications are sent if the connection succesful (or not)
-            options: options // Connection oprtions
+            databaseId: databaseId, // User configurable id of the data-base connection
+            deferred: deferred, // deferred object, where the notifications are sent if the connection successful (or not)
+            options: options // Connection options (GME.gmeConfig)
         } );
 
         processQueue();
