@@ -387,6 +387,10 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         this.databaseConnection.client.setRegistry( this.id, name, value, msg );
     };
 
+    NodeObj.prototype.delRegistry = function ( name, msg ) {
+        this.databaseConnection.client.delRegistry( this.id, name, msg );
+    };
+
     /** Gets nodeIds of nodes this node points 'to' and is pointed to 'from'.
      * @param {string} name - name of pointer, e.g. 'src', 'dst'.
      * @returns {object} pointers - object with ids.
