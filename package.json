@@ -37,7 +37,7 @@
     "run-sequence": "^0.3.6",
     "tiny-lr": "^0.1.1",
     "vinyl-source-stream": "^1.0.0",
-    "webgme": "0.8.1",
+    "webgme": "0.11.1",
     "yargs": "^1.3.1"
   },
   "browserify": {
