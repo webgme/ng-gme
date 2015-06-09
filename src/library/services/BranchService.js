@@ -8,7 +8,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.selectBranchAsync( branchId,
+        dbConn.client.selectBranch( branchId,
             function ( err ) {
                 if ( err ) {
                     deferred.reject( err );
@@ -26,11 +26,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
     this.getBranches = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            projectId = dbConn.getActiveProjectName(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.getBranchesAsync( function ( err, branches ) {
+        dbConn.client.getBranches( projectId, function ( err, branches ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
@@ -46,11 +47,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
     this.createBranch = function ( databaseId, branchId, hash ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            projectId = dbConn.getActiveProjectName(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.createBranchAsync( branchId, hash,
+        dbConn.client.createBranch( projectId, branchId, hash,
             function ( err ) {
                 if ( err ) {
                     deferred.reject( err );
@@ -77,13 +79,15 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     };
 
     /**
-     * Registered functions are fired when the BRANCHSTATUS_CHANGED event was raised.
+     * Registered functions are fired when the BRANCH_STATUS_CHANGED event was raised.
      * TODO: Currently the eventTypes are passed to fn as the values in branchStates.
-     *  branchStates = {
-     *    'SYNC':    'inSync',
-     *    'FORKED':  'forked',
-     *    'OFFLINE': 'offline'
-     *  };
+     * fn is called with two or three arguments: client, BRANCH_STATUS and data.
+     *  BRANCH_STATUS: {
+     *    CONSTANTS.BRANCH_STATUS.SYNCH: 'SYNCH',       // data = undefined
+     *    CONSTANTS.BRANCH_STATUS.AHEAD: 'AHEAD',       // data = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.FORKED: 'FORKED',     // data = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'    // data = updateQueue.length [int]
+     *  },
      * @param {string} databaseId
      * @param {function} fn
      */
@@ -97,12 +101,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
             dbConn.branchService.events = dbConn.branchService.events || {};
             dbConn.branchService.events.branchState = dbConn.branchService.events.branchState || [];
             dbConn.branchService.events.branchState.push( fn );
-            dbConn.client.addEventListener( dbConn.client.events.BRANCHSTATUS_CHANGED,
-                function ( dummy, eventType ) {
+            dbConn.client.addEventListener( dbConn.client.events.BRANCH_STATUS_CHANGED,
+                function ( dummy, eventType, data ) {
                     var i;
                     //console.log(eventType);
                     for ( i = 0; i < dbConn.branchService.events.branchState.length; i += 1 ) {
-                        dbConn.branchService.events.branchState[ i ]( eventType );
+                        dbConn.branchService.events.branchState[ i ]( eventType, data );
                     }
                 } );
         } else {
@@ -158,7 +162,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
                 }
             } );
 
-            dbConn.client.addEventListener( dbConn.client.events.BRANCH_CHANGED,
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.BRANCH_CHANGED,
                 function ( projectId /* FIXME */ , branchId ) {
 
                     if ( dbConn.branchService.branchId !== branchId ) {
