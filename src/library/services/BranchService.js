@@ -8,7 +8,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.selectBranch( branchId,
+        dbConn.client.selectBranch( branchId, null,
             function ( err ) {
                 if ( err ) {
                     deferred.reject( err );
@@ -81,13 +81,14 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     /**
      * Registered functions are fired when the BRANCH_STATUS_CHANGED event was raised.
      * TODO: Currently the eventTypes are passed to fn as the values in branchStates.
-     * fn is called with two or three arguments: client, BRANCH_STATUS and data.
-     *  BRANCH_STATUS: {
-     *    CONSTANTS.BRANCH_STATUS.SYNCH: 'SYNCH',       // data = undefined
-     *    CONSTANTS.BRANCH_STATUS.AHEAD: 'AHEAD',       // data = commitQueue [array<Objects>]
-     *    CONSTANTS.BRANCH_STATUS.FORKED: 'FORKED',     // data = commitQueue [array<Objects>]
-     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'    // data = updateQueue.length [int]
-     *  },
+     * fn is called eventData.
+     * eventData has key status and optionally a key details based on status.
+     *  status:
+     *    CONSTANTS.BRANCH_STATUS.SYNCH: 'SYNCH',       // details = undefined
+     *    CONSTANTS.BRANCH_STATUS.AHEAD: 'AHEAD',       // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.FORKED: 'FORKED',     // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'    // details = updateQueue.length [int]
+     *
      * @param {string} databaseId
      * @param {function} fn
      */
@@ -101,12 +102,11 @@ module.exports = function ( $q, dataStoreService, projectService ) {
             dbConn.branchService.events = dbConn.branchService.events || {};
             dbConn.branchService.events.branchState = dbConn.branchService.events.branchState || [];
             dbConn.branchService.events.branchState.push( fn );
-            dbConn.client.addEventListener( dbConn.client.events.BRANCH_STATUS_CHANGED,
-                function ( dummy, eventType, data ) {
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.BRANCH_STATUS_CHANGED,
+                function ( dummy, eventData ) {
                     var i;
-                    //console.log(eventType);
                     for ( i = 0; i < dbConn.branchService.events.branchState.length; i += 1 ) {
-                        dbConn.branchService.events.branchState[ i ]( eventType, data );
+                        dbConn.branchService.events.branchState[ i ]( eventData );
                     }
                 } );
         } else {

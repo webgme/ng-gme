@@ -154,21 +154,22 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.createProject = function ( databaseId, projectname, seedParameters ) {
-        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            deferred = new $q.defer();
-
-        dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
-            if ( err ) {
-                deferred.reject( err );
-                return;
-            } else {
-                deferred.resolve();
-            }
-        } );
-
-        return deferred.promise;
-    };
+    //TODO: This should be seedProject
+    //this.createProject = function ( databaseId, projectname, seedParameters ) {
+    //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+    //        deferred = new $q.defer();
+    //
+    //    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
+    //        if ( err ) {
+    //            deferred.reject( err );
+    //            return;
+    //        } else {
+    //            deferred.resolve();
+    //        }
+    //    } );
+    //
+    //    return deferred.promise;
+    //};
 
     this.deleteProject = function ( databaseId, projectId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
