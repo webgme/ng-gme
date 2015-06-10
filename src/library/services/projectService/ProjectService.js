@@ -1,8 +1,8 @@
-/*globals angular*/
+/*globals angular, GME*/
 
 module.exports = function ( $q, dataStoreService ) {
     'use strict';
-    //var self = this;
+    var logger = GME.classes.Logger.create('ng-gme:ProjectService', GME.gmeConfig.client.log);
 
     //this.getAvailableProjectTags = function ( databaseId ) {
     //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -175,7 +175,7 @@ module.exports = function ( $q, dataStoreService ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
-        console.log( projectId );
+        logger.debug( 'deleteProject', projectId );
 
         dbConn.client.deleteProject( projectId, function ( err ) {
             if ( err ) {
@@ -286,7 +286,7 @@ module.exports = function ( $q, dataStoreService ) {
                     if ( dbConn.projectService.projectId !== projectId ) {
                         dbConn.projectService.projectId = projectId;
 
-                        console.log( 'There was a PROJECT_OPENED event', projectId );
+                        logger.debug( 'There was a PROJECT_OPENED event', projectId );
                         if ( projectId ) {
                             // initialize
                             if ( dbConn.projectService &&
@@ -318,7 +318,7 @@ module.exports = function ( $q, dataStoreService ) {
 
             dbConn.client.addEventListener( dbConn.client.CONSTANTS.PROJECT_CLOSED,
                 function ( /*dummy*/ /* FIXME */) {
-                    console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
+                    logger.debug( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
 
                     delete dbConn.projectService.projectId;
 

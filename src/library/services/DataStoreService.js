@@ -7,7 +7,8 @@ module.exports = function ( $q ) {
         connectQueue = [],
         queueProcessing = false,
         connectNextInQueue,
-        processQueue;
+        processQueue,
+        logger = GME.classes.Logger.create('ng-gme:DataStoreService', GME.gmeConfig.client.log);
 
 
     // Picks up the next connection-meta and tries to connect
@@ -102,7 +103,7 @@ module.exports = function ( $q ) {
             return dataStores[ databaseId ];
         }
 
-        console.error( databaseId + ' does not have an active database connection.' );
+        logger.error( databaseId + ' does not have an active database connection.' );
     };
 
     /**
@@ -120,7 +121,7 @@ module.exports = function ( $q ) {
         var dbConn = dataStores[ databaseId ];
 
         if ( !( dbConn && typeof dbConn === 'object' ) ) {
-            console.error( databaseId + ' does not have an active database connection.' );
+            logger.error( databaseId + ' does not have an active database connection.' );
         }
 
         if ( typeof dbConn.events === 'undefined' || typeof dbConn.events.connectionState === 'undefined' ) {
@@ -130,7 +131,7 @@ module.exports = function ( $q ) {
             dbConn.client.addEventListener( dbConn.client.CONSTANTS.NETWORK_STATUS_CHANGED,
                 function ( client, connectionState ) {
                     var i;
-                    console.log( connectionState );
+                    logger.debug( 'NETWORK_STATUS_CHANGED', connectionState );
                     for ( i = 0; i < dbConn.events.connectionState.length; i += 1 ) {
                         dbConn.events.connectionState[ i ]( connectionState );
                     }

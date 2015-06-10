@@ -1,9 +1,11 @@
+/*globals GME*/
 'use strict';
 
 module.exports = function ( $q, dataStoreService, branchService ) {
 
     var self = this,
         NodeObj,
+        logger = GME.classes.Logger.create('ng-gme:NodeService', GME.gmeConfig.client.log),
         getIdFromNodeOrString;
 
     /**
@@ -36,7 +38,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                     queueList = [],
                     i;
 
-                //console.log(metaNodeIds);
+                logger.debug('metaNodeIds', metaNodeIds);
                 for ( i = 0; i < metaNodeIds.length; i += 1 ) {
                     queueList.push( self.loadNode( context, metaNodeIds[ i ] ) );
                 }
@@ -86,9 +88,8 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         };
 
         nodes = dbConn.nodeService.regions[ context.regionId ].nodes;
-        //console.log('territoryId', territoryId);
         if ( nodes.hasOwnProperty( id ) ) {
-            //console.log( 'Node already loaded..', id );
+            logger.debug( 'Node already loaded..', id );
             deferred.resolve( nodes[ id ] );
         } else {
             dbConn.client.addUI( {}, function ( events ) {
@@ -103,10 +104,13 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                     if ( event.etype === 'load' ) {
                         nodes[ id ] = new NodeObj( context, id );
                         nodes[ id ].territories.push( territoryId );
+                        logger.debug( 'load event for', id );
                         deferred.resolve( nodes[ id ] );
                     } else if ( event.etype === 'update' ) {
+                        logger.debug( 'update event for', id );
                         nodes[ id ]._onUpdate( event.eid );
                     } else if ( event.etype === 'unload' ) {
+                        logger.debug( 'unload event for', id );
                         nodes[ id ]._onUnload( event.eid );
                         nodes[ id ].__onUnload();
                     } else {
@@ -196,7 +200,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         if ( nodeToDelete ) {
             dbConn.client.delMoreNodes( [ id ], msg );
         } else {
-            console.warn( 'Requested deletion of node that does not exist in context! (id, context) ',
+            logger.warn( 'Requested deletion of node that does not exist in context! (id, context) ',
                 id,
                 context );
         }
@@ -298,7 +302,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
         if ( dbConn.isInTransaction ) {
             // TODO: Remove error logging here and let user log.
-            console.error( 'Already in transaction - refused to start additional.' );
+            logger.error( 'Already in transaction - refused to start additional.' );
         } else {
             dbConn.isInTransaction = true;
             dbConn.client.startTransaction( msg );
@@ -341,7 +345,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
      */
     this.logContext = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId );
-        console.log( 'logContext: ', dbConn );
+        logger.debug( 'logContext: ', dbConn );
     };
 
     NodeObj = function ( context, id ) {
@@ -499,7 +503,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
             node = this.databaseConnection.client.getNode( node.getBaseId() );
         }
 
-        console.error( 'Could not getMetaTypeNode of ', this.getAttribute( 'name' ), this.id );
+        logger.error( 'Could not getMetaTypeNode of ', this.getAttribute( 'name' ), this.id );
         return null;
     };
 
@@ -559,7 +563,7 @@ module.exports = function ( $q, dataStoreService, branchService ) {
 
         //console.log(dbConn);
         if ( this.territories.indexOf( terrId ) > -1 ) {
-            console.warn( 'Children are already being watched for ', terrId );
+            logger.warn( 'Children are already being watched for ', terrId );
         } else {
             this.territories.push( terrId );
             dbConn.client.addUI( {}, function ( events ) {
@@ -573,8 +577,8 @@ module.exports = function ( $q, dataStoreService, branchService ) {
                             self.loadNode( context, event.eid )
                                 .then( initializeNewNode );
                         } else {
-                            //console.info('Node ' + event.eid + ' was loaded in ' + terrId + ' but it already' +
-                            //    ' existed in the nodes of the region: ' + context.regionId);
+                            logger.debug('Node ' + event.eid + ' was loaded in ' + terrId + ' but it already' +
+                                ' existed in the nodes of the region: ' + context.regionId);
                         }
                     } else {
                         // These node are just watched for loading..
@@ -598,10 +602,10 @@ module.exports = function ( $q, dataStoreService, branchService ) {
             if ( typeof nodeOrId.getId === 'function' ) {
                 return nodeOrId.getId();
             } else {
-                console.error( nodeOrId, ' does not have a getId function' );
+                logger.error( nodeOrId, ' does not have a getId function' );
             }
         } else {
-            console.error( nodeOrId, ' is not a string nor an object.' );
+            logger.error( nodeOrId, ' is not a string nor an object.' );
         }
     };
 

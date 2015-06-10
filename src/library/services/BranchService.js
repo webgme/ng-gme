@@ -1,6 +1,8 @@
+/*globals GME*/
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
+    var logger = GME.classes.Logger.create('ng-gme:BranchService', GME.gmeConfig.client.log);
 
     this.selectBranch = function ( databaseId, branchId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
@@ -95,7 +97,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
     this.watchBranchState = function ( databaseId, fn ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId );
         if ( !( dbConn && dbConn.branchService && dbConn.branchService.branchId ) ) {
-            console.error( databaseId + ' does not have an active database connection or branch-service.' );
+            logger.error( databaseId + ' does not have an active database connection or branch-service.' );
         }
         if ( typeof dbConn.branchService.events === 'undefined' ||
             typeof dbConn.branchService.events.branchState === 'undefined' ) {
@@ -169,7 +171,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
                         dbConn.branchService.branchId = branchId;
 
-                        console.log( 'There was a BRANCH_CHANGED event', branchId );
+                        logger.debug( 'There was a BRANCH_CHANGED event', branchId );
                         if ( branchId ) {
                             // initialize
                             if ( dbConn.branchService &&
