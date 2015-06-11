@@ -4,24 +4,29 @@
 module.exports = function ( $q, dataStoreService, projectService ) {
     var logger = GME.classes.Logger.create('ng-gme:BranchService', GME.gmeConfig.client.log);
 
-    this.selectBranch = function ( databaseId, branchId ) {
+    this.selectBranch = function ( databaseId, branchId, reOpen ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
-
+        logger.debug('selectBranch called', databaseId, branchId);
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.selectBranch( branchId, null,
-            function ( err ) {
-                if ( err ) {
-                    deferred.reject( err );
-                    return;
-                }
+        if (dbConn.client.getActiveBranchName() === branchId && !reOpen) {
+            logger.debug('branch was already selected (and reOpen falsy) resolved directly', databaseId, branchId);
+            deferred.resolve(branchId);
+        } else {
+            dbConn.client.selectBranch(branchId, null,
+                function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                        return;
+                    }
 
-                dbConn.branchService.branchId = branchId;
-                dbConn.branchService.isInitialized = true;
-
-                deferred.resolve( branchId );
-            } );
+                    dbConn.branchService.branchId = branchId;
+                    dbConn.branchService.isInitialized = true;
+                    logger.debug('selectBranch resolved', databaseId, branchId);
+                    deferred.resolve(branchId);
+                });
+        }
 
         return deferred.promise;
     };
@@ -86,11 +91,11 @@ module.exports = function ( $q, dataStoreService, projectService ) {
      * fn is called eventData.
      * eventData has key status and optionally a key details based on status.
      *  status:
-     *    CONSTANTS.BRANCH_STATUS.SYNCH: 'SYNCH',       // details = undefined
-     *    CONSTANTS.BRANCH_STATUS.AHEAD: 'AHEAD',       // details = commitQueue [array<Objects>]
-     *    CONSTANTS.BRANCH_STATUS.FORKED: 'FORKED',     // details = commitQueue [array<Objects>]
-     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'    // details = updateQueue.length [int]
-     *
+     *    CONSTANTS.BRANCH_STATUS.SYNC: 'SYNC',                         // details = undefined
+     *    CONSTANTS.BRANCH_STATUS.AHEAD_SYNC: 'AHEAD_SYNC',             // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.AHEAD_NOT_SYNC: 'AHEAD_NOT_SYNC',     // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'                    // details = updateQueue.length [int]
+     *    null
      * @param {string} databaseId
      * @param {function} fn
      */

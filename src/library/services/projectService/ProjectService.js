@@ -4,78 +4,7 @@ module.exports = function ( $q, dataStoreService ) {
     'use strict';
     var logger = GME.classes.Logger.create('ng-gme:ProjectService', GME.gmeConfig.client.log);
 
-    //this.getAvailableProjectTags = function ( databaseId ) {
-    //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    //        deferred = $q.defer();
-    //    dbConn.projectService = dbConn.projectService || {};
-    //    dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
-    //        var tagKeys,
-    //            tags = [];
-    //        if ( err ) {
-    //            deferred.reject( err );
-    //            return;
-    //        }
-    //
-    //        tagKeys = Object.keys( results );
-    //        for ( var i = tagKeys.length - 1; i >= 0; i-- ) {
-    //            tags.push( {
-    //                id: tagKeys[ i ],
-    //                name: results[ tagKeys[ i ] ]
-    //            } );
-    //        }
-    //
-    //        deferred.resolve( tags );
-    //    } );
-    //
-    //    return deferred.promise;
-    //};
-    //
-    //this.applyTagsOnProject = function ( databaseId, projectId, newTags ) {
-    //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    //        deferred = $q.defer(),
-    //        mappedTags = {},
-    //        tagMapper = function ( tag ) {
-    //            mappedTags[ tag.id ] = tag.name;
-    //        };
-    //    dbConn.projectService = dbConn.projectService || {};
-    //    dbConn.client.getProjectInfoAsync( projectId, function ( err, existingInfo ) {
-    //        if ( err ) {
-    //            deferred.reject( err );
-    //            return;
-    //        }
-    //        // Transform the tags to key-value format
-    //        angular.forEach( newTags, tagMapper );
-    //        existingInfo.tags = mappedTags;
-    //        dbConn.client.setProjectInfoAsync( projectId, existingInfo, function ( errInfo ) {
-    //            if ( errInfo ) {
-    //                deferred.reject( errInfo );
-    //                return;
-    //            }
-    //            deferred.resolve();
-    //        } );
-    //    } );
-    //
-    //    return deferred.promise;
-    //};
-
-    // This is a duplicate of getProjectIds
-    //this.getAvailableProjects = function ( databaseId ) {
-    //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-    //        deferred = $q.defer();
-    //    dbConn.projectService = dbConn.projectService || {};
-    //    dbConn.client.getProjectNames( function ( err, projects ) {
-    //        if ( err ) {
-    //            deferred.reject( err );
-    //            return;
-    //        }
-    //
-    //        deferred.resolve( projects );
-    //    } );
-    //
-    //    return deferred.promise;
-    //};
-
-    this.getProjects = function ( databaseId ) {
+    this.getProjectsAndBranches = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
@@ -136,13 +65,13 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.getProjectIds = function ( databaseId ) {
+    this.getProjects = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
-        dbConn.client.getProjectNames( function ( err, projectIds ) {
+        dbConn.client.getProjects( function ( err, projectIds ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
