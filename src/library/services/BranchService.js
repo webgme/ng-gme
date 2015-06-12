@@ -76,13 +76,56 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         throw new Error( 'Not implemented yet.' );
     };
 
-    this.watchBranches = function ( /*databaseId*/) {
-        // TODO: register for branch events
-        // TODO: SERVER_BRANCH_CREATED
-        // TODO: SERVER_BRANCH_UPDATED
-        // TODO: SERVER_BRANCH_DELETED
+    /**
+     * Registers fn to listen to events regarding deletion and creation of projects;
+     * CONSTANTS.STORAGE.BRANCH_CREATED = 'BRANCH_CREATED'
+     * CONSTANTS.STORAGE.BRANCH_DELETED = 'BRANCH_DELETED'
+     * CONSTANTS.STORAGE.BRANCH_HASH_UPDATED = 'BRANCH_HASH_UPDATED'
+     *
+     * The fn is called with emitter as first argument and data as second.
+     *
+     * Example:
+     * data = {
+     *    etype: 'BRANCH_CREATED',
+     *    projectName: 'TestProject',
+     *    branchName: 'b1',
+     *    newHash: '#somehash',
+     *    oldHash: ''
+     * }
+     *
+     * @param databaseId
+     * @param projectId
+     * @param fn
+     * @returns {*}
+     */
+    this.watchBranches = function ( databaseId, projectId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
 
-        throw new Error( 'Not implemented yet.' );
+        dbConn.client.watchProject( projectId, fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    this.unwatchBranches = function ( databaseId, projectId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
+
+        dbConn.client.unwatchProject( projectId, fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
     };
 
     /**
