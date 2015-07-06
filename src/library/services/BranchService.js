@@ -33,7 +33,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
     this.getBranches = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            projectId = dbConn.client.getActiveProjectName(),
+            projectId = dbConn.client.getActiveProjectId(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};
@@ -54,7 +54,7 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
     this.createBranch = function ( databaseId, branchId, hash ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            projectId = dbConn.client.getActiveProjectName(),
+            projectId = dbConn.client.getActiveProjectId(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};

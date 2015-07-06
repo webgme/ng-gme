@@ -10,7 +10,7 @@ module.exports = function ( $q, dataStoreService ) {
 
         dbConn.projectService = dbConn.projectService || {};
 
-        dbConn.client.getProjectsAndBranches( true, function ( err, result ) {
+        dbConn.client.getProjects({rights: true, branches: true, asObject: true, info: true}, function ( err, result ) {
             var projectTags,
                 branches,
                 projects = [],
@@ -71,7 +71,7 @@ module.exports = function ( $q, dataStoreService ) {
 
         dbConn.projectService = dbConn.projectService || {};
 
-        dbConn.client.getProjects( function ( err, projectIds ) {
+        dbConn.client.getProjects( {}, function ( err, projectIds ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
@@ -117,7 +117,7 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.selectProject = function ( databaseId, projectId ) {
+    this.selectProject = function ( databaseId, projectId, branchName ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
@@ -125,7 +125,7 @@ module.exports = function ( $q, dataStoreService ) {
 
         // Make sure that PROJECT_OPENED is registered.
         // self.on( databaseId, 'RegisterEventListener', function () {} );
-        dbConn.client.selectProject( projectId, function ( err ) {
+        dbConn.client.selectProject( projectId, branchName, function ( err ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
