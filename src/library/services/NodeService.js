@@ -382,6 +382,10 @@ module.exports = function ( $q, dataStoreService, branchService ) {
         this.databaseConnection.client.setAttributes( this.id, name, value, msg );
     };
 
+    NodeObj.prototype.delAttribute = function ( name, msg ) {
+        this.databaseConnection.client.delAttribute( this.id, name, msg );
+    };
+
     NodeObj.prototype.getRegistry = function ( name ) {
         return this.databaseConnection.client.getNode( this.id )
             .getRegistry( name );
