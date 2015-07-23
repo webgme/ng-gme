@@ -72,8 +72,9 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         return deferred.promise;
     };
 
-    this.getSelectedBranch = function ( /*databaseId*/) {
-        throw new Error( 'Not implemented yet.' );
+    this.getSelectedBranch = function (databaseId) {
+        var dbConn = dataStoreService.getDatabaseConnection(databaseId);
+        return dbConn.client.getActiveBranchName();
     };
 
     /**
