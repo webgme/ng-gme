@@ -1,86 +1,16 @@
-/*globals angular*/
+/*globals angular, GME*/
 
 module.exports = function ( $q, dataStoreService ) {
     'use strict';
-    //var self = this;
+    var logger = GME.classes.Logger.create('ng-gme:ProjectService', GME.gmeConfig.client.log);
 
-    this.getAvailableProjectTags = function ( databaseId ) {
-        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            deferred = $q.defer();
-        dbConn.projectService = dbConn.projectService || {};
-        dbConn.client.getAllInfoTagsAsync( function ( err, results ) {
-            var tagKeys,
-                tags = [];
-            if ( err ) {
-                deferred.reject( err );
-                return;
-            }
-
-            tagKeys = Object.keys( results );
-            for ( var i = tagKeys.length - 1; i >= 0; i-- ) {
-                tags.push( {
-                    id: tagKeys[ i ],
-                    name: results[ tagKeys[ i ] ]
-                } );
-            }
-
-            deferred.resolve( tags );
-        } );
-
-        return deferred.promise;
-    };
-
-    this.applyTagsOnProject = function ( databaseId, projectId, newTags ) {
-        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            deferred = $q.defer(),
-            mappedTags = {},
-            tagMapper = function ( tag ) {
-                mappedTags[ tag.id ] = tag.name;
-            };
-        dbConn.projectService = dbConn.projectService || {};
-        dbConn.client.getProjectInfoAsync( projectId, function ( err, existingInfo ) {
-            if ( err ) {
-                deferred.reject( err );
-                return;
-            }
-            // Transform the tags to key-value format
-            angular.forEach( newTags, tagMapper );
-            existingInfo.tags = mappedTags;
-            dbConn.client.setProjectInfoAsync( projectId, existingInfo, function ( errInfo ) {
-                if ( errInfo ) {
-                    deferred.reject( errInfo );
-                    return;
-                }
-                deferred.resolve();
-            } );
-        } );
-
-        return deferred.promise;
-    };
-
-    this.getAvailableProjects = function ( databaseId ) {
-        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            deferred = $q.defer();
-        dbConn.projectService = dbConn.projectService || {};
-        dbConn.client.getAvailableProjectsAsync( function ( err, projects ) {
-            if ( err ) {
-                deferred.reject( err );
-                return;
-            }
-
-            deferred.resolve( projects );
-        } );
-
-        return deferred.promise;
-    };
-
-    this.getProjects = function ( databaseId ) {
+    this.getProjectsAndBranches = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
-        dbConn.client.getFullProjectsInfoAsync( function ( err, result ) {
+        dbConn.client.getProjects({rights: true, branches: true, asObject: true, info: true}, function ( err, result ) {
             var projectTags,
                 branches,
                 projects = [],
@@ -135,13 +65,13 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.getProjectsIds = function ( databaseId ) {
+    this.getProjects = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
-        dbConn.client.getAvailableProjectsAsync( function ( err, projectIds ) {
+        dbConn.client.getProjects( {}, function ( err, projectIds ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
@@ -153,32 +83,32 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.createProject = function ( databaseId, projectname, projectInfo ) {
-        var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
-            deferred = new $q.defer();
-
-        dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
-            if ( err ) {
-                deferred.reject( err );
-                return;
-            } else {
-                deferred.resolve();
-            }
-        } );
-
-        return deferred.promise;
-    };
+    //TODO: This should be seedProject
+    //this.createProject = function ( databaseId, projectname, seedParameters ) {
+    //    var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+    //        deferred = new $q.defer();
+    //
+    //    dbConn.client.createProjectAsync( projectname, projectInfo, function ( err ) {
+    //        if ( err ) {
+    //            deferred.reject( err );
+    //            return;
+    //        } else {
+    //            deferred.resolve();
+    //        }
+    //    } );
+    //
+    //    return deferred.promise;
+    //};
 
     this.deleteProject = function ( databaseId, projectId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
-        console.log( projectId );
+        logger.debug( 'deleteProject', projectId );
 
-        dbConn.client.deleteProjectAsync( projectId, function ( err ) {
+        dbConn.client.deleteProject( projectId, function ( err ) {
             if ( err ) {
                 deferred.reject( err );
-                return;
             } else {
                 deferred.resolve();
             }
@@ -187,46 +117,80 @@ module.exports = function ( $q, dataStoreService ) {
         return deferred.promise;
     };
 
-    this.selectProject = function ( databaseId, projectId ) {
+    this.selectProject = function ( databaseId, projectId, branchName ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
 
         dbConn.projectService = dbConn.projectService || {};
 
-        this.getProjectsIds( databaseId )
-            .then( function ( projectIds ) {
-                if ( projectIds.indexOf( projectId ) > -1 ) {
-                    // Make sure that PROJECT_OPENED is registered.
-                    // self.on( databaseId, 'RegisterEventListener', function () {} );
-                    dbConn.client.selectProjectAsync( projectId, function ( err ) {
-                        if ( err ) {
-                            deferred.reject( err );
-                            return;
-                        }
+        // Make sure that PROJECT_OPENED is registered.
+        // self.on( databaseId, 'RegisterEventListener', function () {} );
+        dbConn.client.selectProject( projectId, branchName, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+                return;
+            }
 
-                        dbConn.projectService.projectId = projectId;
-                        dbConn.projectService.isInitialized = true;
-                        deferred.resolve( projectId );
-                    } );
-                } else {
-                    deferred.reject( new Error( 'Project does not exist. ' + projectId + ' databaseId: ' +
-                        databaseId ) );
-                }
-            } )
-            .
-        catch ( function ( reason ) {
-            deferred.reject( reason );
+            dbConn.projectService.projectId = projectId;
+            dbConn.projectService.isInitialized = true;
+            deferred.resolve( projectId );
         } );
 
         return deferred.promise;
     };
 
-    this.watchProjects = function ( /*databaseId*/) {
-        // TODO: register for project events
-        // TODO: SERVER_PROJECT_CREATED
-        // TODO: SERVER_PROJECT_DELETED
+    /**
+     * Registers fn to listen to events regarding deletion and creation of projects;
+     * CONSTANTS.STORAGE.PROJECT_CREATED = 'PROJECT_CREATED'
+     * CONSTANTS.STORAGE.PROJECT_DELETED = 'PROJECT_DELETED'
+     *
+     * The fn is called with emitter as first argument and data as second.
+     *
+     * Example:
+     * data = {
+     *    etype: 'PROJECT_CREATED',
+     *    projectName: 'TestProject'
+     * }
+     *
+     * @param databaseId
+     * @param fn
+     * @returns {*}
+     */
+    this.watchProjects = function ( databaseId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
 
-        throw new Error( 'Not implemented yet.' );
+        dbConn.client.watchDatabase( fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    /**
+     * Stop watching events regarding project creation and deletion.
+     *
+     * @param databaseId
+     * @param fn - same function that was passed in watchProjects..
+     * @returns {*}
+     */
+    this.unwatchProjects = function ( databaseId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
+
+        dbConn.client.unwatchDatabase( fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
     };
 
     this.on = function ( databaseId, eventName, fn ) {
@@ -245,13 +209,13 @@ module.exports = function ( $q, dataStoreService ) {
         if ( typeof dbConn.projectService.events === 'undefined' ) {
             // this should not be an inline function
 
-            dbConn.client.addEventListener( dbConn.client.events.PROJECT_OPENED,
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.PROJECT_OPENED,
                 function ( dummy /* FIXME */ , projectId ) {
 
                     if ( dbConn.projectService.projectId !== projectId ) {
                         dbConn.projectService.projectId = projectId;
 
-                        console.log( 'There was a PROJECT_OPENED event', projectId );
+                        logger.debug( 'There was a PROJECT_OPENED event', projectId );
                         if ( projectId ) {
                             // initialize
                             if ( dbConn.projectService &&
@@ -281,9 +245,9 @@ module.exports = function ( $q, dataStoreService ) {
                     }
                 } );
 
-            dbConn.client.addEventListener( dbConn.client.events.PROJECT_CLOSED,
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.PROJECT_CLOSED,
                 function ( /*dummy*/ /* FIXME */) {
-                    console.log( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
+                    logger.debug( 'There was a PROJECT_CLOSED event', dbConn.projectService.projectId );
 
                     delete dbConn.projectService.projectId;
 

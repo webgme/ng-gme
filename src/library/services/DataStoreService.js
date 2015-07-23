@@ -7,7 +7,8 @@ module.exports = function ( $q ) {
         connectQueue = [],
         queueProcessing = false,
         connectNextInQueue,
-        processQueue;
+        processQueue,
+        logger = GME.classes.Logger.create('ng-gme:DataStoreService', GME.gmeConfig.client.log);
 
 
     // Picks up the next connection-meta and tries to connect
@@ -33,7 +34,7 @@ module.exports = function ( $q ) {
 
                 // TODO: add event listeners to client
                 // FIXME: deferred should not be used from closure
-                client.connectToDatabaseAsync( {}, function ( err ) {
+                client.connectToDatabase(function ( err ) {
                     if ( err ) {
                         currentItem.deferred.reject( err );
                     } else {
@@ -78,21 +79,41 @@ module.exports = function ( $q ) {
         return deferred.promise;
     };
 
+    this.disconnectFromDatabase = function ( databaseId ) {
+        var deferred = $q.defer(),
+            dbConn = this.getDatabaseConnection( databaseId );
+
+        if ( dbConn ) {
+            dbConn.client.disconnectfromDatabase(function ( err ) {
+                if ( err ) {
+                    deferred.reject( err );
+                } else {
+                    deferred.resolve();
+                }
+            });
+        } else {
+            deferred.resolve();
+        }
+
+        return deferred.promise;
+    };
+
     this.getDatabaseConnection = function ( databaseId ) {
         if ( dataStores.hasOwnProperty( databaseId ) && typeof dataStores[ databaseId ] === 'object' ) {
             return dataStores[ databaseId ];
         }
 
-        console.error( databaseId + ' does not have an active database connection.' );
+        logger.error( databaseId + ' does not have an active database connection.' );
     };
 
     /**
-     * Registered functions are fired when the NETWORKSTATUS_CHANGED event was raised.
+     * Registered functions are fired when the NETWORK_STATUS_CHANGED event was raised.
      * TODO: Currently the eventTypes are passed to fn as the values in networkStates.
-     *  networkStates = {
-     *    'CONNECTED':    'connected',
-     *    'DISCONNECTED': 'socket.io is disconnected'
-     *  };
+     *  networkStates -
+     *  dbConn.client.CONSTANTS.STORAGE.CONNECTED = 'CONNECTED'
+     *  dbConn.client.CONSTANTS.STORAGE.DISCONNECTED = 'DISCONNECTED'
+     *  dbConn.client.CONSTANTS.STORAGE.RECONNECTED = 'RECONNECTED'
+     *
      * @param {string} databaseId
      * @param {function} fn
      */
@@ -100,19 +121,19 @@ module.exports = function ( $q ) {
         var dbConn = dataStores[ databaseId ];
 
         if ( !( dbConn && typeof dbConn === 'object' ) ) {
-            console.error( databaseId + ' does not have an active database connection.' );
+            logger.error( databaseId + ' does not have an active database connection.' );
         }
 
         if ( typeof dbConn.events === 'undefined' || typeof dbConn.events.connectionState === 'undefined' ) {
             dbConn.events = dbConn.events || {};
             dbConn.events.connectionState = dbConn.events.connectionState || [];
             dbConn.events.connectionState.push( fn );
-            dbConn.client.addEventListener( dbConn.client.events.NETWORKSTATUS_CHANGED,
-                function ( dummy, eventType ) {
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.NETWORK_STATUS_CHANGED,
+                function ( client, connectionState ) {
                     var i;
-                    console.log( eventType );
+                    logger.debug( 'NETWORK_STATUS_CHANGED', connectionState );
                     for ( i = 0; i < dbConn.events.connectionState.length; i += 1 ) {
-                        dbConn.events.connectionState[ i ]( eventType );
+                        dbConn.events.connectionState[ i ]( connectionState );
                     }
                 } );
         } else {

@@ -1,36 +1,44 @@
+/*globals GME*/
 'use strict';
 
 module.exports = function ( $q, dataStoreService, projectService ) {
+    var logger = GME.classes.Logger.create('ng-gme:BranchService', GME.gmeConfig.client.log);
 
-    this.selectBranch = function ( databaseId, branchId ) {
+    this.selectBranch = function ( databaseId, branchId, reOpen ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
             deferred = new $q.defer();
-
+        logger.debug('selectBranch called', databaseId, branchId);
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.selectBranchAsync( branchId,
-            function ( err ) {
-                if ( err ) {
-                    deferred.reject( err );
-                    return;
-                }
+        if (dbConn.client.getActiveBranchName() === branchId && !reOpen) {
+            logger.debug('branch was already selected (and reOpen falsy) resolved directly', databaseId, branchId);
+            deferred.resolve(branchId);
+        } else {
+            dbConn.client.selectBranch(branchId, null,
+                function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                        return;
+                    }
 
-                dbConn.branchService.branchId = branchId;
-                dbConn.branchService.isInitialized = true;
-
-                deferred.resolve( branchId );
-            } );
+                    dbConn.branchService.branchId = branchId;
+                    dbConn.branchService.isInitialized = true;
+                    logger.debug('selectBranch resolved', databaseId, branchId);
+                    deferred.resolve(branchId);
+                });
+        }
 
         return deferred.promise;
     };
 
     this.getBranches = function ( databaseId ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            projectId = dbConn.client.getActiveProjectId(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.getBranchesAsync( function ( err, branches ) {
+        dbConn.client.getBranches( projectId, function ( err, branches ) {
             if ( err ) {
                 deferred.reject( err );
                 return;
@@ -46,11 +54,12 @@ module.exports = function ( $q, dataStoreService, projectService ) {
 
     this.createBranch = function ( databaseId, branchId, hash ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId ),
+            projectId = dbConn.client.getActiveProjectId(),
             deferred = new $q.defer();
 
         dbConn.branchService = dbConn.branchService || {};
 
-        dbConn.client.createBranchAsync( branchId, hash,
+        dbConn.client.createBranch( projectId, branchId, hash,
             function ( err ) {
                 if ( err ) {
                     deferred.reject( err );
@@ -67,42 +76,87 @@ module.exports = function ( $q, dataStoreService, projectService ) {
         throw new Error( 'Not implemented yet.' );
     };
 
-    this.watchBranches = function ( /*databaseId*/) {
-        // TODO: register for branch events
-        // TODO: SERVER_BRANCH_CREATED
-        // TODO: SERVER_BRANCH_UPDATED
-        // TODO: SERVER_BRANCH_DELETED
+    /**
+     * Registers fn to listen to events regarding deletion and creation of projects;
+     * CONSTANTS.STORAGE.BRANCH_CREATED = 'BRANCH_CREATED'
+     * CONSTANTS.STORAGE.BRANCH_DELETED = 'BRANCH_DELETED'
+     * CONSTANTS.STORAGE.BRANCH_HASH_UPDATED = 'BRANCH_HASH_UPDATED'
+     *
+     * The fn is called with emitter as first argument and data as second.
+     *
+     * Example:
+     * data = {
+     *    etype: 'BRANCH_CREATED',
+     *    projectName: 'TestProject',
+     *    branchName: 'b1',
+     *    newHash: '#somehash',
+     *    oldHash: ''
+     * }
+     *
+     * @param databaseId
+     * @param projectId
+     * @param fn
+     * @returns {*}
+     */
+    this.watchBranches = function ( databaseId, projectId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
 
-        throw new Error( 'Not implemented yet.' );
+        dbConn.client.watchProject( projectId, fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    this.unwatchBranches = function ( databaseId, projectId, fn ) {
+        var deferred = new $q.defer(),
+            dbConn = dataStoreService.getDatabaseConnection( databaseId );
+
+        dbConn.client.unwatchProject( projectId, fn, function ( err ) {
+            if ( err ) {
+                deferred.reject( err );
+            } else {
+                deferred.resolve();
+            }
+        });
+
+        return deferred.promise;
     };
 
     /**
-     * Registered functions are fired when the BRANCHSTATUS_CHANGED event was raised.
+     * Registered functions are fired when the BRANCH_STATUS_CHANGED event was raised.
      * TODO: Currently the eventTypes are passed to fn as the values in branchStates.
-     *  branchStates = {
-     *    'SYNC':    'inSync',
-     *    'FORKED':  'forked',
-     *    'OFFLINE': 'offline'
-     *  };
+     * fn is called eventData.
+     * eventData has key status and optionally a key details based on status.
+     *  status:
+     *    CONSTANTS.BRANCH_STATUS.SYNC: 'SYNC',                         // details = undefined
+     *    CONSTANTS.BRANCH_STATUS.AHEAD_SYNC: 'AHEAD_SYNC',             // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.AHEAD_NOT_SYNC: 'AHEAD_NOT_SYNC',     // details = commitQueue [array<Objects>]
+     *    CONSTANTS.BRANCH_STATUS.PULLING: 'PULLING'                    // details = updateQueue.length [int]
+     *    null
      * @param {string} databaseId
      * @param {function} fn
      */
     this.watchBranchState = function ( databaseId, fn ) {
         var dbConn = dataStoreService.getDatabaseConnection( databaseId );
         if ( !( dbConn && dbConn.branchService && dbConn.branchService.branchId ) ) {
-            console.error( databaseId + ' does not have an active database connection or branch-service.' );
+            logger.error( databaseId + ' does not have an active database connection or branch-service.' );
         }
         if ( typeof dbConn.branchService.events === 'undefined' ||
             typeof dbConn.branchService.events.branchState === 'undefined' ) {
             dbConn.branchService.events = dbConn.branchService.events || {};
             dbConn.branchService.events.branchState = dbConn.branchService.events.branchState || [];
             dbConn.branchService.events.branchState.push( fn );
-            dbConn.client.addEventListener( dbConn.client.events.BRANCHSTATUS_CHANGED,
-                function ( dummy, eventType ) {
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.BRANCH_STATUS_CHANGED,
+                function ( dummy, eventData ) {
                     var i;
-                    //console.log(eventType);
                     for ( i = 0; i < dbConn.branchService.events.branchState.length; i += 1 ) {
-                        dbConn.branchService.events.branchState[ i ]( eventType );
+                        dbConn.branchService.events.branchState[ i ]( eventData );
                     }
                 } );
         } else {
@@ -158,14 +212,14 @@ module.exports = function ( $q, dataStoreService, projectService ) {
                 }
             } );
 
-            dbConn.client.addEventListener( dbConn.client.events.BRANCH_CHANGED,
+            dbConn.client.addEventListener( dbConn.client.CONSTANTS.BRANCH_CHANGED,
                 function ( projectId /* FIXME */ , branchId ) {
 
                     if ( dbConn.branchService.branchId !== branchId ) {
 
                         dbConn.branchService.branchId = branchId;
 
-                        console.log( 'There was a BRANCH_CHANGED event', branchId );
+                        logger.debug( 'There was a BRANCH_CHANGED event', branchId );
                         if ( branchId ) {
                             // initialize
                             if ( dbConn.branchService &&
