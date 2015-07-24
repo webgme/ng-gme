@@ -133,6 +133,11 @@ module.exports = function ( $q, dataStoreService ) {
 
             dbConn.projectService.projectId = projectId;
             dbConn.projectService.isInitialized = true;
+
+            dbConn.branchService = dbConn.branchService || {};
+            dbConn.branchService.branchId = branchName || 'master';
+            dbConn.branchService.isInitialized = true;
+
             deferred.resolve( projectId );
         } );
 
