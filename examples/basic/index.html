@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>this is an app for testing app configuration issues</title>
+    <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="/node_modules/webgme/dist/webgme.classes.build.js"></script>
+    <script src="/node_modules/ng-gme/dist/ng-gme.js"></script>
+    <script src="./app.js"></script>
+</head>
+<body>
+<!-- Start the main application -->
+<script type="text/javascript">
+    var clientLoaded,
+            timeout = 10000, // 10 seconds
+            waitCounter = 0,
+            i,
+            success,
+            usedClasses = ["Client"],
+            interval = 200, // 100 milliseconds interval
+            waitForLoadId = setInterval(function () {
+                if (window.WebGMEGlobal &&
+                        window.WebGMEGlobal.classes) {
+                    // TODO: check for all classes that we use
+                    clearInterval(waitForLoadId);
+                    success = true;
+
+                    if (success) {
+                        console.log('WebGME client library is ready to use.');
+                        clientLoaded();
+                    }
+                } else {
+                    console.log('Waiting for WebGME client library to load.');
+                    waitCounter += 1;
+                    if (waitCounter >= timeout / interval) {
+                        clearInterval(waitForLoadId);
+                        console.error('WebGME client library was not loaded within a reasonable time. (' + (timeout / 1000) + ' s)');
+                    }
+                }
+            }, interval);
+
+    clientLoaded = function () {
+
+        angular.bootstrap(document, ['testApp']);
+    };
+</script>
+<div ng-controller="blactrl">
+    <h4>List of models in the project</h4>
+    <ul>
+        <li><input type="text" ng-model="newModelName">
+            <button ng-click="duplicate(newModelName)">duplicate</button>
+        </li>
+        <li data-ng-repeat="modelId in modelIds">{{ modelId }}</li>
+
+    </ul>
+
+</div>
+</body>
+</html>
