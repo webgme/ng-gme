@@ -113,12 +113,12 @@ function swallowError( error ) {
   this.emit( 'end' );
 }
 
-gulp.task( 'clean-build', function (cb) {
+gulp.task( 'clean-build', function () {
   require('del')([
     'dist/**/*',
     '!dist/.npmignore',
     '!dist/.gitignore'
-  ], cb);
+  ]);
 } );
 
 
@@ -302,10 +302,9 @@ function () {
 } );
 
 
-gulp.task( 'compile-all', function ( cb ) {
+gulp.task( 'compile-all', function ()  {
   runSequence( 'clean-build', [
-    'compile-library', 'compile-docs',
-  ], cb );
+    'compile-library', 'compile-docs'] );
 } );
 
 
@@ -363,7 +362,8 @@ gulp.task( 'refresh-server', function () {
 } );
 
 
-gulp.task( 'register-watchers', [ 'compile-all' ], function ( cb ) {
+gulp.task( 'register-watchers', [ 'compile-all' ], function () {
+  console.log( 'Registering watchers...');
   gulp.watch( sourcePaths.index, [ 'compile-index', 'refresh-server' ] );
 
   gulp.watch( sourcePaths.docsSourceIndex, [ 'compile-docs', 'refresh-server' ] );
@@ -378,12 +378,12 @@ gulp.task( 'register-watchers', [ 'compile-all' ], function ( cb ) {
   gulp.watch( sourcePaths.libraryStyles, [ 'compile-library-styles', 'compile-docs', 'refresh-server' ] );
   gulp.watch( sourcePaths.libraryImages, [ 'compile-library-images', 'refresh-server' ] );
 
-  return cb;
+  //return cb;
 } );
 
 // Dev task
-gulp.task( 'dev', [ 'compile-all' ], function ( cb ) {
+gulp.task( 'dev', [ 'compile-all' ], function () {
 
-  runSequence( 'start-server', 'register-watchers', cb );
+  runSequence( 'start-server', 'register-watchers' );
 
 } );

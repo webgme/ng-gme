@@ -1,22 +1,22 @@
 /*globals angular, chance*/
 'use strict';
 
-require( '../termFilter/termFilter.js' );
+require('../termFilter/termFilter.js');
 
-angular.module( 'gme.directives.projectBrowser', [
-    'gme.templates',
-    'isis.ui.itemList',
-    'isis.ui.simpleDialog',
-    'gme.directives.termFilter',
-    'ngTagsInput',
-    'gme.testServices',
-    'isis.ui.valueWidgets'
-] )
-    .run( function () {
+angular.module('gme.directives.projectBrowser', [
+        'gme.templates',
+        'isis.ui.itemList',
+        'isis.ui.simpleDialog',
+        'gme.directives.termFilter',
+        'ngTagsInput',
+        'gme.testServices',
+        'isis.ui.valueWidgets'
+    ])
+    .run(function () {
 
-    } )
-    .controller( 'ProjectBrowserController',
-        function ( $scope, $log, $filter, projectServiceTest, projectService, $simpleDialog ) {
+    })
+    .controller('ProjectBrowserController',
+        function ($scope, $log, $filter, projectServiceTest, projectService, $simpleDialog) {
 
             var config,
                 dummyProjectGenerator,
@@ -67,11 +67,8 @@ angular.module( 'gme.directives.projectBrowser', [
             //    }
             //  ];
 
-
             $scope.filtering = {
-                selectedTermIds: [
-
-                ]
+                selectedTermIds: []
             };
 
             projectList = $scope.projectList = {
@@ -82,50 +79,48 @@ angular.module( 'gme.directives.projectBrowser', [
                 items: []
             };
 
-
             filterItems = function () {
-                $scope.filteredProjectList.items = $filter( 'termFilter' )( $scope.projectList.items,
-                    $scope.filtering.selectedTermIds );
+                $scope.filteredProjectList.items = $filter('termFilter')($scope.projectList.items,
+                    $scope.filtering.selectedTermIds);
             };
 
-            $scope.$watch( function () {
+            $scope.$watch(function () {
 
                     return $scope.filtering.selectedTermIds;
                 }, function () {
                     filterItems();
                 },
-                true );
+                true);
 
-
-            $scope.$watch( 'filtering.selectedTermIds', function () {
+            $scope.$watch('filtering.selectedTermIds', function () {
                 filterItems();
-            } );
+            });
 
-            $scope.$watch( 'projectList.items', function () {
+            $scope.$watch('projectList.items', function () {
                 filterItems();
-            } );
+            });
 
-            dummyProjectGenerator = function ( id ) {
+            dummyProjectGenerator = function (id) {
 
                 var projectDescriptor, i;
 
                 projectDescriptor = {
                     id: id,
-                    title: chance.paragraph( {
+                    title: chance.paragraph({
                         sentences: 1
-                    } ),
+                    }),
                     cssClass: 'project-item',
                     toolTip: 'Open project',
-                    description: chance.paragraph( {
+                    description: chance.paragraph({
                         sentences: 2
-                    } ),
+                    }),
                     lastUpdated: {
                         time: Date.now(),
                         user: 'N/A'
 
                     },
                     taxonomyTerms: [],
-                    stats: [ {
+                    stats: [{
                         value: id,
                         toolTip: 'Commits',
                         iconClass: 'fa fa-cloud-upload'
@@ -133,16 +128,16 @@ angular.module( 'gme.directives.projectBrowser', [
                         value: id,
                         toolTip: 'Users',
                         iconClass: 'fa fa-users'
-                    } ],
-                    details: chance.paragraph( {
+                    }],
+                    details: chance.paragraph({
                         sentences: 3
-                    } )
+                    })
                 };
 
-                for ( i = 0; i < $scope.availableTerms.length - 1; i++ ) {
+                for (i = 0; i < $scope.availableTerms.length - 1; i++) {
 
-                    if ( Math.random() > 0.5 ) {
-                        projectDescriptor.taxonomyTerms.push( $scope.availableTerms[ i ] );
+                    if (Math.random() > 0.5) {
+                        projectDescriptor.taxonomyTerms.push($scope.availableTerms[i]);
                     }
                 }
 
@@ -154,24 +149,24 @@ angular.module( 'gme.directives.projectBrowser', [
             //    $scope.projectList.items.push(dummyProjectGenerator(i));
             //  }
 
-            projectDescriptorMapper = function ( projectDescriptors ) {
+            projectDescriptorMapper = function (projectDescriptors) {
 
                 var result = [];
 
-                angular.forEach( projectDescriptors, function ( projectDescriptor ) {
+                angular.forEach(projectDescriptors, function (projectDescriptor) {
 
                     //console.log( projectDescriptor );
 
-                    result.push( {
+                    result.push({
 
                         id: projectDescriptor.id,
                         description: projectDescriptor.info.description,
                         title: projectDescriptor.info.visibleName,
                         taxonomyTerms: projectDescriptor.info.tags
 
-                    } );
+                    });
 
-                } );
+                });
 
                 return result;
 
@@ -179,33 +174,32 @@ angular.module( 'gme.directives.projectBrowser', [
 
             updateProjectList = function () {
 
-                projectService.getAvailableProjectTags( databaseId )
-                    .then( function ( tagList ) {
+                projectService.getAvailableProjectTags(databaseId)
+                    .then(function (tagList) {
 
                         $scope.availableTerms = tagList;
 
-                    } );
+                    });
 
-                console.log( 'In here...' );
+                console.log('In here...');
 
-                projectService.getProjects( databaseId )
-                    .then( function ( gmeProjectDescriptors ) {
+                projectService.getProjects(databaseId)
+                    .then(function (gmeProjectDescriptors) {
 
                         $scope.projectList.items = [];
-                        $scope.projectList.items = projectDescriptorMapper( gmeProjectDescriptors );
+                        $scope.projectList.items = projectDescriptorMapper(gmeProjectDescriptors);
 
                         //$scope.projectList.items = results;
-                    } );
+                    });
 
             };
-
 
             // Making sure we have test project in DB
 
             projectServiceTest.startTest()
-                .then( function () {
+                .then(function () {
                     updateProjectList();
-                } );
+                });
 
             $scope.config = config = {
 
@@ -218,18 +212,18 @@ angular.module( 'gme.directives.projectBrowser', [
 
                 // Event handlers
 
-                itemSort: function ( jQEvent, ui ) {
-                    console.log( 'Sort happened', jQEvent, ui );
+                itemSort: function (jQEvent, ui) {
+                    console.log('Sort happened', jQEvent, ui);
                 },
 
-                itemClick: function ( event, item ) {
-                    console.log( 'Clicked: ' + item );
+                itemClick: function (event, item) {
+                    console.log('Clicked: ' + item);
                 },
 
-                itemContextmenuRenderer: function ( e, item ) {
-                    console.log( 'Contextmenu was triggered for node:', item );
+                itemContextmenuRenderer: function (e, item) {
+                    console.log('Contextmenu was triggered for node:', item);
 
-                    return [ {
+                    return [{
                         items: [
 
                             {
@@ -238,31 +232,30 @@ angular.module( 'gme.directives.projectBrowser', [
                                 disabled: false,
                                 iconClass: '',
                                 action: function () {
-                                    projectService.selectProject( databaseId, item.id );
+                                    projectService.selectProject(databaseId, item.id);
                                 }
 
                             }
                         ]
                     }, {
-                        items: [ {
+                        items: [{
                             id: 'edit',
                             label: 'Edit Project Details',
                             disabled: false,
                             iconClass: '',
                             action: function () {
-                                $simpleDialog.open( {
+                                $simpleDialog.open({
                                     dialogTitle: 'Edit project details',
                                     dialogContentTemplate: '/ng-gme/templates/newProjectTemplate.html',
                                     onOk: function () {
 
-
                                     },
                                     onCancel: function () {
-                                        console.log( 'This was canceled' );
+                                        console.log('This was canceled');
                                     },
                                     size: 'lg', // can be sm or lg
                                     scope: false
-                                } );
+                                });
 
                             }
                         }, {
@@ -270,31 +263,31 @@ angular.module( 'gme.directives.projectBrowser', [
                             label: 'Delete Project',
                             disabled: false,
                             action: function () {
-                                $simpleDialog.open( {
+                                $simpleDialog.open({
                                     dialogTitle: 'Are you sure?',
                                     dialogContentTemplate: '/ng-gme/templates/confirmProjectDelete.html',
                                     onOk: function () {
 
-                                        projectService.deleteProject( databaseId, item.id )
-                                            .then( function () {
+                                        projectService.deleteProject(databaseId, item.id)
+                                            .then(function () {
                                                 updateProjectList();
-                                            } );
+                                            });
 
                                     },
                                     onCancel: function () {
-                                        console.log( 'This was canceled' );
+                                        console.log('This was canceled');
                                     },
                                     size: 'lg', // can be sm or lg
                                     scope: false
-                                } );
+                                });
 
                             },
                             iconClass: ''
-                        } ]
-                    } ];
+                        }]
+                    }];
                 },
 
-                detailsRenderer: function ( item ) {
+                detailsRenderer: function (item) {
                     item.details = 'My details are here now!';
                 },
 
@@ -302,25 +295,25 @@ angular.module( 'gme.directives.projectBrowser', [
                     title: 'Create new Project',
                     itemTemplateUrl: '/ng-gme/templates/newProjectTemplate.html',
                     expanded: false,
-                    controller: function ( $scope, projectService ) {
+                    controller: function ($scope, projectService) {
 
                         $scope.newItem = {};
 
-                        $scope.tags = angular.copy( availableTerms );
+                        $scope.tags = angular.copy(availableTerms);
 
-                        $scope.loadTags = function ( /*query*/) {
-                            return projectService.getAvailableProjectTags( databaseId );
+                        $scope.loadTags = function (/*query*/) {
+                            return projectService.getAvailableProjectTags(databaseId);
                         };
 
-                        $scope.createItem = function ( newItem ) {
+                        $scope.createItem = function (newItem) {
 
                             var tags;
 
                             tags = {};
 
-                            angular.forEach( newItem.tags, function ( tag ) {
-                                tags[ tag.id ] = tag.name;
-                            } );
+                            angular.forEach(newItem.tags, function (tag) {
+                                tags[tag.id] = tag.name;
+                            });
 
                             projectService.createProject(
                                 databaseId,
@@ -329,10 +322,10 @@ angular.module( 'gme.directives.projectBrowser', [
                                     tags: tags,
                                     description: newItem.description
                                 }
-                            )
-                                .then( function () {
+                                )
+                                .then(function () {
                                     updateProjectList();
-                                } );
+                                });
 
                             $scope.newItem = {};
 
@@ -345,9 +338,8 @@ angular.module( 'gme.directives.projectBrowser', [
 
             };
 
-
-        } )
-    .directive( 'projectBrowser', function () {
+        })
+    .directive('projectBrowser', function () {
 
         return {
             scope: false,
@@ -356,4 +348,4 @@ angular.module( 'gme.directives.projectBrowser', [
             replace: true,
             templateUrl: '/ng-gme/templates/projectBrowser.html'
         };
-    } );
+    });

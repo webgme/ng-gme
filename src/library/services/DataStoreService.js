@@ -24,7 +24,7 @@ module.exports = function ( $q ) {
                 connectQueue.splice( 0, 1 );
                 connectNextInQueue();
             } else {
-                var client = new GME.classes.Client( currentItem.options );
+                var client = new GME.classes.Client( /*currentItem.options*/GME.gmeConfig );
 
                 // hold a reference to the client instance
                 dataStores[ currentItem.databaseId ] = {
